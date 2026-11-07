@@ -426,3 +426,60 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# ============================================================
+# Vault Heist additions
+# ============================================================
+
+# CMake generated files
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+_deps/
+install_manifest.txt
+compile_commands.json
+CMakeUserPresets.json
+
+# Compiled outputs (C++ / MinGW / GCC / Clang)
+*.exe
+*.o
+*.a
+*.lib
+*.dll
+*.exp
+*.so
+*.dylib
+*.d
+
+# Other IDEs (partners may use different ones)
+.idea/
+
+# Runtime-generated files (NOT level data)
+saves/
+leaderboard.dat
+
+# Deliverable archive and generated reports
+*.zip
+benchmark_output/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Exceptions: these MUST be committed
+# ============================================================
+!levels/**
+!contracts/**
+!tests/doctest.h
+!third_party/doctest/**
+# Uncomment ONLY if you vendor SFML binaries in the repo:
+# !third_party/SFML/**/*.dll
+# !third_party/SFML/**/*.lib
+# !third_party/SFML/**/*.a
