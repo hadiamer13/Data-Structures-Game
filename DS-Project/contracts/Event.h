@@ -1,55 +1,54 @@
 #pragma once
 // contracts/Event.h
-// One plain event struct, no variant, no SFML.
-// Every model operation records VhEvents into an EventLog (nullptr = off).
+// One plain event struct. Every model operation records VhEvents into an EventLog (nullptr = off).
 
-#include "Types.h"
+#include "contracts/Types.h"
 
-enum class EventType {
+struct EventType {
     // --- Trees (Acts 1-3) ---
-    VISIT,              // id                         alarm +1
-    COMPARE,            // id, key, result            alarm +1
-    INSERT,             // id, id2 = parent, side
-    UNLINK,             // id, id2 = parent, side
-    SWAP_VALUE,         // id, id2                    (delete two-child case)
-    ROTATE,             // id = pivot, rotation
-    UPDATE_HEIGHT,      // id, oldV, newV
-    UPDATE_SIZE,        // id, oldV, newV
-    BALANCE_ALERT,      // id, oldV = balance factor
-    HIGHLIGHT_SUBTREE,  // id, mode
+    static inline const int VISIT = 0;   // id                      alarm +1
+    static inline const int COMPARE = 1;   // id, key, result         alarm +1
+    static inline const int INSERT = 2;   // id, id2 = parent, side
+    static inline const int UNLINK = 3;   // id, id2 = parent, side
+    static inline const int SWAP_VALUE = 4;   // id, id2
+    static inline const int ROTATE = 5;   // id = pivot, rotation
+    static inline const int UPDATE_HEIGHT = 6;   // id, oldV, newV
+    static inline const int UPDATE_SIZE = 7;   // id, oldV, newV
+    static inline const int BALANCE_ALERT = 8;   // id, oldV = balance factor
+    static inline const int HIGHLIGHT_SUBTREE = 9;   // id, mode
 
     // --- Heap (Act 4) ---
-    HEAP_BUILD,         // idx = first index to sift, idx2 = heap size
-    HEAP_SWAP,          // idx, idx2, oldV = value at idx, newV = value at idx2 (before swap)
-    HEAPIFY_START,      // idx = start index, oldV = heap size
-    HEAPIFY_DONE,       // idx = start index, oldV = heap size
-    EXTRACT_MAX,        // key = value, idx = root index, oldV = heap size
-    MARK_SORTED,        // idx, key = value
-    HEAP_SIZE_CHANGE,   // oldV, newV
-    HEAP_SORT_COMPLETE, // end of heap sort
+    static inline const int HEAP_BUILD = 10;  // idx = first index to sift, idx2 = heap size
+    static inline const int HEAP_SWAP = 11;  // idx, idx2, oldV = value at idx, newV = value at idx2 (before swap)
+    static inline const int HEAPIFY_START = 12;  // idx = start index, oldV = heap size
+    static inline const int HEAPIFY_DONE = 13;  // idx = start index, oldV = heap size
+    static inline const int EXTRACT_MAX = 14;  // key = value, idx = root index, oldV = heap size
+    static inline const int MARK_SORTED = 15;  // idx, key = value
+    static inline const int HEAP_SIZE_CHANGE = 16;  // oldV, newV
+    static inline const int HEAP_SORT_COMPLETE = 17;  // end of heap sort
 
     // --- Common ---
-    DONE                // ends the batch
+    static inline const int DONE = 18;  // ends the batch
 };
 
 struct VhEvent {
-    EventType     type = EventType::DONE;
+    int type = EventType::DONE;
 
-    int           id = kNull;   // primary node id
-    int           id2 = kNull;   // second node id (parent, swap partner)
-    VhSide        side = VhSide::None;
+    int id = VhConst::Null;        // primary node id
+    int id2 = VhConst::Null;        // second node id (parent, swap partner)
+    int side = VhSide::None;
 
-    int           idx = kNull;   // heap array index
-    int           idx2 = kNull;   // second heap array index
+    int idx = VhConst::Null;        // heap array index
+    int idx2 = VhConst::Null;        // second heap array index
 
-    int           key = 0;       // key or value involved
-    CompareResult result = CompareResult::Equal;   // COMPARE only
-    RotationType  rotation = RotationType::LL;       // ROTATE only
-    HighlightMode mode = HighlightMode::Visited; // HIGHLIGHT_SUBTREE only
+    int key = 0;                    // key or value involved
+    int result = CompareResult::Equal;     // COMPARE only
+    int rotation = RotationType::LL;         // ROTATE only
+    int mode = HighlightMode::Visited;   // HIGHLIGHT_SUBTREE only
 
-    int           oldV = 0;       // old value (height, size, bf, heap value)
-    int           newV = 0;       // new value
+    int oldV = 0;                    // old value (height, size, bf, heap value)
+    int newV = 0;                    // new value
 
-    int           undo[6] = { 0, 0, 0, 0, 0, 0 };  // extra data to reverse the event
-    int           alarmCost = 0;       // set by the model: 1 for VISIT/COMPARE, else 0
+    int undo[6] = { 0, 0, 0, 0, 0, 0 };   // extra data to reverse the event
+    int alarmCost = 0;                    // set by the model: 1 for VISIT/COMPARE, else 0
 };

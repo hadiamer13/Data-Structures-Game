@@ -1,14 +1,13 @@
 #pragma once
 // contracts/Types.h
-// Shared basic types for model, game and gui.
-// RULE: no SFML types in this file. Only plain C++.
-// RULE: no namespace. Shared names use the Vh prefix to avoid clashes.
+// No enums, no global variables. Named constants live inside structs.
+// RULE: no SFML types here. Never compare against raw numbers, use the names.
 
-// ---- Constants -------------------------------------------------------
-constexpr int kNull = -1;  // "no node" / "no index" (ids and indices)
-constexpr int kLeafHeight = 1;   // Height convention: leaf = 1, empty tree = 0 (counted in nodes)
+struct VhConst {
+    static inline const int Null = -1;  // "no node" / "no index"
+    static inline const int LeafHeight = 1;   // leaf = 1, empty tree = 0 (counted in nodes)
+};
 
-// ---- Own 2D point (replaces sf::Vector2f outside /gui) ----------------
 struct VhPoint {
     float x = 0.0f;
     float y = 0.0f;
@@ -16,39 +15,34 @@ struct VhPoint {
     VhPoint(float px, float py) : x(px), y(py) {}
 };
 
-// ---- Which structure is being shown / edited -----------------------------
-enum class TreeKind {
-    Binary,    // Act 1: general binary tree
-    BST,       // Act 2
-    AVL,       // Act 3
-    MaxHeap    // Act 4
+struct TreeKind {
+    static inline const int Binary = 0;  // Act 1
+    static inline const int BST = 1;  // Act 2
+    static inline const int AVL = 2;  // Act 3
+    static inline const int MaxHeap = 3;  // Act 4
 };
 
-// ---- Child side ----------------------------------------------------------------
-enum class VhSide {
-    None,      // root / not applicable
-    Left,
-    Right
+struct VhSide {
+    static inline const int None = 0;    // root / not applicable
+    static inline const int Left = 1;
+    static inline const int Right = 2;
 };
 
-// ---- AVL rotation cases -----------------------------------------------------
-enum class RotationType {
-    LL,        // right rotation
-    RR,        // left rotation
-    LR,        // left then right
-    RL         // right then left
+struct RotationType {
+    static inline const int LL = 0;       // right rotation
+    static inline const int RR = 1;       // left rotation
+    static inline const int LR = 2;       // left then right
+    static inline const int RL = 3;       // right then left
 };
 
-// ---- Subtree tint modes (HIGHLIGHT_SUBTREE event) -------------------------
-enum class HighlightMode {
-    Visited,
-    Skipped,   // grey: pruned by range query
-    Result
+struct HighlightMode {
+    static inline const int Visited = 0;
+    static inline const int Skipped = 1;  // grey: pruned by range query
+    static inline const int Result = 2;
 };
 
-// ---- Result of a key comparison (COMPARE event) ----------------------------
-enum class CompareResult {
-    Less,      // key < node
-    Equal,
-    Greater
+struct CompareResult {
+    static inline const int Less = 0;  // key < node
+    static inline const int Equal = 1;
+    static inline const int Greater = 2;
 };
