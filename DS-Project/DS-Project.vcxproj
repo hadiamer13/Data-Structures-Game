@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClCompile Include="gui\Assets.cpp" />
     <ClCompile Include="gui\main_gui.cpp" />
+    <ClCompile Include="gui\screens\CampaignMap.cpp" />
     <ClCompile Include="gui\screens\MainMenu.cpp" />
     <ClCompile Include="gui\screens\PlaceholderScreen.cpp" />
     <ClCompile Include="gui\UIManager.cpp" />
     <ClCompile Include="gui\widgets\Button.cpp" />
+    <ClCompile Include="gui\widgets\LevelNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Types.h" />
@@ -152,12 +154,15 @@
     <ClInclude Include="contracts\ViewSnapshot.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
+    <ClInclude Include="gui\FakeCampaignData.h" />
+    <ClInclude Include="gui\screens\CampaignMap.h" />
     <ClInclude Include="gui\screens\MainMenu.h" />
     <ClInclude Include="gui\screens\PlaceholderScreen.h" />
     <ClInclude Include="gui\screens\Screen.h" />
     <ClInclude Include="gui\UIManager.h" />
     <ClInclude Include="gui\widgets\Button.h" />
     <ClInclude Include="gui\Theme.h" />
+    <ClInclude Include="gui\widgets\LevelNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

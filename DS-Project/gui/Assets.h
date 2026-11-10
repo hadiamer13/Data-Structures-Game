@@ -11,10 +11,13 @@ public:
 
     const sf::Font& font() const { return m_font; }
     const sf::Texture& menuBackground() const { return m_menuBg; }
+    const sf::Texture& campaignBackground() const { return m_campaignBg; }
+
 
     // Later: add accessors for campaign map bg, node icons, vault door, etc.
 
 private:
     sf::Font    m_font;
     sf::Texture m_menuBg;
+    sf::Texture m_campaignBg;   
 };

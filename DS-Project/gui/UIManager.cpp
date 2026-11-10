@@ -1,7 +1,8 @@
 // gui/UIManager.cpp
 #include "UIManager.h"
 #include "screens/MainMenu.h"
-#include "screens/PlaceholderScreen.h"   // written in Batch 3
+#include "screens/PlaceholderScreen.h"   
+#include "screens/CampaignMap.h"
 
 UIManager::UIManager(AppContext& ctx) : m_ctx(ctx) {}
 
@@ -26,7 +27,7 @@ Screen* UIManager::makeScreen(int id) {
     // ------------------------------------------------------------------
     switch (id) {
     case ScreenId::MainMenu:    return new MainMenu(m_ctx);
-    case ScreenId::Campaign:    return new PlaceholderScreen(m_ctx, "Campaign Map");
+    case ScreenId::Campaign:    return new CampaignMap(m_ctx);
     case ScreenId::Endless:     return new PlaceholderScreen(m_ctx, "Endless Mode");
     case ScreenId::Sandbox:     return new PlaceholderScreen(m_ctx, "Sandbox");
     case ScreenId::Leaderboard: return new PlaceholderScreen(m_ctx, "Leaderboard");
