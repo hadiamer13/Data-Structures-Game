@@ -1,67 +1,57 @@
-#include "contracts/Types.h"
-#include "contracts/Event.h"
-#include "contracts/ViewSnapshot.h"
-#include <iostream>
+// gui/main_gui.cpp
 #include <SFML/Graphics.hpp>
-
-// Reason for error: if include file show error. go to Project > Properties > C/C++ > General > Additional dependencies and add $(ProjectDir) to path.
-static void contractSmokeTest()
-{
-    ViewSnapshot snap;
-    snap.kind = TreeKind::BST;
-    snap.rootId = 0;
-    snap.nodes.resize(3);
-
-    // Node 0 = root (50), left = 1 (30), right = 2 (70)
-    snap.nodes[0].id = 0; snap.nodes[0].key = 50;
-    snap.nodes[0].left = 1; snap.nodes[0].right = 2;
-
-    snap.nodes[1].id = 1; snap.nodes[1].key = 30;
-    snap.nodes[1].parent = 0;
-
-    snap.nodes[2].id = 2; snap.nodes[2].key = 70;
-    snap.nodes[2].parent = 0;
-
-    VhEvent e;
-    e.type = EventType::VISIT;
-    e.id = 0;
-    e.alarmCost = 1;
-
-    VhPoint p(10.0f, 20.0f);
-
-    std::cout << "Nodes: " << snap.nodes.size()
-        << ", root key: " << snap.nodes[snap.rootId].key
-        << ", event cost: " << e.alarmCost
-        << ", point: " << p.x << "," << p.y << "\n";
-}
+#include <cstdio>
+#include "Theme.h"
+#include "Assets.h"
+#include "AppContext.h"
+#include "UIManager.h"
 
 int main() {
-    contractSmokeTest();
-    // Create a 200x200 window
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    // ---- Window (SFML 2.x: sf::VideoMode(w, h)) ----------------------
+    sf::RenderWindow window(sf::VideoMode(Theme::WindowW, Theme::WindowH),
+        "Vault Heist: The Living Vault",
+        sf::Style::Titlebar | sf::Style::Close);
+    // Use setFramerateLimit OR vsync, never both.
+    window.setFramerateLimit(Theme::FrameLimit);
 
-    // Create a green circle shape
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    // ---- Assets: loaded ONCE ----------------------------------------
+    // TODO(YOU): if this fails, check the paths in Theme.h and run the
+    // exe from the project root so "assets/..." resolves.
+    Assets assets;
+    if (!assets.loadAll()) {
+        std::fprintf(stderr, "Asset loading failed. Exiting.\n");
+        return 1;
+    }
 
-    // Main game/application loop
-    while (window.isOpen()) {
-        // Process system events
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            // "Close requested" event: we close the window
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
+    // ---- Shared context + screen manager -----------------------------
+    AppContext ctx;
+    ctx.window = &window;
+    ctx.assets = &assets;
+
+    UIManager ui(ctx);
+    ctx.ui = &ui;
+
+    // INTEGRATION (later): create the GameSession / SaveManager here,
+    // store a pointer in ctx, and call SaveManager load before ui.start().
+    ui.start();
+
+    // ---- Main loop ---------------------------------------------------
+    sf::Clock clock;
+    while (window.isOpen() && !ui.wantsQuit()) {
+        sf::Event e;
+        while (window.pollEvent(e)) {
+            if (e.type == sf::Event::Closed) window.close();
+            else                             ui.handleEvent(e);
         }
 
-        // Clear screen with a default color (black)
-        window.clear();
+        // Cap dt so a long stall never makes animations jump.
+        float dt = clock.restart().asSeconds();
+        if (dt > 0.05f) dt = 0.05f;
 
-        // Draw your green circle
-        window.draw(shape);
+        ui.update(dt);
 
-        // Update the window display
+        window.clear(sf::Color::Black);
+        ui.draw(window);
         window.display();
     }
 
