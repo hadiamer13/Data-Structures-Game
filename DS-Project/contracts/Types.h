@@ -1,48 +1,82 @@
-#pragma once
 // contracts/Types.h
-// No enums, no global variables. Named constants live inside structs.
-// RULE: no SFML types here. Never compare against raw numbers, use the names.
+// Shared basic types and int-constant "enums". No SFML, no STL containers.
+#ifndef VH_TYPES_H
+#define VH_TYPES_H
 
-struct VhConst {
-    static inline const int Null = -1;  // "no node" / "no index"
-    static inline const int LeafHeight = 1;   // leaf = 1, empty tree = 0 (counted in nodes)
+// Sentinel for "no node / no index / not applicable".
+inline const int kNull = -1;
+
+// Height convention (frozen decision 4): height counts NODES.
+// Empty tree = 0, leaf = 1.
+inline const int kEmptyHeight = 0;
+inline const int kLeafHeight = 1;
+
+// Plain 2D point (layout math lives in model-independent code; no sf::Vector2f here).
+struct Point
+{
+    float x;
+    float y;
+
+    Point() : x(0.f), y(0.f)
+    {
+    }
+
+    Point(float px, float py) : x(px), y(py)
+    {
+    }
 };
 
-struct VhPoint {
-    float x = 0.0f;
-    float y = 0.0f;
-    VhPoint() = default;
-    VhPoint(float px, float py) : x(px), y(py) {}
+// Small replacement for std::pair<int,int>.
+struct IntPair
+{
+    int a;
+    int b;
+
+    IntPair() : a(0), b(0)
+    {
+    }
+
+    IntPair(int pa, int pb) : a(pa), b(pb)
+    {
+    }
 };
 
-struct TreeKind {
-    static inline const int Binary = 0;  // Act 1
-    static inline const int BST = 1;  // Act 2
-    static inline const int AVL = 2;  // Act 3
-    static inline const int MaxHeap = 3;  // Act 4
-};
+namespace TreeKind
+{
+    inline const int Binary = 0;
+    inline const int BST = 1;
+    inline const int AVL = 2;
+    inline const int MaxHeap = 3;
+}
 
-struct VhSide {
-    static inline const int None = 0;    // root / not applicable
-    static inline const int Left = 1;
-    static inline const int Right = 2;
-};
+namespace Side
+{
+    inline const int None = -1;
+    inline const int Left = 0;
+    inline const int Right = 1;
+}
 
-struct RotationType {
-    static inline const int LL = 0;       // right rotation
-    static inline const int RR = 1;       // left rotation
-    static inline const int LR = 2;       // left then right
-    static inline const int RL = 3;       // right then left
-};
+namespace RotationType
+{
+    inline const int None = -1;
+    inline const int LL = 0;
+    inline const int RR = 1;
+    inline const int LR = 2;
+    inline const int RL = 3;
+}
 
-struct HighlightMode {
-    static inline const int Visited = 0;
-    static inline const int Skipped = 1;  // grey: pruned by range query
-    static inline const int Result = 2;
-};
+namespace HighlightMode
+{
+    inline const int Visited = 0;
+    inline const int Skipped = 1;
+    inline const int Result = 2;
+}
 
-struct CompareResult {
-    static inline const int Less = 0;  // key < node
-    static inline const int Equal = 1;
-    static inline const int Greater = 2;
-};
+namespace CompareResult
+{
+    inline const int Less = -1;
+    inline const int Equal = 0;
+    inline const int Greater = 1;
+}
+
+#endif
