@@ -3,6 +3,7 @@
 #include "screens/MainMenu.h"
 #include "screens/PlaceholderScreen.h"   
 #include "screens/CampaignMap.h"
+#include "screens/BriefingScreen.h"
 
 UIManager::UIManager(AppContext& ctx) : m_ctx(ctx) {}
 
@@ -32,6 +33,8 @@ Screen* UIManager::makeScreen(int id) {
     case ScreenId::Sandbox:     return new PlaceholderScreen(m_ctx, "Sandbox");
     case ScreenId::Leaderboard: return new PlaceholderScreen(m_ctx, "Leaderboard");
     case ScreenId::Settings:    return new PlaceholderScreen(m_ctx, "Settings");
+    case ScreenId::Briefing:    return new BriefingScreen(m_ctx);
+    case ScreenId::Level:       return new PlaceholderScreen(m_ctx, "Level");
     default:                    return nullptr;
     }
 }
@@ -52,6 +55,10 @@ void UIManager::handleEvent(const sf::Event& e) {
     // Global key: Esc returns to the menu from any other screen.
     // (Later, Level screens may want Esc to open a pause dialog instead.)
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape) {
+        if (m_currentId == ScreenId::Briefing) {
+            requestScreen(ScreenId::Campaign);     // one step back
+            return;
+        }
         if (m_currentId != ScreenId::MainMenu) {
             requestScreen(ScreenId::MainMenu);
             return;

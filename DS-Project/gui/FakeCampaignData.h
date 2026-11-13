@@ -66,4 +66,27 @@ namespace FakeCampaign {
         "Full Heap Sort workflow"
     };
 
+    inline const char* const Objectives[20] = {
+    "Guards patrol in a fixed order.\nClick the rooms in the order\nthe patrol will visit them.",
+    "Rebuild the hidden tree from\nits traversals by dragging\nroom tokens into the slots.",
+    "Enter every room's height,\nleaves first, then report\nthe diameter of the tree.",
+    "Select two rooms, click the\nroom where their routes meet,\nthen trace the path.",
+    "Swap the children of every\nroom, bottom-up, to mirror\nthe vault.",
+    "Find the target treasure.\nEvery comparison costs\none alarm step.",
+    "Stash the loot: choose the\npath and place the new room\nat the correct leaf.",
+    "Remove the target room.\nPick the delete case first,\nthen watch it collapse.",
+    "Collect every room in the\nrange [lo, hi]. Skip subtrees\nthat cannot hold a match.",
+    "The vault is now a corridor.\nFind the target before the\nshrinking alarm fills.",
+    "Every room shows a balance\nbadge. Click all of the\nunbalanced rooms.",
+    "Repair the vault with a\nsingle rotation. Choose the\npivot and the direction.",
+    "Identify LR or RL first,\nthen perform both rotations\nin the right order.",
+    "Predict which rotation, if any,\nthe vault will perform\nbefore each insert.",
+    "Steal the k-th most valuable\ntreasure in O(log n) steps.\nKeep every size correct.",
+    "Turn the treasure array into\na valid Max Heap using\nbottom-up construction.",
+    "A heap has been disturbed.\nRepair it with sift-up and\nsift-down swaps.",
+    "Extract the maximum, restore\nthe heap, and move it into\nthe sorted region.",
+    "Run several extract and\nheapify rounds before the\noperation limit runs out.",
+    "Sort a brand new array in\nascending order. The door\nopens only when it is sorted."
+    };
+
 }  // namespace FakeCampaign

@@ -33,6 +33,22 @@ bool Assets::loadAll() {
         m_campaignBg.setSmooth(true);
     }
 
+    // TODO(YOU): make sure these exist (see Theme.h BannerPath / SkullPath)
+    if (!m_banner.loadFromFile(Theme::BannerPath)) {
+        std::fprintf(stderr, "[Assets] Failed to load banner: %s\n", Theme::BannerPath);
+        ok = false;
+    }
+    else {
+        m_banner.setSmooth(true);
+    }
+    if (!m_skull.loadFromFile(Theme::SkullPath)) {
+        std::fprintf(stderr, "[Assets] Failed to load skull icon: %s\n", Theme::SkullPath);
+        ok = false;
+    }
+    else {
+        m_skull.setSmooth(true);
+    }
+
     // TODO(YOU, later): load more images here, e.g.
     // m_campaignBg.loadFromFile("assets/images/campaign_bg.png");
     //   m_vaultDoor.loadFromFile("assets/images/vault_door.png");

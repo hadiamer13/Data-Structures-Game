@@ -39,6 +39,12 @@
     <ClCompile Include="gui\screens\CampaignMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gui\widgets\LevelBanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\screens\BriefingScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Types.h">
@@ -81,6 +87,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\screens\CampaignMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\LevelBanner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\screens\BriefingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

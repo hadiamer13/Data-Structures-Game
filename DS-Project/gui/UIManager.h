@@ -3,6 +3,7 @@
 #include "AppContext.h"
 #include "screens/Screen.h"
 
+
 // Screen IDs as plain ints (no enums).
 namespace ScreenId {
     inline const int MainMenu = 0;
@@ -11,6 +12,8 @@ namespace ScreenId {
     inline const int Sandbox = 3;
     inline const int Leaderboard = 4;
     inline const int Settings = 5;
+    inline const int Briefing = 6;
+    inline const int Level = 7;
     inline const int None = -1;
 }  // namespace ScreenId
 
