@@ -140,43 +140,55 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="gui\Assets.cpp" />
+    <ClCompile Include="gui\LayoutEngine.cpp" />
     <ClCompile Include="gui\main_gui.cpp" />
+    <ClCompile Include="gui\Renderer.cpp" />
     <ClCompile Include="gui\screens\BriefingScreen.cpp" />
     <ClCompile Include="gui\screens\CampaignMap.cpp" />
+    <ClCompile Include="gui\screens\LevelScreen.cpp" />
     <ClCompile Include="gui\screens\MainMenu.cpp" />
     <ClCompile Include="gui\screens\PlaceholderScreen.cpp" />
     <ClCompile Include="gui\UIManager.cpp" />
     <ClCompile Include="gui\widgets\Button.cpp" />
+    <ClCompile Include="gui\widgets\EventLogPanel.cpp" />
+    <ClCompile Include="gui\widgets\Hud.cpp" />
     <ClCompile Include="gui\widgets\LevelBanner.cpp" />
-    <ClCompile Include="gui\widgets\LevelNode.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="gui\widgets\Toolbar.cpp" />
+    <ClCompile Include="gui\widgets\Tooltip.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="contracts\Containers.h" />
+    <ClInclude Include="contracts\GameTypes.h" />
+    <ClInclude Include="contracts\NodeDefs.h" />
     <ClInclude Include="contracts\Types.h" />
     <ClInclude Include="contracts\Event.h" />
+    <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
     <ClInclude Include="gui\FakeCampaignData.h" />
+    <ClInclude Include="gui\FakeSnapshots.h" />
+    <ClInclude Include="gui\IEventVisualizer.h" />
+    <ClInclude Include="gui\LayoutEngine.h" />
+    <ClInclude Include="gui\Renderer.h" />
     <ClInclude Include="gui\screens\BriefingScreen.h" />
     <ClInclude Include="gui\screens\CampaignMap.h" />
+    <ClInclude Include="gui\screens\LevelScreen.h" />
     <ClInclude Include="gui\screens\MainMenu.h" />
     <ClInclude Include="gui\screens\PlaceholderScreen.h" />
     <ClInclude Include="gui\screens\Screen.h" />
     <ClInclude Include="gui\UIManager.h" />
     <ClInclude Include="gui\widgets\Button.h" />
     <ClInclude Include="gui\Theme.h" />
+    <ClInclude Include="gui\widgets\EventLogPanel.h" />
+    <ClInclude Include="gui\widgets\Hud.h" />
     <ClInclude Include="gui\widgets\LevelBanner.h" />
-    <ClInclude Include="gui\widgets\LevelNode.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="gui\widgets\Toolbar.h" />
+    <ClInclude Include="gui\widgets\Tooltip.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="contracts\LevelSchema.md" />
+    <None Include="contracts\SaveSchema.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

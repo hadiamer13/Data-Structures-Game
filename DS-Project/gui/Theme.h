@@ -35,8 +35,6 @@ namespace Theme {
 
     // ---- Misc numbers ----
     inline const float Pi = 3.14159265f;
-    inline const float NodeRadius = 30.f;     // old LevelNode (delete with it later)
-    inline const float StarRadius = 9.f;
     inline const float BannerH = 340.f;       // selected banner height
 
     // ---- Colours (dark red theme) ----

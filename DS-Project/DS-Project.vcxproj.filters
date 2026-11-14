@@ -33,9 +33,6 @@
     <ClCompile Include="gui\screens\PlaceholderScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gui\widgets\LevelNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gui\screens\CampaignMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +40,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gui\screens\BriefingScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\LayoutEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\EventLogPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\Hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\Toolbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\widgets\Tooltip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\screens\LevelScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,9 +98,6 @@
     <ClInclude Include="gui\screens\PlaceholderScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gui\widgets\LevelNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gui\FakeCampaignData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -95,5 +110,48 @@
     <ClInclude Include="gui\screens\BriefingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="contracts\Containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="contracts\GameTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="contracts\NodeDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="contracts\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\LayoutEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\FakeSnapshots.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\IEventVisualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\EventLogPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\Hud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\Toolbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\Tooltip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\screens\LevelScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="contracts\LevelSchema.md" />
+    <None Include="contracts\SaveSchema.md" />
   </ItemGroup>
 </Project>
