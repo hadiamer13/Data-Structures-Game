@@ -6,4 +6,4 @@ The model test suite was built and run with the repository's `.vscode/test-model
 
 The suite includes existing tree, heap, serializer, validator, scoring, and game-session tests plus new coverage for custom insertion/merge/quick sorts, JSON parsing and error positions, all four five-level act files, seeded tree generation, AVL rotation demonstrations, save/load round trips, and top-ten local leaderboard persistence.
 
-The Release x64 SFML game also compiled successfully using `.vscode/build.ps1`. The optional model console demo is built and run with the **Build and Run Console Model Demo** VS Code task.
+The integrated Release x64 build compiled the SFML GUI, game/model modules, and all test sources into one executable with `tests/test_main.cpp` as its entry point. The same executable ran successfully with all 14 test cases passing. The optional model console demo is built and run with the **Build and Run Console Model Demo** VS Code task.

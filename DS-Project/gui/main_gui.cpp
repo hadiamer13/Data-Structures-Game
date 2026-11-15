@@ -6,6 +6,9 @@
 #include "AppContext.h"
 #include "UIManager.h"
 
+// The model test runner is the project's active entry point while running the
+// integrated build. Re-enable this block to launch the SFML menu instead.
+#if 0
 int main() {
     // ---- Window (SFML 2.x: sf::VideoMode(w, h)) ----------------------
     sf::RenderWindow window(sf::VideoMode(Theme::WindowW, Theme::WindowH),
@@ -57,3 +60,4 @@ int main() {
 
     return 0;
 }
+#endif
