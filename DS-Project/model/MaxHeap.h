@@ -1,6 +1,7 @@
 #ifndef VH_MAXHEAP_H
 #define VH_MAXHEAP_H
 
+#include <cstdint>
 #include "../contracts/Containers.h"
 #include "../contracts/Event.h"
 #include "EventLog.h"
@@ -27,6 +28,8 @@ public:
     int extractMax(EventLog* log = nullptr);
     void heapSort(EventLog* log = nullptr);
     bool loadState(const IntArray& values, int activeSize);
+    std::uint64_t comparisonCount() const;
+    std::uint64_t swapCount() const;
 
     bool isMaxHeap() const;
     bool isMaxHeap(int heapSize) const;
@@ -40,6 +43,8 @@ private:
 
     IntArray m_array;
     int m_activeSize;
+    std::uint64_t m_comparisons;
+    std::uint64_t m_swaps;
 };
 
 #endif

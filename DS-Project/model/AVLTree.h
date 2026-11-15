@@ -45,6 +45,7 @@ public:
     void clear();
 
 private:
+    friend class Serializer;
     AVLNode* findWithoutEvents(int key) const;
     AVLNode* rotateLeftRaw(AVLNode* pivot, EventLog* log);
     AVLNode* rotateRightRaw(AVLNode* pivot, EventLog* log);

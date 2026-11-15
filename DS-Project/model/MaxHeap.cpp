@@ -1,6 +1,6 @@
 #include "MaxHeap.h"
 
-MaxHeap::MaxHeap() : m_activeSize(0)
+MaxHeap::MaxHeap() : m_activeSize(0), m_comparisons(0), m_swaps(0)
 {
 }
 
@@ -18,6 +18,9 @@ const IntArray& MaxHeap::array() const
 {
     return m_array;
 }
+
+std::uint64_t MaxHeap::comparisonCount() const { return m_comparisons; }
+std::uint64_t MaxHeap::swapCount() const { return m_swaps; }
 
 void MaxHeap::swapIndices(int indexA, int indexB, int reason, EventLog* log)
 {
@@ -40,6 +43,7 @@ void MaxHeap::swapIndices(int indexA, int indexB, int reason, EventLog* log)
     const int temporary = m_array[indexA];
     m_array[indexA] = m_array[indexB];
     m_array[indexB] = temporary;
+    m_swaps++;
 }
 
 void MaxHeap::emitHeapSizeChange(int oldSize, int newSize, EventLog* log) const
@@ -58,13 +62,15 @@ void MaxHeap::siftDownRaw(int index, int heapSize, int reason, EventLog* log)
         int largest = current;
         const int left = current * 2 + 1;
         const int right = current * 2 + 2;
-        if (left < heapSize && m_array[left] > m_array[largest])
+        if (left < heapSize)
         {
-            largest = left;
+            m_comparisons++;
+            if (m_array[left] > m_array[largest]) largest = left;
         }
-        if (right < heapSize && m_array[right] > m_array[largest])
+        if (right < heapSize)
         {
-            largest = right;
+            m_comparisons++;
+            if (m_array[right] > m_array[largest]) largest = right;
         }
         if (largest == current)
         {
@@ -81,6 +87,7 @@ void MaxHeap::siftUpRaw(int index, int reason, EventLog* log)
     while (current > 0)
     {
         const int parent = (current - 1) / 2;
+        m_comparisons++;
         if (m_array[parent] >= m_array[current])
         {
             break;
@@ -99,6 +106,8 @@ void MaxHeap::buildMaxHeap(const IntArray& values, EventLog* log)
 
 void MaxHeap::buildMaxHeap(EventLog* log)
 {
+    m_comparisons = 0;
+    m_swaps = 0;
     m_activeSize = m_array.size();
     Event build(EventType::HEAP_BUILD);
     build.idx = m_activeSize / 2 - 1;
@@ -289,6 +298,8 @@ bool MaxHeap::loadState(const IntArray& values, int activeSize)
     }
     m_array = values;
     m_activeSize = activeSize;
+    m_comparisons = 0;
+    m_swaps = 0;
     return true;
 }
 

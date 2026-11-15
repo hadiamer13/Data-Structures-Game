@@ -13,6 +13,8 @@ void runSerializerTests();
 void runValidatorTests();
 void runScoreTests();
 void runGameSessionTests();
+void runSortTests();
+void runCampaignSupportTests();
 
 TEST_CASE("AVL tree operations")
 {
@@ -72,4 +74,14 @@ TEST_CASE("Scoring rules")
 TEST_CASE("Game session bridge")
 {
     runGameSessionTests();
+}
+
+TEST_CASE("Custom sorting algorithms")
+{
+    runSortTests();
+}
+
+TEST_CASE("Campaign JSON, generation, save, and leaderboard")
+{
+    runCampaignSupportTests();
 }

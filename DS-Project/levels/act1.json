@@ -1,0 +1,10 @@
+{
+  "act": 1,
+  "levels": [
+    { "index": 1, "name": "Guard Patrol", "concept": "Preorder traversal", "objective": "Predict the patrol route.", "treeKind": "binary", "mission": "traversal", "seed": 101, "nodeCount": 8, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 2, "name": "Blueprint Decode", "concept": "Tree reconstruction", "objective": "Rebuild the hidden tree.", "treeKind": "binary", "mission": "reconstruct", "seed": 102, "nodeCount": 8, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 3, "name": "Alarm Roots", "concept": "Height and diameter", "objective": "Measure the vault from its leaves.", "treeKind": "binary", "mission": "heightDiameter", "seed": 103, "nodeCount": 9, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 4, "name": "Escape Routes", "concept": "Lowest common ancestor", "objective": "Find where the routes meet.", "treeKind": "binary", "mission": "lcaPath", "seed": 104, "nodeCount": 10, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 5, "name": "Mirror Vault", "concept": "Tree inversion", "objective": "Mirror the original layout.", "treeKind": "binary", "mission": "mirror", "seed": 105, "nodeCount": 11, "style": "random", "param": 0, "boss": true, "preorder": "" }
+  ]
+}
