@@ -3,7 +3,7 @@
 Supported JSON subset (our own parser): objects, arrays, strings, integers, booleans, null.
 No floats, no unicode escapes, no comments. Parse errors report the character position.
 
-One file per act: `levels/act1.json` ... `levels/act4.json`, plus `levels/endless.json`.
+One file per act: `levels/act1.json` ... `levels/act4.json`. Endless mode uses the seeded generator and save data rather than a fifth campaign act file.
 
 ```json
 {
