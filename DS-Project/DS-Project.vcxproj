@@ -139,6 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="model\AVLTree.cpp" />
+    <ClCompile Include="model\BinaryTree.cpp" />
+    <ClCompile Include="model\EventLog.cpp" />
+    <ClCompile Include="model\MaxHeap.cpp" />
+    <ClCompile Include="model\Validator.cpp" />
     <ClCompile Include="gui\Assets.cpp" />
     <ClCompile Include="gui\main_gui.cpp" />
     <ClCompile Include="gui\screens\BriefingScreen.cpp" />
