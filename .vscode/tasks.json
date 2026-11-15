@@ -31,6 +31,32 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Run Model Benchmarks",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\.vscode\\bench.ps1"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build and Run Console Model Demo",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\.vscode\\build-console.ps1"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

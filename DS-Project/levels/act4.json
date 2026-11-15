@@ -1,0 +1,10 @@
+{
+  "act": 4,
+  "levels": [
+    { "index": 1, "name": "Activate the Vault", "concept": "Bottom-up heap construction", "objective": "Build a valid Max Heap.", "treeKind": "maxheap", "mission": "heapBuild", "seed": 401, "nodeCount": 12, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 2, "name": "Repair the Locks", "concept": "Heapify and sift", "objective": "Restore the Max Heap property.", "treeKind": "maxheap", "mission": "heapRepair", "seed": 402, "nodeCount": 12, "style": "heap", "param": 0, "boss": false, "preorder": "" },
+    { "index": 3, "name": "Greatest Treasure", "concept": "Extract maximum", "objective": "Move each extracted maximum into the sorted region.", "treeKind": "maxheap", "mission": "heapExtract", "seed": 403, "nodeCount": 14, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 4, "name": "Race the Guards", "concept": "Heap Sort operation limit", "objective": "Complete extraction and heapify before the limit.", "treeKind": "maxheap", "mission": "heapRace", "seed": 404, "nodeCount": 15, "style": "reverse", "param": 20, "boss": false, "preorder": "" },
+    { "index": 5, "name": "Final Vault", "concept": "Heap Sort", "objective": "Sort every treasure in ascending order.", "treeKind": "maxheap", "mission": "heapBoss", "seed": 405, "nodeCount": 16, "style": "duplicates", "param": 0, "boss": true, "preorder": "" }
+  ]
+}

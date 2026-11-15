@@ -1,0 +1,10 @@
+{
+  "act": 3,
+  "levels": [
+    { "index": 1, "name": "Read the Badges", "concept": "Balance factors", "objective": "Identify every unbalanced room.", "treeKind": "avl", "mission": "avlBadges", "seed": 301, "nodeCount": 9, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 2, "name": "Single Repair", "concept": "LL and RR rotations", "objective": "Repair a single-turn imbalance.", "treeKind": "avl", "mission": "avlSingle", "seed": 302, "nodeCount": 8, "style": "sorted", "param": 0, "boss": false, "preorder": "" },
+    { "index": 3, "name": "Double Repair", "concept": "LR and RL rotations", "objective": "Identify and repair a double-turn imbalance.", "treeKind": "avl", "mission": "avlDouble", "seed": 303, "nodeCount": 9, "style": "random", "param": 2, "boss": false, "preorder": "" },
+    { "index": 4, "name": "Auto Architect", "concept": "Insertion and rebalancing", "objective": "Predict the rotation before each insertion.", "treeKind": "avl", "mission": "avlAuto", "seed": 304, "nodeCount": 10, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    { "index": 5, "name": "Order Statistic Heist", "concept": "Subtree sizes and kth", "objective": "Find the requested order statistic.", "treeKind": "avl", "mission": "avlOrderStat", "seed": 305, "nodeCount": 12, "style": "random", "param": 5, "boss": true, "preorder": "" }
+  ]
+}
