@@ -7,7 +7,8 @@
 
 void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
     const char* str, unsigned size,
-    const sf::Color& col, float x, float y) {
+    const sf::Color& col, float x, float y) 
+{
     t.setFont(font);                       // SFML 2.x API
     t.setString(str);
     t.setCharacterSize(size);
@@ -15,7 +16,8 @@ void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
     t.setPosition(x, y);
 }
 
-void BriefingScreen::buildStars(float x, float y) {
+void BriefingScreen::buildStars(float x, float y) 
+{
     const float outer = 14.f;
     const float inner = outer * 0.45f;
     for (int s = 0; s < 3; ++s) {
