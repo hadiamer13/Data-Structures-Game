@@ -182,7 +182,6 @@
     <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
-    <ClInclude Include="contracts\GameTypes.h" />
     <ClInclude Include="third_party\doctest\doctest.h" />
     <ClInclude Include="model\BST.h" />
     <ClInclude Include="model\NodePool.h" />
