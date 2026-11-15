@@ -1,4 +1,5 @@
 #include "BinaryTree.h"
+#include "TreeNode.h"
 
 namespace
 {
@@ -161,14 +162,9 @@ bool BinaryTree::attachChild(TreeNode* parent, TreeNode* child, int side, EventL
         ancestor = ancestor->parent;
     }
 
-    child->parent = parent;
-    if (side == Side::Left)
+    if (!TreeNodeLinks::attach(parent, child, side))
     {
-        parent->left = child;
-    }
-    else
-    {
-        parent->right = child;
+        return false;
     }
     Event inserted(EventType::INSERT);
     inserted.id = child->id;

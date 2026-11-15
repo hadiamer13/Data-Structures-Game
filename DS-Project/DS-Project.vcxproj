@@ -141,9 +141,15 @@
   <ItemGroup>
     <ClCompile Include="model\AVLTree.cpp" />
     <ClCompile Include="model\BinaryTree.cpp" />
+    <ClCompile Include="model\BST.cpp" />
     <ClCompile Include="model\EventLog.cpp" />
     <ClCompile Include="model\MaxHeap.cpp" />
+    <ClCompile Include="model\Serializer.cpp" />
+    <ClCompile Include="model\TreeNode.cpp" />
     <ClCompile Include="model\Validator.cpp" />
+    <ClCompile Include="game\GameSession.cpp" />
+    <ClCompile Include="game\ScoreSystem.cpp" />
+    <ClCompile Include="game\SnapshotBuilder.cpp" />
     <ClCompile Include="gui\Assets.cpp" />
     <ClCompile Include="gui\main_gui.cpp" />
     <ClCompile Include="gui\screens\BriefingScreen.cpp" />
@@ -164,6 +170,15 @@
     <ClInclude Include="contracts\Types.h" />
     <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
+    <ClInclude Include="contracts\GameTypes.h" />
+    <ClInclude Include="third_party\doctest\doctest.h" />
+    <ClInclude Include="model\BST.h" />
+    <ClInclude Include="model\NodePool.h" />
+    <ClInclude Include="model\Serializer.h" />
+    <ClInclude Include="model\TreeNode.h" />
+    <ClInclude Include="game\GameSession.h" />
+    <ClInclude Include="game\ScoreSystem.h" />
+    <ClInclude Include="game\SnapshotBuilder.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
     <ClInclude Include="gui\FakeCampaignData.h" />

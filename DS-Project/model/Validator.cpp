@@ -115,6 +115,43 @@ namespace
         }
         return leftCount + rightCount + 1;
     }
+
+    int inspectBST(const BSTNode* node, const BSTNode* expectedParent,
+                   const NodePtrArray& pool, const BoolArray& alive,
+                   BoolArray& visited, bool hasLower, int lower,
+                   bool hasUpper, int upper, std::string* error)
+    {
+        if (node == nullptr)
+        {
+            return 0;
+        }
+        if (node->id < 0 || node->id >= pool.size() || pool[node->id] != node || !alive[node->id])
+        {
+            setError(error, "BST node id does not match its live pool slot.");
+            return -1;
+        }
+        if (visited[node->id])
+        {
+            setError(error, "BST contains a cycle or a node with multiple parents.");
+            return -1;
+        }
+        if (node->parent != expectedParent)
+        {
+            setError(error, "BST parent pointer is inconsistent.");
+            return -1;
+        }
+        if ((hasLower && node->key <= lower) || (hasUpper && node->key >= upper))
+        {
+            setError(error, "BST keys violate strict ordering or contain a duplicate.");
+            return -1;
+        }
+        visited[node->id] = true;
+        const BSTNode* left = node->left == nullptr ? nullptr : static_cast<const BSTNode*>(node->left);
+        const BSTNode* right = node->right == nullptr ? nullptr : static_cast<const BSTNode*>(node->right);
+        const int leftCount = inspectBST(left, node, pool, alive, visited, hasLower, lower, true, node->key, error);
+        const int rightCount = inspectBST(right, node, pool, alive, visited, true, node->key, hasUpper, upper, error);
+        return leftCount < 0 || rightCount < 0 ? -1 : leftCount + rightCount + 1;
+    }
 }
 
 bool Validator::validateBinaryTree(const BinaryTree& tree, std::string* error)
@@ -206,6 +243,52 @@ bool Validator::validateAVL(const AVLTree& tree, std::string* error)
     if (visitedCount < 0 || visitedCount != liveCount || liveCount != tree.nodeCount())
     {
         setError(error, "AVL reachable node count differs from its live node count.");
+        return false;
+    }
+    return true;
+}
+
+bool Validator::validateBST(const BST& tree, std::string* error)
+{
+    if (error != nullptr)
+    {
+        error->clear();
+    }
+    const NodePtrArray& pool = tree.pool();
+    BoolArray alive;
+    BoolArray visited;
+    alive.resize(pool.size());
+    visited.resize(pool.size());
+    int liveCount = 0;
+    for (int i = 0; i < pool.size(); i++)
+    {
+        alive[i] = tree.isAlive(i);
+        if (alive[i])
+        {
+            liveCount = liveCount + 1;
+            if (pool[i] == nullptr || pool[i]->id != i)
+            {
+                setError(error, "BST pool ids are not dense.");
+                return false;
+            }
+        }
+    }
+    const BSTNode* root = tree.root();
+    if (root != nullptr && root->parent != nullptr)
+    {
+        setError(error, "BST root has a parent.");
+        return false;
+    }
+    if (root == nullptr && liveCount != 0)
+    {
+        setError(error, "BST has live nodes but no root.");
+        return false;
+    }
+    const int visitedCount = inspectBST(root, nullptr, pool, alive, visited,
+                                        false, 0, false, 0, error);
+    if (visitedCount < 0 || visitedCount != liveCount || liveCount != tree.nodeCount())
+    {
+        setError(error, "BST reachable node count differs from its live node count.");
         return false;
     }
     return true;

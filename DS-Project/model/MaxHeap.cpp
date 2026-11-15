@@ -273,6 +273,25 @@ void MaxHeap::heapSort(EventLog* log)
     }
 }
 
+bool MaxHeap::loadState(const IntArray& values, int activeSize)
+{
+    if (activeSize < 0 || activeSize > values.size())
+    {
+        return false;
+    }
+    MaxHeap candidate;
+    candidate.m_array = values;
+    candidate.m_activeSize = activeSize;
+    if (!candidate.isMaxHeap() || !candidate.isSortedAscending() ||
+        (activeSize > 0 && activeSize < values.size() && values[0] > values[activeSize]))
+    {
+        return false;
+    }
+    m_array = values;
+    m_activeSize = activeSize;
+    return true;
+}
+
 bool MaxHeap::isMaxHeap() const
 {
     return isMaxHeap(m_activeSize);

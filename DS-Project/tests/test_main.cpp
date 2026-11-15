@@ -1,20 +1,75 @@
-#include "TestSupport.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "../third_party/doctest/doctest.h"
 
 void runAVLTests();
 void runOrderStatisticTests();
 void runMaxHeapTests();
 void runHeapSortTests();
 void runBinaryTreeTests();
+void runContainerTests();
+void runNodePoolTests();
+void runBSTTests();
+void runSerializerTests();
+void runValidatorTests();
+void runScoreTests();
+void runGameSessionTests();
 
-int main()
+TEST_CASE("AVL tree operations")
 {
     runAVLTests();
-    runOrderStatisticTests();
-    runMaxHeapTests();
-    runHeapSortTests();
-    runBinaryTreeTests();
+}
 
-    std::printf("Model unit checks: %d assertions, %d failures.\n",
-                vhTestAssertions, vhTestFailures);
-    return vhTestFailures == 0 ? 0 : 1;
+TEST_CASE("AVL order statistics")
+{
+    runOrderStatisticTests();
+}
+
+TEST_CASE("Max heap operations")
+{
+    runMaxHeapTests();
+}
+
+TEST_CASE("Heap sort")
+{
+    runHeapSortTests();
+}
+
+TEST_CASE("Binary tree operations")
+{
+    runBinaryTreeTests();
+}
+
+TEST_CASE("Fixed-size containers")
+{
+    runContainerTests();
+}
+
+TEST_CASE("Node pool ownership")
+{
+    runNodePoolTests();
+}
+
+TEST_CASE("BST operations")
+{
+    runBSTTests();
+}
+
+TEST_CASE("Tree and heap serializer")
+{
+    runSerializerTests();
+}
+
+TEST_CASE("Model validators")
+{
+    runValidatorTests();
+}
+
+TEST_CASE("Scoring rules")
+{
+    runScoreTests();
+}
+
+TEST_CASE("Game session bridge")
+{
+    runGameSessionTests();
 }

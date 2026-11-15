@@ -26,6 +26,7 @@ public:
     bool extractMax(int& outValue, EventLog* log = nullptr);
     int extractMax(EventLog* log = nullptr);
     void heapSort(EventLog* log = nullptr);
+    bool loadState(const IntArray& values, int activeSize);
 
     bool isMaxHeap() const;
     bool isMaxHeap(int heapSize) const;
