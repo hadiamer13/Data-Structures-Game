@@ -14,27 +14,6 @@ namespace
 
     const float ClickSlop = 5.f;
 
-    float evDuration(int type)
-    {
-        if (type == EventType::VISIT || type == EventType::COMPARE)
-        {
-            return 0.5f;
-        }
-        if (type == EventType::ROTATE)
-        {
-            return 1.0f;
-        }
-        if (type == EventType::HEAP_SWAP || type == EventType::SWAP_VALUE)
-        {
-            return 0.7f;
-        }
-        if (type == EventType::DONE)
-        {
-            return 0.05f;
-        }
-        return 0.4f;
-    }
-
     Event makeEv(int type, int id, int cost)
     {
         Event e(type);
@@ -192,10 +171,9 @@ namespace
 LevelScreen::LevelScreen(AppContext& ctx)
     : m_ctx(ctx), m_index(0),
     m_renderer(ctx.assets->font()),
+    m_anim(&m_renderer),
     m_pressX(0), m_pressY(0), m_pressing(false),
-    m_qCount(0), m_qIndex(0),
-    m_busy(false), m_paused(false), m_evActive(false), m_stepping(false), m_stepReq(false),
-    m_done(false), m_evT(0.f), m_speed(1.f),
+    m_qCount(0), m_done(false),
     m_targetId(kNull), m_alarm(0), m_alarmCap(0), m_optimal(0)
 {
     m_index = ctx.selectedLevel;
@@ -206,6 +184,8 @@ LevelScreen::LevelScreen(AppContext& ctx)
 
     buildLayout();
     loadFakeScenario();
+
+    m_anim.setCallbacks(&LevelScreen::onAnimEvent, &LevelScreen::onAnimDone, this);
 
     // INTEGRATION: title/objective come from LevelDef.
     m_hud.setTitle(FakeCampaign::Names[m_index]);
@@ -271,7 +251,6 @@ void LevelScreen::loadFakeScenario()
 {
     int act = m_index / 5;
     m_qCount = 0;
-    m_qIndex = 0;
 
     if (act == 2)
     {
@@ -389,94 +368,53 @@ void LevelScreen::loadFakeScenario()
     m_alarmCap = (3 * m_optimal + 1) / 2 + 2;
 }
 
+// Builds the batch for the controller from the scripted events.
+// INTEGRATION: GameSession::apply() produces the events and per-event snapshots.
 void LevelScreen::startBatch()
 {
-    m_renderer.snapTo(m_start);
+    m_alarm = 0;
+    m_done = false;
     m_renderer.clearHighlights();
     m_renderer.setTarget(kNull);
-    m_alarm = 0;
-    m_qIndex = 0;
-    m_evActive = false;
-    m_stepping = false;
-    m_stepReq = false;
-    m_paused = false;
-    m_done = false;
-    m_busy = (m_qCount > 0);
-    m_log.addLine("--- play ---");
-    refreshHud();
-}
 
-void LevelScreen::beginCurrent()
-{
-    Event& ev = m_queue[m_qIndex];
-    m_renderer.beginEvent(ev);
-    if (ev.type == EventType::ROTATE)
+    m_anim.beginBatch(m_start);
+    m_renderer.snapTo(m_start);
+    for (int k = 0; k < m_qCount; k++)
     {
-        // structure change: nodes tween to the post-rotation slots
-        m_renderer.animateTo(m_final);
+        const ViewSnapshot* after = (m_queue[k].type == EventType::ROTATE) ? &m_final : nullptr;
+        m_anim.enqueue(m_queue[k], after);
     }
-    m_log.addLine(describeEvent(ev));
-    m_alarm += ev.alarmCost;
-    m_evT = 0.f;
-    m_evActive = true;
+    m_log.addLine("--- play ---");
+    m_anim.endBatch(m_final);
     refreshHud();
 }
 
-void LevelScreen::finishBatch()
+// ---------------------------------------------------- animation callbacks
+
+void LevelScreen::onAnimEvent(void* context, const Event& e, int index, int total)
 {
-    m_busy = false;
-    m_evActive = false;
+    (void)index;
+    (void)total;
+    static_cast<LevelScreen*>(context)->animEvent(e);
+}
+
+void LevelScreen::onAnimDone(void* context)
+{
+    static_cast<LevelScreen*>(context)->animDone();
+}
+
+void LevelScreen::animEvent(const Event& e)
+{
+    m_log.addLine(describeEvent(e));
+    m_alarm += e.alarmCost;
+    refreshHud();
+}
+
+void LevelScreen::animDone()
+{
     m_done = true;
-    m_renderer.animateTo(m_final);
     m_log.addLine("Batch complete.");
     refreshHud();
-}
-
-void LevelScreen::advanceDriver(float dt)
-{
-    if (!m_busy)
-    {
-        return;
-    }
-
-    if (!m_evActive)
-    {
-        if (m_paused && !m_stepReq)
-        {
-            return;
-        }
-        if (m_stepReq)
-        {
-            m_stepping = true;
-            m_stepReq = false;
-        }
-        beginCurrent();
-        return;
-    }
-
-    if (m_paused && !m_stepping)
-    {
-        return;
-    }
-
-    Event& ev = m_queue[m_qIndex];
-    m_evT += dt * m_speed;
-    float t = m_evT / evDuration(ev.type);
-    if (t < 1.f)
-    {
-        m_renderer.progress(ev, t);
-        return;
-    }
-
-    m_renderer.progress(ev, 1.f);
-    m_renderer.endEvent(ev);
-    m_evActive = false;
-    m_stepping = false;
-    m_qIndex++;
-    if (m_qIndex >= m_qCount)
-    {
-        finishBatch();
-    }
 }
 
 // ----------------------------------------------------------------- actions
@@ -510,29 +448,36 @@ void LevelScreen::doUndo()
 {
     // FAKE: undo = back to the state before the batch.
     // INTEGRATION: GameSession::apply(Undo) -> snapshot -> renderer.snapTo().
-    m_busy = false;
-    m_evActive = false;
+    m_anim.clear();
     m_done = false;
     m_alarm = 0;
-    m_renderer.snapTo(m_start);
-    m_renderer.clearHighlights();
+    m_renderer.snapTo(m_start);   // also clears highlights and effects
     m_log.addLine("Undo: restored the previous state.");
     refreshHud();
 }
 
 void LevelScreen::doReplay()
 {
-    startBatch();
+    m_alarm = 0;
+    m_done = false;
+    if (m_anim.totalCount() > 0)
+    {
+        m_log.addLine("--- replay ---");
+        m_anim.startReplay();
+        refreshHud();
+    }
+    else
+    {
+        startBatch();
+    }
 }
 
 void LevelScreen::doReset()
 {
-    m_busy = false;
-    m_evActive = false;
+    m_anim.clear();
     m_done = false;
     m_alarm = 0;
     m_renderer.snapTo(m_start);
-    m_renderer.clearHighlights();
     m_renderer.setTarget(kNull);
     m_renderer.setSelected(kNull);
     m_renderer.fit(true);
@@ -550,23 +495,23 @@ void LevelScreen::doHint()
 
 void LevelScreen::togglePlay()
 {
-    if (!m_busy)
+    if (!m_anim.busy())
     {
         startBatch();
         return;
     }
-    m_paused = !m_paused;
+    m_anim.togglePause();
     refreshHud();
 }
 
 void LevelScreen::stepOnce()
 {
-    if (!m_busy)
+    if (!m_anim.busy())
     {
         startBatch();
     }
-    m_paused = true;
-    m_stepReq = true;
+    m_anim.pause();
+    m_anim.stepOne();
     refreshHud();
 }
 
@@ -582,11 +527,11 @@ void LevelScreen::refreshHud()
     m_hud.setScore(score);
     m_hud.setSteps(m_alarm, m_alarmCap);
 
-    if (m_busy && m_paused)
+    if (m_anim.busy() && m_anim.paused())
     {
         m_hud.setStatus("PAUSED");
     }
-    else if (m_busy)
+    else if (m_anim.busy())
     {
         m_hud.setStatus("PLAYING");
     }
@@ -641,7 +586,7 @@ void LevelScreen::updateTooltip(int mx, int my)
 
 void LevelScreen::onCanvasClick(int mx, int my)
 {
-    if (m_busy)
+    if (m_anim.busy())
     {
         return; // input locked while the animation plays
     }
@@ -677,7 +622,7 @@ void LevelScreen::handleEvent(const sf::Event& e)
         }
         if (e.key.code == sf::Keyboard::Left)
         {
-            m_log.addLine("Step back needs undo data (comes with GameSession).");
+            m_log.addLine("Step back is not supported. Use Undo (Z) to undo the whole action.");
             return;
         }
         if (e.key.code == sf::Keyboard::Z)
@@ -738,12 +683,13 @@ void LevelScreen::handleEvent(const sf::Event& e)
 
 void LevelScreen::update(float dt)
 {
-    m_speed = m_toolbar.speed();
     m_toolbar.update(dt);
     m_hud.update(dt);
     m_log.update(dt);
     m_renderer.update(dt);
-    advanceDriver(dt);
+
+    m_anim.setSpeed(m_toolbar.speed());
+    m_anim.update(dt);
 }
 
 void LevelScreen::draw(sf::RenderWindow& window)

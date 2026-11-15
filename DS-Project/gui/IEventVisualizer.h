@@ -17,4 +17,5 @@ public:
     virtual void progress(const Event& e, float t) = 0;
     virtual void endEvent(const Event& e) = 0;
     virtual void snapTo(const ViewSnapshot& snap) = 0;
+    virtual void animateTo(const ViewSnapshot& snap) = 0;  
 };

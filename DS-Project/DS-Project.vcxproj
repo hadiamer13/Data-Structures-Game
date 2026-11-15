@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gui\AnimationController.cpp" />
     <ClCompile Include="gui\Assets.cpp" />
     <ClCompile Include="gui\LayoutEngine.cpp" />
     <ClCompile Include="gui\main_gui.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
+    <ClInclude Include="gui\AnimationController.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
     <ClInclude Include="gui\FakeCampaignData.h" />

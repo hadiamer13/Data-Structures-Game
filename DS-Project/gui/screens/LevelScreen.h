@@ -1,18 +1,18 @@
 // gui/screens/LevelScreen.h
 // Level shell: canvas (Renderer), HUD, toolbar, event log, tooltip.
-// Today it is driven by a FAKE driver (hand-made snapshots + scripted events)
-// so every widget and the Renderer can be tested before GameSession and
-// AnimationController exist.
+// Playback is done by the AnimationController. The scenario itself is still a
+// FAKE one (hand-made snapshots + scripted events) until GameSession exists.
 //
 // INTEGRATION: everything marked "FAKE DRIVER" is replaced by
 //   GameSession::apply(PlayerAction) -> ActionResult{events, hud}
-//   -> AnimationController -> Renderer (IEventVisualizer).
-// The widgets, layout, input routing and Esc handling stay as they are.
+//   -> m_anim.beginBatch / enqueue / endBatch -> Renderer.
+// The widgets, layout, input routing, controller wiring and Esc handling stay.
 #pragma once
 #include <string>
 #include "Screen.h"
 #include "../AppContext.h"
 #include "../Renderer.h"
+#include "../AnimationController.h"
 #include "../widgets/Hud.h"
 #include "../widgets/Toolbar.h"
 #include "../widgets/EventLogPanel.h"
@@ -35,6 +35,8 @@ private:
     LevelScreen& operator=(const LevelScreen&);
 
     static void onToolbarClick(void* context, int action);
+    static void onAnimEvent(void* context, const Event& e, int index, int total);
+    static void onAnimDone(void* context);
 
     // ---- layout / input ----
     void buildLayout();
@@ -49,6 +51,10 @@ private:
     void togglePlay();
     void stepOnce();
 
+    // ---- animation callbacks ----
+    void animEvent(const Event& e);
+    void animDone();
+
     // ---- HUD ----
     void refreshHud();
 
@@ -56,9 +62,6 @@ private:
     void loadFakeScenario();
     void addEvent(const Event& e);
     void startBatch();
-    void advanceDriver(float dt);
-    void beginCurrent();
-    void finishBatch();
 
     AppContext& m_ctx;
     int m_index;                 // level index 0..19 (act * 5 + level)
@@ -70,6 +73,7 @@ private:
     sf::Text m_canvasHint;
 
     Renderer m_renderer;
+    AnimationController m_anim;  // must come after m_renderer (it points at it)
     Hud m_hud;
     Toolbar m_toolbar;
     EventLogPanel m_log;
@@ -80,19 +84,11 @@ private:
     int m_pressY;
     bool m_pressing;
 
-    // ---- fake driver state ----
+    // ---- fake scenario state ----
     static const int kMaxQueue = 64;
     Event m_queue[kMaxQueue];
     int m_qCount;
-    int m_qIndex;
-    bool m_busy;       // a batch is playing (input locked)
-    bool m_paused;
-    bool m_evActive;   // an event is currently animating
-    bool m_stepping;   // single-step requested
-    bool m_stepReq;
     bool m_done;
-    float m_evT;       // seconds into the current event
-    float m_speed;
 
     ViewSnapshot m_start;
     ViewSnapshot m_final;

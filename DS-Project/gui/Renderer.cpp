@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include <cmath>
 
 namespace
 {
@@ -45,6 +46,7 @@ namespace
     const float FitMargin = 60.f;
     const float LabelMinZoom = 0.3f;
     const float BadgeMinZoom = 0.5f;
+    const float PiF = 3.14159265f;
 
     // Colour code (never the only signal: ring thickness, double ring, slash, text badges)
     const sf::Color ColNeutral(55, 45, 60);
@@ -62,6 +64,7 @@ namespace
     const sf::Color ColCellSorted(35, 95, 80);
     const sf::Color ColSorted(90, 200, 160);
     const sf::Color ColText(240, 235, 235);
+    const sf::Color ColInsert(90, 220, 120);
 }
 
 // ----------------------------------------------------------- construction
@@ -87,6 +90,20 @@ Renderer::Renderer(const sf::Font& font)
     m_swapTxt[1] = makeText(18);
     m_regionA = makeText(13);
     m_regionB = makeText(13);
+
+    m_tweenDur = TweenSeconds;
+    m_arrowNode = kNull;
+    m_arrowDir = 0;
+    m_arrowT = 0.f;
+    m_arrowHead.setPointCount(3);
+    m_arrowHead.setPoint(0, sf::Vector2f(0.f, 0.f));
+    m_arrowHead.setPoint(1, sf::Vector2f(-14.f, -7.f));
+    m_arrowHead.setPoint(2, sf::Vector2f(-14.f, 7.f));
+    m_arrowTxt = makeText(14);
+    m_rotNode = kNull;
+    m_rotType = RotationType::None;
+    m_rotT = 0.f;
+    m_rotTxt = makeText(20);
 }
 
 Renderer::~Renderer()
@@ -107,6 +124,8 @@ Renderer::~Renderer()
     delete m_swapTxt[1];
     delete m_regionA;
     delete m_regionB;
+    delete m_arrowTxt;
+    delete m_rotTxt;
 }
 
 sf::Text* Renderer::makeText(unsigned int size) const
@@ -144,6 +163,9 @@ void Renderer::resetNode(RenderNode& r) const
     r.mark = NodeMark::None;
     r.selected = false;
     r.target = false;
+    r.dying = false;
+    r.fx = 0.f;
+    r.fxKind = NodeFx::None;
 }
 
 void Renderer::ensureCapacity(int n)
@@ -159,10 +181,10 @@ void Renderer::ensureCapacity(int n)
     }
 
     RenderNode* nn = new RenderNode[newCap];
-    sf::Text** nk = new sf::Text*[newCap];
-    sf::Text** nb = new sf::Text*[newCap];
-    sf::Text** nc = new sf::Text*[newCap];
-    sf::Text** ni = new sf::Text*[newCap];
+    sf::Text** nk = new sf::Text * [newCap];
+    sf::Text** nb = new sf::Text * [newCap];
+    sf::Text** nc = new sf::Text * [newCap];
+    sf::Text** ni = new sf::Text * [newCap];
 
     for (int i = 0; i < m_cap; i++)
     {
@@ -272,6 +294,7 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
     {
         m_nodes[i].present = false;
         m_nodes[i].visible = false;
+        m_nodes[i].dying = false;
         m_nodes[i].alpha = 0.f;
         m_nodes[i].targetAlpha = 0.f;
     }
@@ -290,6 +313,9 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
         {
             resetNode(r);
         }
+        bool wasDying = r.dying;
+        r.dying = false;
+        int oldParent = r.parent;
         float curX = r.x;
         float curY = r.y;
 
@@ -321,10 +347,26 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
 
         if (!r.present)
         {
-            r.targetAlpha = 0.f;
-            if (!animate)
+            if (animate && (was || wasDying))
             {
-                r.alpha = 0.f;
+                // removed node: stays drawn, fades out, edge retracts to its old parent
+                r.present = true;
+                r.visible = true;
+                r.dying = true;
+                r.parent = oldParent;
+                r.left = kNull;
+                r.right = kNull;
+                r.targetAlpha = 0.f;
+                r.fromX = r.toX = curX;
+                r.fromY = r.toY = curY;
+            }
+            else
+            {
+                r.targetAlpha = 0.f;
+                if (!animate)
+                {
+                    r.alpha = 0.f;
+                }
             }
             continue;
         }
@@ -379,6 +421,7 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
     updateRegionLabels();
 
     m_tween = animate ? 0.f : 1.f;
+    m_tweenDur = TweenSeconds;
     m_swapA = kNull;
     m_swapB = kNull;
     m_edgesDirty = true;
@@ -402,6 +445,7 @@ void Renderer::animateTo(const ViewSnapshot& snap)
 void Renderer::snapTo(const ViewSnapshot& snap)
 {
     setSnapshot(snap, false);
+    clearHighlights();
 }
 
 // ----------------------------------------------------------- highlights
@@ -412,7 +456,11 @@ void Renderer::clearHighlights()
     {
         m_nodes[i].mark = NodeMark::None;
         m_nodes[i].pulse = 0.f;
+        m_nodes[i].fx = 0.f;
+        m_nodes[i].fxKind = NodeFx::None;
     }
+    m_arrowNode = kNull;
+    m_rotNode = kNull;
     m_edgesDirty = true;
 }
 
@@ -539,15 +587,56 @@ void Renderer::beginEvent(const Event& e)
         {
             m_nodes[e.id].mark = NodeMark::Compare;
             m_nodes[e.id].pulse = 1.f;
+            m_arrowNode = e.id;
+            m_arrowDir = e.result;
+            m_arrowT = 0.f;
+            const char* txt = (e.result < 0) ? "go left" : ((e.result > 0) ? "go right" : "FOUND");
+            m_arrowTxt->setString(txt);
+            centreText(*m_arrowTxt);
         }
         m_edgesDirty = true;
     }
-    else if (t == EventType::INSERT || t == EventType::UNLINK || t == EventType::ROTATE)
+    else if (t == EventType::INSERT || t == EventType::UNLINK)
     {
         if (validIdx(e.id))
         {
             m_nodes[e.id].pulse = 1.f;
+            m_nodes[e.id].fxKind = (t == EventType::INSERT) ? NodeFx::Insert : NodeFx::Unlink;
+            m_nodes[e.id].fx = 1.f;
         }
+    }
+    else if (t == EventType::ROTATE)
+    {
+        if (validIdx(e.id))
+        {
+            m_nodes[e.id].pulse = 1.f;
+            m_nodes[e.id].fxKind = NodeFx::Rotate;
+            m_nodes[e.id].fx = 1.f;
+            m_rotNode = e.id;
+            m_rotType = e.result;
+            m_rotT = 0.f;
+            const char* nm = "rotation";
+            if (e.result == RotationType::LL)
+            {
+                nm = "LL: rotate right";
+            }
+            else if (e.result == RotationType::RR)
+            {
+                nm = "RR: rotate left";
+            }
+            else if (e.result == RotationType::LR)
+            {
+                nm = "LR: double rotation";
+            }
+            else if (e.result == RotationType::RL)
+            {
+                nm = "RL: double rotation";
+            }
+            m_rotTxt->setString(nm);
+            centreText(*m_rotTxt);
+        }
+        // the controller already called animateTo(), so the tween spans the event
+        m_tweenDur = 0.9f;
     }
     else if (t == EventType::SWAP_VALUE)
     {
@@ -559,8 +648,7 @@ void Renderer::beginEvent(const Event& e)
         {
             if (t == EventType::UPDATE_HEIGHT)
             {
-                m_nodes[e.id].height = e.newV;
-                m_nodes[e.id].balance = m_nodes[e.id].balance; // bf arrives with the next snapshot
+                m_nodes[e.id].height = e.newV;   // bf arrives with the next snapshot
             }
             else
             {
@@ -581,7 +669,7 @@ void Renderer::beginEvent(const Event& e)
     }
     else if (t == EventType::HIGHLIGHT_SUBTREE)
     {
-        // ASSUMPTION: mode is carried in e.result using HighlightMode constants.
+        // mode is carried in e.result using HighlightMode constants.
         int mark = NodeMark::Visit;
         if (e.result == HighlightMode::Skipped)
         {
@@ -637,16 +725,50 @@ void Renderer::beginEvent(const Event& e)
 
 void Renderer::progress(const Event& e, float t)
 {
-    if (e.type == EventType::SWAP_VALUE || e.type == EventType::HEAP_SWAP)
+    t = fClamp(t, 0.f, 1.f);
+    int ty = e.type;
+    if (ty == EventType::SWAP_VALUE || ty == EventType::HEAP_SWAP)
     {
-        m_swapT = smooth(fClamp(t, 0.f, 1.f));
+        m_swapT = smooth(t);
+    }
+    else if (ty == EventType::COMPARE)
+    {
+        m_arrowT = t;
+    }
+    else if (ty == EventType::ROTATE)
+    {
+        m_rotT = t;
+    }
+
+    if (ty == EventType::INSERT || ty == EventType::UNLINK || ty == EventType::ROTATE)
+    {
+        if (validIdx(e.id))
+        {
+            m_nodes[e.id].fx = 1.f - t;
+        }
     }
 }
 
 void Renderer::endEvent(const Event& e)
 {
     int t = e.type;
-    if (t == EventType::SWAP_VALUE || t == EventType::HEAP_SWAP)
+    if (t == EventType::COMPARE)
+    {
+        m_arrowNode = kNull;
+    }
+    else if (t == EventType::INSERT || t == EventType::UNLINK || t == EventType::ROTATE)
+    {
+        if (validIdx(e.id))
+        {
+            m_nodes[e.id].fx = 0.f;
+            m_nodes[e.id].fxKind = NodeFx::None;
+        }
+        if (t == EventType::ROTATE)
+        {
+            m_rotNode = kNull;
+        }
+    }
+    else if (t == EventType::SWAP_VALUE || t == EventType::HEAP_SWAP)
     {
         finishSwap();
     }
@@ -679,7 +801,7 @@ void Renderer::update(float dt)
 
     if (m_tween < 1.f)
     {
-        m_tween = fMin(1.f, m_tween + dt / TweenSeconds);
+        m_tween = fMin(1.f, m_tween + dt / m_tweenDur);
         float k = smooth(m_tween);
         for (int i = 0; i < m_count; i++)
         {
@@ -704,6 +826,13 @@ void Renderer::update(float dt)
             {
                 r.alpha = fMax(r.targetAlpha, r.alpha - step);
             }
+            m_edgesDirty = true;
+        }
+        if (r.dying && r.alpha <= 0.f)
+        {
+            r.dying = false;
+            r.present = false;
+            r.visible = false;
             m_edgesDirty = true;
         }
         if (r.pulse > 0.f)
@@ -851,7 +980,7 @@ int Renderer::pick(float sx, float sy) const
     for (int i = 0; i < m_count; i++)
     {
         const RenderNode& r = m_nodes[i];
-        if (!r.present || !r.visible || r.alpha < 0.3f)
+        if (!r.present || !r.visible || r.dying || r.alpha < 0.3f)
         {
             continue;
         }
@@ -970,6 +1099,22 @@ void Renderer::rebuildEdges()
             m_edges.append(sf::Vertex(sf::Vector2f(ch.x, ch.y), col));
         }
     }
+
+    // edges of removed nodes retract toward their old parent
+    for (int i = 0; i < m_count; i++)
+    {
+        const RenderNode& d = m_nodes[i];
+        if (!d.dying || d.alpha < 0.02f || d.parent < 0 || d.parent >= m_count || !m_nodes[d.parent].present)
+        {
+            continue;
+        }
+        const RenderNode& p = m_nodes[d.parent];
+        float ex = p.x + (d.x - p.x) * d.alpha;
+        float ey = p.y + (d.y - p.y) * d.alpha;
+        sf::Color col = withAlpha(ColAlert, d.alpha);
+        m_edges.append(sf::Vertex(sf::Vector2f(p.x, p.y), col));
+        m_edges.append(sf::Vertex(sf::Vector2f(ex, ey), col));
+    }
     m_edgesDirty = false;
 }
 
@@ -1047,6 +1192,27 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
         m_ring.setOutlineColor(withAlpha(sf::Color::White, a));
         w.draw(m_ring);
     }
+    if (r.fxKind != NodeFx::None && r.fx > 0.f)
+    {
+        float ringR = R + 8.f;
+        sf::Color fc = ColGold;
+        if (r.fxKind == NodeFx::Insert)
+        {
+            ringR = R + 6.f + 22.f * (1.f - r.fx);
+            fc = ColInsert;
+        }
+        else if (r.fxKind == NodeFx::Unlink)
+        {
+            ringR = R + 6.f + 22.f * (1.f - r.fx);
+            fc = ColAlert;
+        }
+        m_ring.setRadius(ringR);
+        m_ring.setOrigin(ringR, ringR);
+        m_ring.setPosition(r.x, r.y);
+        m_ring.setOutlineThickness(3.f);
+        m_ring.setOutlineColor(withAlpha(fc, r.fx * ((r.alpha > 0.3f) ? 1.f : r.alpha + 0.3f)));
+        w.draw(m_ring);
+    }
     if (skipped)
     {
         sf::Vertex line[2];
@@ -1111,11 +1277,83 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
     }
 }
 
+void Renderer::drawEffects(sf::RenderWindow& w)
+{
+    // COMPARE: arrow toward the chosen child, with a text label (not colour alone)
+    if (validIdx(m_arrowNode))
+    {
+        const RenderNode& n = m_nodes[m_arrowNode];
+        float a = fClamp(1.f - (m_arrowT - 0.7f) / 0.3f, 0.f, 1.f);
+
+        if (m_arrowDir != CompareResult::Equal)
+        {
+            float side = (m_arrowDir < 0) ? -1.f : 1.f;
+            int child = (m_arrowDir < 0) ? n.left : n.right;
+            float tx = n.x + side * 50.f;
+            float ty = n.y + 70.f;
+            if (validIdx(child))
+            {
+                tx = m_nodes[child].x;
+                ty = m_nodes[child].y;
+            }
+            float dx = tx - n.x;
+            float dy = ty - n.y;
+            float len = std::sqrt(dx * dx + dy * dy);
+            if (len < 1.f)
+            {
+                len = 1.f;
+            }
+            float ux = dx / len;
+            float uy = dy / len;
+            float ang = std::atan2(dy, dx) * 180.f / PiF;
+
+            float startD = NodeR + 6.f;
+            float full = fMax(12.f, len - 2.f * NodeR - 12.f);
+            float shaft = full * smooth(fClamp(m_arrowT * 1.5f, 0.f, 1.f));
+            float sx = n.x + ux * startD;
+            float sy = n.y + uy * startD;
+
+            m_rect.setSize(sf::Vector2f(shaft, 4.f));
+            m_rect.setOrigin(0.f, 2.f);
+            m_rect.setPosition(sx, sy);
+            m_rect.setRotation(ang);
+            m_rect.setFillColor(withAlpha(ColBlue, a));
+            m_rect.setOutlineThickness(0.f);
+            w.draw(m_rect);
+            m_rect.setRotation(0.f);
+            m_rect.setFillColor(sf::Color::Transparent);
+
+            m_arrowHead.setPosition(sx + ux * shaft, sy + uy * shaft);
+            m_arrowHead.setRotation(ang);
+            m_arrowHead.setFillColor(withAlpha(ColBlue, a));
+            w.draw(m_arrowHead);
+        }
+
+        if (m_zoom >= LabelMinZoom)
+        {
+            m_arrowTxt->setFillColor(withAlpha((m_arrowDir == CompareResult::Equal) ? ColGold : ColBlue, a));
+            m_arrowTxt->setPosition(n.x, n.y - NodeR - 24.f);
+            w.draw(*m_arrowTxt);
+        }
+    }
+
+    // ROTATE: floating label above the pivot
+    if (validIdx(m_rotNode) && m_zoom >= LabelMinZoom)
+    {
+        const RenderNode& n = m_nodes[m_rotNode];
+        m_rotTxt->setFillColor(withAlpha(ColGold, 1.f - m_rotT * m_rotT));
+        m_rotTxt->setPosition(n.x, n.y - NodeR - 34.f - 20.f * m_rotT);
+        w.draw(*m_rotTxt);
+    }
+}
+
 void Renderer::drawTravelLabel(sf::RenderWindow& w, const Point& a, const Point& b)
 {
-    // value of A travels to B's slot, value of B travels to A's slot
-    m_swapTxt[0]->setPosition(a.x + (b.x - a.x) * m_swapT, a.y + (b.y - a.y) * m_swapT);
-    m_swapTxt[1]->setPosition(b.x + (a.x - b.x) * m_swapT, b.y + (a.y - b.y) * m_swapT);
+    // value of A travels to B's slot, value of B travels to A's slot;
+    // a small vertical lift makes the two values pass each other
+    float lift = 18.f * std::sin(PiF * m_swapT);
+    m_swapTxt[0]->setPosition(a.x + (b.x - a.x) * m_swapT, a.y + (b.y - a.y) * m_swapT - lift);
+    m_swapTxt[1]->setPosition(b.x + (a.x - b.x) * m_swapT, b.y + (a.y - b.y) * m_swapT + lift);
     w.draw(*m_swapTxt[0]);
     w.draw(*m_swapTxt[1]);
 }
@@ -1257,6 +1495,8 @@ void Renderer::draw(sf::RenderWindow& window)
         }
         drawNode(window, i);
     }
+
+    drawEffects(window);
 
     if (m_zoom >= LabelMinZoom && m_swapA != kNull && m_swapB != kNull)
     {

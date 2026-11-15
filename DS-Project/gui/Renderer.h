@@ -5,11 +5,11 @@
 // Implements IEventVisualizer.
 //
 // How events and snapshots cooperate (important):
-//  * Events only drive EFFECTS: pulses, highlights, travelling key labels for
-//    swaps, heap-size changes, sorted marks.
+//  * Events only drive EFFECTS: pulses, highlights, arrows, travelling key labels
+//    for swaps, heap-size changes, sorted marks.
 //  * Structure (INSERT / UNLINK / ROTATE results) is applied by the controller
 //    calling animateTo(snapshotAfter) (tweens nodes to new slots, new nodes
-//    grow from their parent, removed nodes fade). snapTo() = hard sync.
+//    grow from their parent, removed nodes fade). snapTo() = hard sync + reset.
 //  * Ids are stable, so a rotation is just "same ids, new links, new slots".
 
 #include <string>
@@ -26,6 +26,14 @@ namespace NodeMark
     inline const int Result = 4;    // target / result (gold double ring)
     inline const int Violation = 5; // red thick ring
     inline const int Trail = 6;     // previously visited (thin blue ring)
+}
+
+namespace NodeFx
+{
+    inline const int None = 0;
+    inline const int Insert = 1;   // expanding green ring
+    inline const int Unlink = 2;   // expanding red ring
+    inline const int Rotate = 3;   // gold ring on the pivot
 }
 
 struct RenderNode
@@ -48,6 +56,9 @@ struct RenderNode
     int mark;
     bool selected;
     bool target;
+    bool dying;     // removed node fading out (still drawn, edge retracting)
+    float fx;       // 0..1 effect strength
+    int fxKind;     // NodeFx::*
 };
 
 class Renderer : public IEventVisualizer
@@ -61,13 +72,13 @@ public:
 
     // Snapshots
     void setSnapshot(const ViewSnapshot& snap, bool animate);
-    void animateTo(const ViewSnapshot& snap);
-    void snapTo(const ViewSnapshot& snap);           // IEventVisualizer
+    void animateTo(const ViewSnapshot& snap) override;
+    void snapTo(const ViewSnapshot& snap) override;
 
     // IEventVisualizer
-    void beginEvent(const Event& e);
-    void progress(const Event& e, float t);
-    void endEvent(const Event& e);
+    void beginEvent(const Event& e) override;
+    void progress(const Event& e, float t) override;
+    void endEvent(const Event& e) override;
 
     // Frame
     void update(float dt);
@@ -111,6 +122,7 @@ private:
     void rebuildEdges();
 
     void drawNode(sf::RenderWindow& w, int i);
+    void drawEffects(sf::RenderWindow& w);
     void drawArray(sf::RenderWindow& w, float left, float right);
     void drawTravelLabel(sf::RenderWindow& w, const Point& a, const Point& b);
 
@@ -143,6 +155,20 @@ private:
     bool m_edgesDirty;
 
     float m_tween;
+    float m_tweenDur;
+
+    // compare arrow
+    int m_arrowNode;
+    int m_arrowDir;
+    float m_arrowT;
+    sf::ConvexShape m_arrowHead;
+    sf::Text* m_arrowTxt;
+
+    // rotation label
+    int m_rotNode;
+    int m_rotType;
+    float m_rotT;
+    sf::Text* m_rotTxt;
 
     float m_zoom, m_cx, m_cy;
     float m_tZoom, m_tCx, m_tCy;
