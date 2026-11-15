@@ -5,6 +5,8 @@
 #include "screens/CampaignMap.h"
 #include "screens/BriefingScreen.h"
 #include "screens/LevelScreen.h"
+#include "screens/SandboxScreen.h"
+#include "screens/ResultScreen.h"
 
 UIManager::UIManager(AppContext& ctx) : m_ctx(ctx)
 {
@@ -47,7 +49,7 @@ Screen* UIManager::makeScreen(int id)
     case ScreenId::Endless:
         return new PlaceholderScreen(m_ctx, "Endless Mode");
     case ScreenId::Sandbox:
-        return new PlaceholderScreen(m_ctx, "Sandbox");
+        return new SandboxScreen(m_ctx);
     case ScreenId::Leaderboard:
         return new PlaceholderScreen(m_ctx, "Leaderboard");
     case ScreenId::Settings:
@@ -56,6 +58,8 @@ Screen* UIManager::makeScreen(int id)
         return new BriefingScreen(m_ctx);
     case ScreenId::Level:
         return new LevelScreen(m_ctx);
+    case ScreenId::Result:
+        return new ResultScreen(m_ctx);
     default:
         return nullptr;
     }
@@ -84,7 +88,7 @@ void UIManager::handleEvent(const sf::Event& e)
     // every other screen returns to the Main Menu.
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape)
     {
-        if (m_currentId == ScreenId::Briefing || m_currentId == ScreenId::Level)
+        if (m_currentId == ScreenId::Briefing || m_currentId == ScreenId::Level || m_currentId == ScreenId::Result)
         {
             requestScreen(ScreenId::Campaign);
             return;

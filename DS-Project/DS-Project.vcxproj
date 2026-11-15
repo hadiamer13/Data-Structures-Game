@@ -139,6 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\SandboxSession.cpp" />
+    <ClCompile Include="gui\screens\ResultScreen.cpp" />
+    <ClCompile Include="gui\screens\SandboxScreen.cpp" />
+    <ClCompile Include="gui\widgets\NumberField.cpp" />
     <ClCompile Include="model\AVLTree.cpp" />
     <ClCompile Include="model\BinaryTree.cpp" />
     <ClCompile Include="model\BST.cpp" />
@@ -182,6 +186,11 @@
     <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
+    <ClInclude Include="game\SandboxSession.h" />
+    <ClInclude Include="gui\EventText.h" />
+    <ClInclude Include="gui\screens\ResultScreen.h" />
+    <ClInclude Include="gui\screens\SandboxScreen.h" />
+    <ClInclude Include="gui\widgets\NumberField.h" />
     <ClInclude Include="third_party\doctest\doctest.h" />
     <ClInclude Include="model\BST.h" />
     <ClInclude Include="model\NodePool.h" />

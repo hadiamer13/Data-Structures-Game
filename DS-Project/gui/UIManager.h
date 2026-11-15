@@ -14,6 +14,7 @@ namespace ScreenId {
     inline const int Settings = 5;
     inline const int Briefing = 6;
     inline const int Level = 7;
+    inline const int Result = 8;      
     inline const int None = -1;
 }  // namespace ScreenId
 
