@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Data Structures Game (Release x64)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\DS-Project\\x64\\Release\\DS-Project.exe",
+            "cwd": "${workspaceFolder}\\DS-Project",
+            "preLaunchTask": "Build SFML Game (Release x64)",
+            "externalConsole": false
+        }
+    ]
+}
