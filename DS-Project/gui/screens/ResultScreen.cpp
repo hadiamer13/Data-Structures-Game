@@ -2,6 +2,7 @@
 #include "ResultScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
+#include "../../game/Campaign.h"
 #include <cmath>
 
 namespace
@@ -27,8 +28,8 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
 {
     const sf::Font& font = ctx.assets->font();
     const LevelResult& r = ctx.result;
-    const float W = (float)Theme::WindowW;
-    const float H = (float)Theme::WindowH;
+    const float W = static_cast<float>(Theme::WindowW);
+    const float H = static_cast<float>(Theme::WindowH);
     const float cx = W / 2.f;
 
     m_won = r.won;
@@ -40,9 +41,16 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_lastLevel = (idx >= 19);
     m_showBadge = (r.won && r.heapAct && idx == 19);
 
+    // Save this result into campaign progress. setStars keeps the best value,
+    // so showing the same result again is harmless.
+    if (ctx.campaign != nullptr)
+    {
+        ctx.campaign->setStars(idx, r.stars);
+    }
+
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
-    m_background.setScale(W / (float)bg.getSize().x, H / (float)bg.getSize().y);
+    m_background.setScale(W / static_cast<float>(bg.getSize().x), H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
     m_dim.setFillColor(sf::Color(0, 0, 0, 0));    // fades in via update()
 
@@ -61,8 +69,8 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_title.setString(r.won ? "LEVEL CLEARED" : "ALARM FULL - LEVEL FAILED");
     centreAt(m_title, cx, py + 42.f);
 
-    int act = idx / 5 + 1;
-    int lvl = idx % 5 + 1;
+    const int act = idx / 5 + 1;
+    const int lvl = idx % 5 + 1;
     styleText(m_sub, font, 20, Theme::NodeGlow);
     m_sub.setString("ACT " + std::to_string(act) + "  -  LEVEL " + std::to_string(act) + "." + std::to_string(lvl));
     centreAt(m_sub, cx, py + 92.f);
@@ -76,10 +84,10 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
         for (int p = 0; p < 10; ++p)
         {
             float rad = (p % 2 == 0) ? outer : inner;
-            float a = -Theme::Pi / 2.f + (float)p * (Theme::Pi / 5.f);
+            float a = -Theme::Pi / 2.f + static_cast<float>(p) * (Theme::Pi / 5.f);
             m_star[s].setPoint(p, sf::Vector2f(rad * std::cos(a), rad * std::sin(a)));
         }
-        m_star[s].setPosition(cx + (float)(s - 1) * 80.f, py + 150.f);
+        m_star[s].setPosition(cx + static_cast<float>(s - 1) * 80.f, py + 150.f);
         m_star[s].setOutlineThickness(2.f);
         bool on = s < r.stars;
         m_star[s].setFillColor(on ? Theme::StarOn : sf::Color(0, 0, 0, 0));
@@ -216,7 +224,7 @@ void ResultScreen::update(float dt)
         {
             m_fade = 1.f;
         }
-        m_dim.setFillColor(sf::Color(0, 0, 0, (sf::Uint8)(180.f * m_fade)));
+        m_dim.setFillColor(sf::Color(0, 0, 0, static_cast<sf::Uint8>(180.f * m_fade)));
     }
 }
 

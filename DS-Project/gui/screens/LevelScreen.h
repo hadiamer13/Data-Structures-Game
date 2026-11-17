@@ -1,22 +1,22 @@
 // gui/screens/LevelScreen.h
-// Level shell: canvas (Renderer), HUD, toolbar, event log, tooltip.
-// Playback is done by the AnimationController. The scenario itself is still a
-// FAKE one (hand-made snapshots + scripted events) until GameSession exists.
-//
-// INTEGRATION: everything marked "FAKE DRIVER" is replaced by
-//   GameSession::apply(PlayerAction) -> ActionResult{events, hud}
-//   -> m_anim.beginBatch / enqueue / endBatch -> Renderer.
-// The widgets, layout, input routing, controller wiring and Esc handling stay.
+// Real level screen: GameSession + AnimationController + Renderer.
+// Playable missions today: 2.1 search, 2.2 insert, 2.3 delete, 2.5 boss (BST).
+// Other missions show a "not implemented yet" panel.
+// Flow: input -> PlayerAction -> GameSession::apply -> events -> animation -> Result screen.
 #pragma once
 #include <string>
+#include <SFML/Graphics.hpp>
 #include "Screen.h"
 #include "../AppContext.h"
 #include "../Renderer.h"
 #include "../AnimationController.h"
+#include "../widgets/Button.h"
+#include "../widgets/NumberField.h"
 #include "../widgets/Hud.h"
 #include "../widgets/Toolbar.h"
 #include "../widgets/EventLogPanel.h"
 #include "../widgets/Tooltip.h"
+#include "../../game/GameSession.h"
 
 class LevelScreen : public Screen
 {
@@ -27,74 +27,81 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the static toolbar callback (public so it can reach it).
+    // Called by the static callbacks (public so they can reach them).
     void onToolbar(int action);
+    void onAction(int which);
+    void onFieldEnter();
 
 private:
     LevelScreen(const LevelScreen&);
     LevelScreen& operator=(const LevelScreen&);
 
+    struct ActCtx
+    {
+        LevelScreen* owner;
+        int which;
+    };
+
     static void onToolbarClick(void* context, int action);
+    static void onActionClick(void* context);
+    static void onFieldClick(void* context);
     static void onAnimEvent(void* context, const Event& e, int index, int total);
     static void onAnimDone(void* context);
 
-    // ---- layout / input ----
     void buildLayout();
-    void updateTooltip(int mx, int my);
-    void onCanvasClick(int mx, int my);
+    bool loadLevel();
+    void buildActionButtons();
+    void setMessage(const std::string& msg);
+    void refreshHud(const HudState& h);
+    void refreshStatus();
 
-    // ---- toolbar actions ----
+    void doAction(int which);
     void doUndo();
-    void doReplay();
     void doReset();
     void doHint();
-    void togglePlay();
-    void stepOnce();
+    void play(const ViewSnapshot& before, const ActionResult& r);
+    void goToResult();
 
-    // ---- animation callbacks ----
     void animEvent(const Event& e);
     void animDone();
-
-    // ---- HUD ----
-    void refreshHud();
-
-    // ---- FAKE DRIVER (INTEGRATION: delete) ----
-    void loadFakeScenario();
-    void addEvent(const Event& e);
-    void startBatch();
+    void updateTooltip(int mx, int my);
+    void onCanvasClick(int mx, int my);
+    bool typing() const;
 
     AppContext& m_ctx;
-    int m_index;                 // level index 0..19 (act * 5 + level)
+    int m_index;
+    bool m_ok;
+    std::string m_error;
+    LevelDef m_def;
+    GameSession m_session;
 
-    // visuals
+    HudState m_lastHud;
+    int m_shownAlarm;
+    float m_endTimer;
+    int m_selected;
+
     sf::Sprite m_background;
     sf::RectangleShape m_dim;
     sf::RectangleShape m_canvasBox;
-    sf::Text m_canvasHint;
+    sf::RectangleShape m_bar;
+    sf::Text m_hint;
+    sf::Text m_msg;
+    sf::Text m_targetText;
+    sf::Text m_notice;
 
     Renderer m_renderer;
-    AnimationController m_anim;  // must come after m_renderer (it points at it)
+    AnimationController m_anim;   // must come after m_renderer
     Hud m_hud;
     Toolbar m_toolbar;
     EventLogPanel m_log;
     Tooltip m_tooltip;
 
-    // input state
+    NumberField m_field;
+    Button m_act[3];
+    ActCtx m_actCtx[3];
+    int m_actCount;
+
     int m_pressX;
     int m_pressY;
     bool m_pressing;
-
-    // ---- fake scenario state ----
-    static const int kMaxQueue = 64;
-    Event m_queue[kMaxQueue];
-    int m_qCount;
-    bool m_done;
-
-    ViewSnapshot m_start;
-    ViewSnapshot m_final;
-    int m_targetId;
-
-    int m_alarm;
-    int m_alarmCap;
-    int m_optimal;
 };

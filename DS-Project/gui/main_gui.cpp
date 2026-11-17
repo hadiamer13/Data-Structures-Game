@@ -5,8 +5,10 @@
 #include "Assets.h"
 #include "AppContext.h"
 #include "UIManager.h"
+#include "../game/Campaign.h"
 
-int main() {
+int main()
+{
     // ---- Window (SFML 2.x: sf::VideoMode(w, h)) ----------------------
     sf::RenderWindow window(sf::VideoMode(Theme::WindowW, Theme::WindowH),
         "Vault Heist: The Living Vault",
@@ -18,35 +20,57 @@ int main() {
     // TODO(YOU): if this fails, check the paths in Theme.h and run the
     // exe from the project root so "assets/..." resolves.
     Assets assets;
-    if (!assets.loadAll()) {
+    if (!assets.loadAll())
+    {
         std::fprintf(stderr, "Asset loading failed. Exiting.\n");
         return 1;
+    }
+
+    // ---- Campaign: level definitions + star progress, loaded ONCE ----
+    // Declared before ui so it outlives every screen that points at it.
+    // A load failure is shown on the campaign map instead of crashing.
+    Campaign campaign;
+    if (!campaign.load())
+    {
+        std::fprintf(stderr, "Campaign data incomplete:\n%s\n", campaign.error().c_str());
     }
 
     // ---- Shared context + screen manager -----------------------------
     AppContext ctx;
     ctx.window = &window;
     ctx.assets = &assets;
+    ctx.campaign = &campaign;
 
     UIManager ui(ctx);
     ctx.ui = &ui;
 
-    // INTEGRATION (later): create the GameSession / SaveManager here,
+    // INTEGRATION (later): create the GameSession / SaveManager load here,
     // store a pointer in ctx, and call SaveManager load before ui.start().
     ui.start();
 
     // ---- Main loop ---------------------------------------------------
     sf::Clock clock;
-    while (window.isOpen() && !ui.wantsQuit()) {
+    while (window.isOpen() && !ui.wantsQuit())
+    {
         sf::Event e;
-        while (window.pollEvent(e)) {
-            if (e.type == sf::Event::Closed) window.close();
-            else                             ui.handleEvent(e);
+        while (window.pollEvent(e))
+        {
+            if (e.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+            else
+            {
+                ui.handleEvent(e);
+            }
         }
 
         // Cap dt so a long stall never makes animations jump.
         float dt = clock.restart().asSeconds();
-        if (dt > 0.05f) dt = 0.05f;
+        if (dt > 0.05f)
+        {
+            dt = 0.05f;
+        }
 
         ui.update(dt);
 

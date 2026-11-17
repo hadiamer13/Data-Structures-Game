@@ -5,8 +5,9 @@
 #include "Assets.h"
 #include "../contracts/Containers.h"
 
-class UIManager;    // forward declarations (avoid circular / heavy includes)
+class UIManager;
 class GameSession;
+class Campaign;
 
 // Filled by the Level screen when a level ends, read by the Result screen.
 struct LevelResult
@@ -34,7 +35,8 @@ struct AppContext
     const Assets* assets = nullptr;
     UIManager* ui = nullptr;           // main_gui.cpp sets this to &uiManager
     GameSession* session = nullptr;    // main_gui.cpp sets this (stub or real)
+    Campaign* campaign = nullptr;      // main_gui.cpp sets this; levels + star progress
 
-    int selectedLevel = -1;
+    int selectedLevel = -1;            // index = act * 5 + level (0..19), -1 = none
     LevelResult result;
 };

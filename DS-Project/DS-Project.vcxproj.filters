@@ -129,6 +129,15 @@
     <ClCompile Include="gui\screens\SandboxScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tests\test_act3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\Campaign.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Types.h">
@@ -164,9 +173,6 @@
     <ClInclude Include="gui\screens\PlaceholderScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gui\FakeCampaignData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gui\screens\CampaignMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -189,9 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\LayoutEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\FakeSnapshots.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\IEventVisualizer.h">
@@ -275,9 +278,35 @@
     <ClInclude Include="gui\screens\SandboxScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tests\TestSupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\MaxHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\EventLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\BinaryTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\AVLTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Validator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\Campaign.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="contracts\LevelSchema.md" />
     <None Include="contracts\SaveSchema.md" />
+    <None Include="levels\act4.json" />
+    <None Include="levels\act1.json" />
+    <None Include="levels\act2.json" />
+    <None Include="levels\act3.json" />
+    <None Include="levels\GUIDE.md" />
   </ItemGroup>
 </Project>

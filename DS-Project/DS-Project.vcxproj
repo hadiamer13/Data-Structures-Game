@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\Campaign.cpp" />
     <ClCompile Include="game\SandboxSession.cpp" />
     <ClCompile Include="gui\screens\ResultScreen.cpp" />
     <ClCompile Include="gui\screens\SandboxScreen.cpp" />
@@ -163,7 +164,12 @@
     <ClCompile Include="gui\AnimationController.cpp" />
     <ClCompile Include="gui\Assets.cpp" />
     <ClCompile Include="gui\LayoutEngine.cpp" />
-    <ClCompile Include="gui\main_gui.cpp" />
+    <ClCompile Include="gui\main_gui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="gui\Renderer.cpp" />
     <ClCompile Include="gui\screens\BriefingScreen.cpp" />
     <ClCompile Include="gui\screens\CampaignMap.cpp" />
@@ -177,6 +183,18 @@
     <ClCompile Include="gui\widgets\LevelBanner.cpp" />
     <ClCompile Include="gui\widgets\Toolbar.cpp" />
     <ClCompile Include="gui\widgets\Tooltip.cpp" />
+    <ClCompile Include="tests\test_act3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\test_main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Containers.h" />
@@ -186,11 +204,23 @@
     <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
+    <ClInclude Include="game\Campaign.h" />
     <ClInclude Include="game\SandboxSession.h" />
     <ClInclude Include="gui\EventText.h" />
     <ClInclude Include="gui\screens\ResultScreen.h" />
     <ClInclude Include="gui\screens\SandboxScreen.h" />
     <ClInclude Include="gui\widgets\NumberField.h" />
+    <ClInclude Include="model\AVLTree.h" />
+    <ClInclude Include="model\BinaryTree.h" />
+    <ClInclude Include="model\EventLog.h" />
+    <ClInclude Include="model\MaxHeap.h" />
+    <ClInclude Include="model\Validator.h" />
+    <ClInclude Include="tests\TestSupport.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="third_party\doctest\doctest.h" />
     <ClInclude Include="model\BST.h" />
     <ClInclude Include="model\NodePool.h" />
@@ -208,8 +238,6 @@
     <ClInclude Include="gui\AnimationController.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
-    <ClInclude Include="gui\FakeCampaignData.h" />
-    <ClInclude Include="gui\FakeSnapshots.h" />
     <ClInclude Include="gui\IEventVisualizer.h" />
     <ClInclude Include="gui\LayoutEngine.h" />
     <ClInclude Include="gui\Renderer.h" />
@@ -231,6 +259,11 @@
   <ItemGroup>
     <None Include="contracts\LevelSchema.md" />
     <None Include="contracts\SaveSchema.md" />
+    <None Include="levels\act1.json" />
+    <None Include="levels\act2.json" />
+    <None Include="levels\act3.json" />
+    <None Include="levels\act4.json" />
+    <None Include="levels\GUIDE.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

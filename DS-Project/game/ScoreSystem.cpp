@@ -2,7 +2,7 @@
 
 ScoreSystem::ScoreSystem()
     : m_alarm(0), m_alarmCap(2), m_stepsTaken(0), m_optimalSteps(1),
-      m_penalties(0), m_penaltyCount(0), m_status(HudStatus::Playing)
+    m_penalties(0), m_penaltyCount(0), m_status(HudStatus::Playing), m_hintUsed(false)
 {
 }
 
@@ -21,6 +21,7 @@ void ScoreSystem::reset()
     m_penalties = 0;
     m_penaltyCount = 0;
     m_status = HudStatus::Playing;
+    m_hintUsed = false;
 }
 
 void ScoreSystem::recordAction(int alarmCost, int penalty)
@@ -69,21 +70,36 @@ int ScoreSystem::score() const
     return value < 0 ? 0 : value;
 }
 
+void ScoreSystem::useHint()
+{
+    m_hintUsed = true;
+}
+
+bool ScoreSystem::hintUsed() const
+{
+    return m_hintUsed;
+}
+
 int ScoreSystem::stars() const
 {
     if (m_status != HudStatus::Won)
     {
         return 0;
     }
+    int result = 1;
     if (m_stepsTaken <= m_optimalSteps && m_penalties == 0)
     {
-        return 3;
+        result = 3;
     }
-    if (4 * m_stepsTaken <= 5 * m_optimalSteps && m_penaltyCount <= 1)
+    else if (4 * m_stepsTaken <= 5 * m_optimalSteps && m_penaltyCount <= 1)
     {
-        return 2;
+        result = 2;
     }
-    return 1;
+    if (m_hintUsed && result > 2)
+    {
+        result = 2;     // hint = star cap of 2
+    }
+    return result;
 }
 
 HudState ScoreSystem::hud() const

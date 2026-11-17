@@ -2,199 +2,69 @@
 #include "LevelScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
-#include "../FakeCampaignData.h"   // INTEGRATION: remove (LevelDef supplies name/objective)
-#include "../FakeSnapshots.h"      // INTEGRATION: remove (SnapshotBuilder supplies snapshots)
+#include "../EventText.h"
+#include "../../game/LevelLoader.h"
 
 namespace
 {
-    // Layout (window 1280 x 720)
     const float HudH = 84.f;
     const float ToolbarH = 48.f;
     const float LogW = 320.f;
-
+    const float BarH = 64.f;
     const float ClickSlop = 5.f;
 
-    Event makeEv(int type, int id, int cost)
+    bool structural(int type)
     {
-        Event e(type);
-        e.id = id;
-        e.alarmCost = cost;
-        return e;
+        return type == EventType::INSERT || type == EventType::UNLINK;
     }
 
-    Event makeHeapEv(int type, int idx, int idx2, int cost)
+    void styleText(sf::Text& t, const sf::Font& font, unsigned size, const sf::Color& col, float x, float y)
     {
-        Event e(type);
-        e.idx = idx;
-        e.idx2 = idx2;
-        e.alarmCost = cost;
-        return e;
-    }
-
-    const char* rotationName(int r)
-    {
-        if (r == RotationType::LL)
-        {
-            return "LL (right rotation)";
-        }
-        if (r == RotationType::RR)
-        {
-            return "RR (left rotation)";
-        }
-        if (r == RotationType::LR)
-        {
-            return "LR (double)";
-        }
-        if (r == RotationType::RL)
-        {
-            return "RL (double)";
-        }
-        return "?";
-    }
-
-    const char* swapReason(int r)
-    {
-        if (r == SwapReason::SiftUp)
-        {
-            return "sift-up";
-        }
-        if (r == SwapReason::SiftDown)
-        {
-            return "sift-down";
-        }
-        if (r == SwapReason::Extract)
-        {
-            return "extract";
-        }
-        if (r == SwapReason::Player)
-        {
-            return "player";
-        }
-        return "build";
-    }
-
-    // INTEGRATION: replace with EventLog::describe(e) from the model.
-    std::string describeEvent(const Event& e)
-    {
-        std::string s;
-        int t = e.type;
-        if (t == EventType::VISIT)
-        {
-            s = "Visit room #" + std::to_string(e.id);
-        }
-        else if (t == EventType::COMPARE)
-        {
-            const char* dir = (e.result == CompareResult::Less) ? "go left"
-                : ((e.result == CompareResult::Greater) ? "go right" : "found");
-            s = "Compare " + std::to_string(e.key) + " with room #" + std::to_string(e.id) + ": " + dir;
-        }
-        else if (t == EventType::INSERT)
-        {
-            s = "Insert room #" + std::to_string(e.id) + " under #" + std::to_string(e.id2);
-        }
-        else if (t == EventType::UNLINK)
-        {
-            s = "Unlink room #" + std::to_string(e.id);
-        }
-        else if (t == EventType::SWAP_VALUE)
-        {
-            s = "Swap values of rooms #" + std::to_string(e.id) + " and #" + std::to_string(e.id2);
-        }
-        else if (t == EventType::ROTATE)
-        {
-            s = std::string("Rotate ") + rotationName(e.result) + " at pivot #" + std::to_string(e.id);
-        }
-        else if (t == EventType::UPDATE_HEIGHT)
-        {
-            s = "Height of #" + std::to_string(e.id) + ": " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
-        }
-        else if (t == EventType::UPDATE_SIZE)
-        {
-            s = "Size of #" + std::to_string(e.id) + ": " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
-        }
-        else if (t == EventType::BALANCE_ALERT)
-        {
-            s = "BALANCE ALERT at #" + std::to_string(e.id) + " (bf " + std::to_string(e.newV) + ")";
-        }
-        else if (t == EventType::HIGHLIGHT_SUBTREE)
-        {
-            s = std::string((e.result == HighlightMode::Skipped) ? "Skip" : "Mark")
-                + " subtree at #" + std::to_string(e.id);
-        }
-        else if (t == EventType::HEAP_BUILD)
-        {
-            s = "Build heap, array size " + std::to_string(e.newV);
-        }
-        else if (t == EventType::HEAP_SWAP)
-        {
-            s = "Swap cells [" + std::to_string(e.idx) + "] and [" + std::to_string(e.idx2) + "] ("
-                + swapReason(e.result) + ")";
-        }
-        else if (t == EventType::HEAPIFY_START)
-        {
-            s = "Heapify from [" + std::to_string(e.idx) + "], heap size " + std::to_string(e.newV);
-        }
-        else if (t == EventType::HEAPIFY_DONE)
-        {
-            s = "Heapify done: heap property restored";
-        }
-        else if (t == EventType::EXTRACT_MAX)
-        {
-            s = "Extract max " + std::to_string(e.key) + " (heap size " + std::to_string(e.newV) + ")";
-        }
-        else if (t == EventType::MARK_SORTED)
-        {
-            s = "Value " + std::to_string(e.key) + " moved to sorted region";
-        }
-        else if (t == EventType::HEAP_SIZE_CHANGE)
-        {
-            s = "Heap size " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
-        }
-        else if (t == EventType::HEAP_SORT_COMPLETE)
-        {
-            s = "HEAP SORT COMPLETE";
-        }
-        else if (t == EventType::DONE)
-        {
-            s = "Done";
-        }
-        else
-        {
-            s = "Event " + std::to_string(t);
-        }
-        return s;
+        t.setFont(font);
+        t.setCharacterSize(size);
+        t.setFillColor(col);
+        t.setPosition(x, y);
     }
 }
 
 // ------------------------------------------------------------ construction
 
 LevelScreen::LevelScreen(AppContext& ctx)
-    : m_ctx(ctx), m_index(0),
-    m_renderer(ctx.assets->font()),
-    m_anim(&m_renderer),
-    m_pressX(0), m_pressY(0), m_pressing(false),
-    m_qCount(0), m_done(false),
-    m_targetId(kNull), m_alarm(0), m_alarmCap(0), m_optimal(0)
+    : m_ctx(ctx), m_index(0), m_ok(false), m_shownAlarm(0), m_endTimer(0.f), m_selected(kNull),
+    m_renderer(ctx.assets->font()), m_anim(&m_renderer),
+    m_actCount(0), m_pressX(0), m_pressY(0), m_pressing(false)
 {
     m_index = ctx.selectedLevel;
     if (m_index < 0 || m_index > 19)
     {
         m_index = 0;
     }
+    for (int i = 0; i < 3; ++i)
+    {
+        m_actCtx[i].owner = this;
+        m_actCtx[i].which = i;
+    }
 
     buildLayout();
-    loadFakeScenario();
-
     m_anim.setCallbacks(&LevelScreen::onAnimEvent, &LevelScreen::onAnimDone, this);
+    m_ok = loadLevel();
 
-    // INTEGRATION: title/objective come from LevelDef.
-    m_hud.setTitle(FakeCampaign::Names[m_index]);
-    m_hud.setObjective(FakeCampaign::Objectives[m_index]);
-
-    m_renderer.snapTo(m_start);
-    m_log.addLine("Level ready. Press Space (or Replay) to play the demo.");
-    m_log.addLine("Wheel = zoom, drag background = pan, hover = info.");
-    refreshHud();
+    if (m_ok)
+    {
+        m_renderer.snapTo(m_session.snapshot());
+        m_renderer.fit(false);
+        buildActionButtons();
+        refreshHud(m_session.hud());
+        m_log.addLine("Level ready. Type a key, then use the buttons below.");
+        m_log.addLine("Wheel = zoom, drag background = pan, hover = info.");
+    }
+    else
+    {
+        m_hud.setTitle(m_def.name.empty() ? std::string("Level") : m_def.name);
+        m_hud.setObjective(m_error);
+        m_hud.setStatus("UNAVAILABLE");
+        m_notice.setString(m_error + "\n\nPlayable now: 2.1 Search, 2.2 Insert, 2.3 Delete, 2.5 Boss.\nPress Esc to go back.");
+    }
 }
 
 void LevelScreen::buildLayout()
@@ -212,21 +82,30 @@ void LevelScreen::buildLayout()
     float cx = 0.f;
     float cy = HudH;
     float cw = W - LogW;
-    float ch = H - HudH - ToolbarH;
+    float ch = H - HudH - ToolbarH - BarH;
 
     m_canvasBox.setPosition(cx, cy);
     m_canvasBox.setSize(sf::Vector2f(cw, ch));
     m_canvasBox.setFillColor(sf::Color(12, 6, 9, 170));
     m_canvasBox.setOutlineColor(Theme::BtnOutline);
     m_canvasBox.setOutlineThickness(-2.f);
-
-    m_canvasHint.setFont(font);
-    m_canvasHint.setCharacterSize(14);
-    m_canvasHint.setFillColor(sf::Color(170, 150, 150));
-    m_canvasHint.setString("Wheel: zoom   Drag background: pan   Space: play/pause   Right: step   Z: undo   H: hint");
-    m_canvasHint.setPosition(cx + 10.f, cy + ch - 24.f);
-
     m_renderer.setCanvasRect(cx, cy, cw, ch);
+
+    styleText(m_hint, font, 12, sf::Color(170, 150, 150), cx + 10.f, cy + ch - 20.f);
+    m_hint.setString("Wheel: zoom   Drag: pan   Click a room: fills KEY   Space: pause   Z: undo   H: hint");
+    styleText(m_msg, font, 15, Theme::StarOn, cx + 10.f, cy + 8.f);
+    styleText(m_notice, font, 24, Theme::TextColor, cx + 40.f, cy + 80.f);
+
+    float barY = H - ToolbarH - BarH;
+    m_bar.setPosition(0.f, barY);
+    m_bar.setSize(sf::Vector2f(cw, BarH));
+    m_bar.setFillColor(Theme::TooltipBg);
+    m_bar.setOutlineColor(Theme::BtnOutline);
+    m_bar.setOutlineThickness(-2.f);
+
+    m_field.init("KEY", font, 16.f, barY + 28.f, 130.f, 28.f);
+    m_field.setCallback(&LevelScreen::onFieldClick, this);
+    styleText(m_targetText, font, 18, Theme::StarOn, 165.f, barY + 22.f);
 
     m_hud.init(font, 0.f, 0.f, W, HudH);
     m_log.init(font, W - LogW, HudH, LogW, H - HudH - ToolbarH);
@@ -235,161 +114,94 @@ void LevelScreen::buildLayout()
     m_tooltip.init(font);
 }
 
-// ------------------------------------------------------------ FAKE DRIVER
-
-void LevelScreen::addEvent(const Event& e)
+// Level definition comes from levels/actN.json (LevelLoader), index = act * 5 + level.
+bool LevelScreen::loadLevel()
 {
-    if (m_qCount < kMaxQueue)
+    const int act = m_index / 5 + 1;
+    const int slot = m_index % 5;
+    const std::string path = std::string("levels/act") + static_cast<char>('0' + act) + ".json";
+
+    LevelDefArray defs;
+    std::string error;
+    if (!LevelLoader::loadFile(path, defs, &error))
     {
-        m_queue[m_qCount] = e;
-        m_qCount++;
+        m_error = "Could not load " + path + ": " + error;
+        return false;
     }
+    m_def = defs[slot];
+
+    if (!GameSession::supportsMission(m_def.mission))
+    {
+        m_error = "Level " + std::to_string(act) + "." + std::to_string(slot + 1) + " (" + m_def.name + ") is not implemented yet.";
+        return false;
+    }
+    if (!m_session.startLevel(m_def))
+    {
+        m_error = "The level data for \"" + m_def.name + "\" could not be started.";
+        return false;
+    }
+
+    m_hud.setTitle(std::to_string(act) + "." + std::to_string(slot + 1) + " " + m_def.name);
+    std::string objective = m_def.objective;
+    if (m_session.targetKey() != kNull)
+    {
+        objective += "  Target key: " + std::to_string(m_session.targetKey()) + ".";
+        m_targetText.setString("Target: " + std::to_string(m_session.targetKey()));
+    }
+    m_hud.setObjective(objective);
+    return true;
 }
 
-// INTEGRATION: delete. Real levels come from GameSession::startLevel(LevelDef).
-void LevelScreen::loadFakeScenario()
+void LevelScreen::buildActionButtons()
 {
-    int act = m_index / 5;
-    m_qCount = 0;
+    const sf::Font& font = m_ctx.assets->font();
+    float barY = (float)Theme::WindowH - ToolbarH - BarH;
+    const int mission = m_def.mission;
 
-    if (act == 2)
+    const char* labels[3] = { "", "", "" };
+    if (mission == MissionKind::BstDelete)
     {
-        // Act 3 style: LL imbalance at the root, rotateRight at 50, pivot = 30 (id 1).
-        m_start = FakeSnapshots::avlLLImbalance();
-        m_final = FakeSnapshots::avlLLAfterRotation();
-        m_targetId = 0;
-        m_optimal = 3;
-
-        addEvent(makeEv(EventType::VISIT, 0, 1));
-        addEvent(makeEv(EventType::VISIT, 1, 1));
-        addEvent(makeEv(EventType::BALANCE_ALERT, 0, 0));
-        m_queue[m_qCount - 1].newV = 2;
-
-        Event rot = makeEv(EventType::ROTATE, 1, 0);
-        rot.result = RotationType::LL;
-        addEvent(rot);
-
-        Event h0 = makeEv(EventType::UPDATE_HEIGHT, 0, 0);
-        h0.oldV = 4;
-        h0.newV = 2;
-        addEvent(h0);
-        Event h1 = makeEv(EventType::UPDATE_HEIGHT, 1, 0);
-        h1.oldV = 3;
-        h1.newV = 3;
-        addEvent(h1);
-        addEvent(makeEv(EventType::DONE, kNull, 0));
+        labels[0] = "Delete: leaf";
+        labels[1] = "Delete: one child";
+        labels[2] = "Delete: two children";
+        m_actCount = 3;
     }
-    else if (act == 3)
+    else if (mission == MissionKind::BstInsert)
     {
-        // Act 4 style: extract max from a Max Heap, sift the new root down.
-        m_start = FakeSnapshots::heapFull();
-        const int after[] = { 80, 70, 75, 40, 50, 60, 30, 10, 20, 90 };
-        m_final = FakeSnapshots::makeHeap(after, 10, 9);
-        m_targetId = 0;
-        m_optimal = 8;
-
-        Event ex = makeHeapEv(EventType::EXTRACT_MAX, 0, kNull, 0);
-        ex.key = 90;
-        ex.newV = 10;
-        addEvent(ex);
-
-        Event s1 = makeHeapEv(EventType::HEAP_SWAP, 0, 9, 1);
-        s1.oldV = 90;
-        s1.newV = 30;
-        s1.result = SwapReason::Extract;
-        addEvent(s1);
-
-        Event ms = makeHeapEv(EventType::MARK_SORTED, 9, kNull, 0);
-        ms.key = 90;
-        addEvent(ms);
-
-        Event sz = makeHeapEv(EventType::HEAP_SIZE_CHANGE, kNull, kNull, 0);
-        sz.oldV = 10;
-        sz.newV = 9;
-        addEvent(sz);
-
-        Event hs = makeHeapEv(EventType::HEAPIFY_START, 0, kNull, 0);
-        hs.newV = 9;
-        addEvent(hs);
-
-        Event s2 = makeHeapEv(EventType::HEAP_SWAP, 0, 2, 1);
-        s2.oldV = 30;
-        s2.newV = 80;
-        s2.result = SwapReason::SiftDown;
-        addEvent(s2);
-
-        Event s3 = makeHeapEv(EventType::HEAP_SWAP, 2, 6, 1);
-        s3.oldV = 30;
-        s3.newV = 75;
-        s3.result = SwapReason::SiftDown;
-        addEvent(s3);
-
-        Event hd = makeHeapEv(EventType::HEAPIFY_DONE, 0, kNull, 0);
-        hd.newV = 9;
-        addEvent(hd);
-        addEvent(makeEv(EventType::DONE, kNull, 0));
+        labels[0] = "Insert";
+        m_actCount = 1;
     }
     else
     {
-        // Acts 1 and 2: BST search for 60 (path 50 -> 70 -> 60), prune the rest.
-        m_start = FakeSnapshots::bst7();
-        m_final = m_start;
-        m_targetId = 5;
-        m_optimal = 6;
-
-        addEvent(makeEv(EventType::VISIT, 0, 1));
-        Event c0 = makeEv(EventType::COMPARE, 0, 1);
-        c0.key = 60;
-        c0.result = CompareResult::Greater;
-        addEvent(c0);
-
-        addEvent(makeEv(EventType::VISIT, 4, 1));
-        Event c1 = makeEv(EventType::COMPARE, 4, 1);
-        c1.key = 60;
-        c1.result = CompareResult::Less;
-        addEvent(c1);
-
-        addEvent(makeEv(EventType::VISIT, 5, 1));
-        Event c2 = makeEv(EventType::COMPARE, 5, 1);
-        c2.key = 60;
-        c2.result = CompareResult::Equal;
-        addEvent(c2);
-
-        Event k1 = makeEv(EventType::HIGHLIGHT_SUBTREE, 1, 0);
-        k1.result = HighlightMode::Skipped;
-        addEvent(k1);
-        Event k2 = makeEv(EventType::HIGHLIGHT_SUBTREE, 6, 0);
-        k2.result = HighlightMode::Skipped;
-        addEvent(k2);
-        addEvent(makeEv(EventType::DONE, kNull, 0));
+        labels[0] = "Search";
+        m_actCount = 1;
     }
 
-    // capacity = ceil(1.5 x optimal) + 2  (INTEGRATION: computed by the model)
-    m_alarmCap = (3 * m_optimal + 1) / 2 + 2;
-}
-
-// Builds the batch for the controller from the scripted events.
-// INTEGRATION: GameSession::apply() produces the events and per-event snapshots.
-void LevelScreen::startBatch()
-{
-    m_alarm = 0;
-    m_done = false;
-    m_renderer.clearHighlights();
-    m_renderer.setTarget(kNull);
-
-    m_anim.beginBatch(m_start);
-    m_renderer.snapTo(m_start);
-    for (int k = 0; k < m_qCount; k++)
+    for (int i = 0; i < m_actCount; ++i)
     {
-        const ViewSnapshot* after = (m_queue[k].type == EventType::ROTATE) ? &m_final : nullptr;
-        m_anim.enqueue(m_queue[k], after);
+        float cx = 410.f + (float)i * 215.f;
+        m_act[i].init(labels[i], font, sf::Vector2f(cx, barY + 34.f), sf::Vector2f(205.f, 38.f));
+        m_act[i].setCallback(&LevelScreen::onActionClick, &m_actCtx[i]);
     }
-    m_log.addLine("--- play ---");
-    m_anim.endBatch(m_final);
-    refreshHud();
 }
 
-// ---------------------------------------------------- animation callbacks
+// ---------------------------------------------------------------- callbacks
+
+void LevelScreen::onToolbarClick(void* context, int action)
+{
+    static_cast<LevelScreen*>(context)->onToolbar(action);
+}
+
+void LevelScreen::onActionClick(void* context)
+{
+    ActCtx* c = static_cast<ActCtx*>(context);
+    c->owner->onAction(c->which);
+}
+
+void LevelScreen::onFieldClick(void* context)
+{
+    static_cast<LevelScreen*>(context)->onFieldEnter();
+}
 
 void LevelScreen::onAnimEvent(void* context, const Event& e, int index, int total)
 {
@@ -403,36 +215,49 @@ void LevelScreen::onAnimDone(void* context)
     static_cast<LevelScreen*>(context)->animDone();
 }
 
-void LevelScreen::animEvent(const Event& e)
+void LevelScreen::onAction(int which)
 {
-    m_log.addLine(describeEvent(e));
-    m_alarm += e.alarmCost;
-    refreshHud();
+    doAction(which);
 }
 
-void LevelScreen::animDone()
+void LevelScreen::onFieldEnter()
 {
-    m_done = true;
-    m_log.addLine("Batch complete.");
-    refreshHud();
-}
-
-// ----------------------------------------------------------------- actions
-
-void LevelScreen::onToolbarClick(void* context, int action)
-{
-    static_cast<LevelScreen*>(context)->onToolbar(action);
+    if (m_def.mission != MissionKind::BstDelete)
+    {
+        doAction(0);       // Enter = the single action; delete needs an explicit case
+    }
+    else
+    {
+        setMessage("Pick the delete case with a button.");
+    }
 }
 
 void LevelScreen::onToolbar(int action)
 {
+    if (!m_ok)
+    {
+        return;
+    }
     if (action == ToolbarAction::Undo)
     {
         doUndo();
     }
     else if (action == ToolbarAction::Replay)
     {
-        doReplay();
+        if (m_anim.totalCount() > 0)
+        {
+            m_log.addLine("--- replay ---");
+            m_shownAlarm = m_lastHud.alarm - m_anim.totalCount();   // display only, corrected at the end
+            if (m_shownAlarm < 0)
+            {
+                m_shownAlarm = 0;
+            }
+            m_anim.startReplay();
+        }
+        else
+        {
+            setMessage("Nothing to replay yet.");
+        }
     }
     else if (action == ToolbarAction::Reset)
     {
@@ -444,89 +269,30 @@ void LevelScreen::onToolbar(int action)
     }
 }
 
-void LevelScreen::doUndo()
-{
-    // FAKE: undo = back to the state before the batch.
-    // INTEGRATION: GameSession::apply(Undo) -> snapshot -> renderer.snapTo().
-    m_anim.clear();
-    m_done = false;
-    m_alarm = 0;
-    m_renderer.snapTo(m_start);   // also clears highlights and effects
-    m_log.addLine("Undo: restored the previous state.");
-    refreshHud();
-}
+// ------------------------------------------------------------------- HUD
 
-void LevelScreen::doReplay()
+void LevelScreen::setMessage(const std::string& msg)
 {
-    m_alarm = 0;
-    m_done = false;
-    if (m_anim.totalCount() > 0)
+    m_msg.setString(msg);
+    if (!msg.empty())
     {
-        m_log.addLine("--- replay ---");
-        m_anim.startReplay();
-        refreshHud();
-    }
-    else
-    {
-        startBatch();
+        m_log.addLine("> " + msg);
     }
 }
 
-void LevelScreen::doReset()
+// Numbers come from the session's HudState, never from GUI maths.
+void LevelScreen::refreshHud(const HudState& h)
 {
-    m_anim.clear();
-    m_done = false;
-    m_alarm = 0;
-    m_renderer.snapTo(m_start);
-    m_renderer.setTarget(kNull);
-    m_renderer.setSelected(kNull);
-    m_renderer.fit(true);
-    m_log.clear();
-    m_log.addLine("Level reset.");
-    refreshHud();
+    m_lastHud = h;
+    m_shownAlarm = h.alarm;
+    m_hud.setAlarm(h.alarm, h.alarmCap);
+    m_hud.setScore(h.score);
+    m_hud.setSteps(h.alarm, h.alarmCap);
+    refreshStatus();
 }
 
-void LevelScreen::doHint()
+void LevelScreen::refreshStatus()
 {
-    // INTEGRATION: hint comes from the model; also caps stars at 2 (HudState).
-    m_renderer.setTarget(m_targetId);
-    m_log.addLine("Hint used: the gold ring marks the room to look at.");
-}
-
-void LevelScreen::togglePlay()
-{
-    if (!m_anim.busy())
-    {
-        startBatch();
-        return;
-    }
-    m_anim.togglePause();
-    refreshHud();
-}
-
-void LevelScreen::stepOnce()
-{
-    if (!m_anim.busy())
-    {
-        startBatch();
-    }
-    m_anim.pause();
-    m_anim.stepOne();
-    refreshHud();
-}
-
-void LevelScreen::refreshHud()
-{
-    // INTEGRATION: these numbers come from ActionResult.hud, never from GUI maths.
-    int score = 1000 - 10 * m_alarm;
-    if (score < 0)
-    {
-        score = 0;
-    }
-    m_hud.setAlarm(m_alarm, m_alarmCap);
-    m_hud.setScore(score);
-    m_hud.setSteps(m_alarm, m_alarmCap);
-
     if (m_anim.busy() && m_anim.paused())
     {
         m_hud.setStatus("PAUSED");
@@ -535,9 +301,13 @@ void LevelScreen::refreshHud()
     {
         m_hud.setStatus("PLAYING");
     }
-    else if (m_done)
+    else if (m_lastHud.status == HudStatus::Won)
     {
-        m_hud.setStatus("DONE");
+        m_hud.setStatus("CLEARED");
+    }
+    else if (m_lastHud.status == HudStatus::Lost)
+    {
+        m_hud.setStatus("ALARM FULL");
     }
     else
     {
@@ -545,13 +315,178 @@ void LevelScreen::refreshHud()
     }
 }
 
-// ------------------------------------------------------------------- input
+bool LevelScreen::typing() const
+{
+    return m_field.focused();
+}
+
+// ------------------------------------------------------------------ actions
+
+void LevelScreen::doAction(int which)
+{
+    if (!m_ok || m_anim.busy() || m_endTimer > 0.f)
+    {
+        return;      // input is locked while the animation plays
+    }
+    if (!m_field.hasValue())
+    {
+        setMessage("Type a key in the KEY box first.");
+        return;
+    }
+
+    PlayerAction act;
+    act.a = m_field.value();
+    if (m_def.mission == MissionKind::BstDelete)
+    {
+        act.kind = ActionKind::Delete;
+        act.c = (which == 0) ? DeleteCase::Leaf : ((which == 1) ? DeleteCase::OneChild : DeleteCase::TwoChildren);
+    }
+    else if (m_def.mission == MissionKind::BstInsert)
+    {
+        act.kind = ActionKind::Insert;
+    }
+    else
+    {
+        act.kind = ActionKind::Search;
+    }
+
+    m_renderer.setTarget(kNull);
+    ViewSnapshot before = m_session.snapshot();
+    ActionResult r = m_session.apply(act);
+    setMessage(r.message);
+    play(before, r);
+}
+
+// One batch. The session returns the final state; the last structural event (INSERT / UNLINK)
+// carries the "after" snapshot so the tree tweens exactly when that event plays.
+void LevelScreen::play(const ViewSnapshot& before, const ActionResult& r)
+{
+    ViewSnapshot after = m_session.snapshot();
+    m_lastHud = r.hud;
+    m_shownAlarm = 0;
+    m_shownAlarm = r.hud.alarm;
+    for (int i = 0; i < r.events.size(); ++i)
+    {
+        m_shownAlarm -= r.events[i].alarmCost;
+    }
+    if (m_shownAlarm < 0)
+    {
+        m_shownAlarm = 0;
+    }
+
+    int lastStruct = -1;
+    for (int i = 0; i < r.events.size(); ++i)
+    {
+        if (structural(r.events[i].type))
+        {
+            lastStruct = i;
+        }
+    }
+
+    m_renderer.snapTo(before);
+    m_anim.beginBatch(before);
+    for (int i = 0; i < r.events.size(); ++i)
+    {
+        m_anim.enqueue(r.events[i], (i == lastStruct) ? &after : nullptr);
+    }
+    m_log.addLine("--- play ---");
+    m_anim.endBatch(after);
+    refreshStatus();
+}
+
+void LevelScreen::animEvent(const Event& e)
+{
+    m_log.addLine(describeEventText(e));
+    m_shownAlarm += e.alarmCost;
+    m_hud.setAlarm(m_shownAlarm, m_lastHud.alarmCap);
+    m_hud.setSteps(m_shownAlarm, m_lastHud.alarmCap);
+    refreshStatus();
+}
+
+void LevelScreen::animDone()
+{
+    refreshHud(m_lastHud);     // authoritative numbers from the session
+    if (m_lastHud.status != HudStatus::Playing)
+    {
+        m_log.addLine(m_lastHud.status == HudStatus::Won ? "LEVEL CLEARED" : "ALARM FULL");
+        m_endTimer = 1.0f;     // Result screen only after the animation ends
+    }
+}
+
+void LevelScreen::doUndo()
+{
+    if (m_endTimer > 0.f)
+    {
+        return;
+    }
+    PlayerAction act;
+    act.kind = ActionKind::Undo;
+    ActionResult r = m_session.apply(act);
+    m_anim.clear();
+    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.setTarget(kNull);
+    m_renderer.setSelected(kNull);
+    m_selected = kNull;
+    refreshHud(r.hud);
+    setMessage(r.message);
+}
+
+void LevelScreen::doReset()
+{
+    if (m_endTimer > 0.f)
+    {
+        return;
+    }
+    PlayerAction act;
+    act.kind = ActionKind::Reset;
+    ActionResult r = m_session.apply(act);
+    m_anim.clear();
+    m_renderer.snapTo(m_session.snapshot());
+    m_renderer.setTarget(kNull);
+    m_renderer.setSelected(kNull);
+    m_renderer.fit(true);
+    m_selected = kNull;
+    m_field.clear();
+    m_log.clear();
+    refreshHud(r.hud);
+    setMessage(r.message);
+}
+
+void LevelScreen::doHint()
+{
+    if (m_anim.busy() || m_endTimer > 0.f)
+    {
+        return;
+    }
+    PlayerAction act;
+    act.kind = ActionKind::Hint;
+    ActionResult r = m_session.apply(act);
+    m_renderer.setTarget(m_session.targetNodeId());     // gold ring on the target room
+    refreshHud(r.hud);
+    setMessage(r.message);
+}
+
+void LevelScreen::goToResult()
+{
+    LevelResult& res = m_ctx.result;
+    res.stars = m_lastHud.stars;
+    res.alarm = m_lastHud.alarm;
+    res.optimal = m_lastHud.optimalSteps;
+    res.penalties = m_lastHud.penalties;
+    res.score = m_lastHud.score;
+    res.won = (m_lastHud.status == HudStatus::Won);
+    res.levelIndex = m_index;
+    res.heapAct = false;
+    res.sortedArray.clear();
+    m_ctx.ui->requestScreen(ScreenId::Result);
+}
+
+// -------------------------------------------------------------------- input
 
 void LevelScreen::updateTooltip(int mx, int my)
 {
     float sx = (float)mx;
     float sy = (float)my;
-
     int id = m_renderer.pick(sx, sy);
     int key = 0;
     int height = 0;
@@ -560,25 +495,7 @@ void LevelScreen::updateTooltip(int mx, int my)
     int depth = 0;
     if (id != kNull && m_renderer.nodeInfo(id, key, height, size, bal, depth))
     {
-        if (m_renderer.isHeap())
-        {
-            m_tooltip.showText(sx + 16.f, sy + 16.f,
-                "value: " + std::to_string(key) + "\nindex: " + std::to_string(id)
-                + "\ndepth: " + std::to_string(depth));
-        }
-        else
-        {
-            m_tooltip.showNode(sx + 16.f, sy + 16.f, key, height, bal, size, depth,
-                m_renderer.kind() == TreeKind::AVL);
-        }
-        return;
-    }
-
-    int cell = m_renderer.pickCell(sx, sy);
-    if (cell != kNull && m_renderer.nodeInfo(cell, key, height, size, bal, depth))
-    {
-        m_tooltip.showText(sx + 16.f, sy + 16.f,
-            "array cell\nindex: " + std::to_string(cell) + "\nvalue: " + std::to_string(key));
+        m_tooltip.showNode(sx + 16.f, sy + 16.f, key, height, bal, size, depth, false);
         return;
     }
     m_tooltip.hide();
@@ -586,43 +503,52 @@ void LevelScreen::updateTooltip(int mx, int my)
 
 void LevelScreen::onCanvasClick(int mx, int my)
 {
-    if (m_anim.busy())
+    if (!m_ok || m_anim.busy())
     {
-        return; // input locked while the animation plays
+        return;
     }
-    float sx = (float)mx;
-    float sy = (float)my;
-    int id = m_renderer.pick(sx, sy);
-    if (id == kNull)
-    {
-        id = m_renderer.pickCell(sx, sy);
-    }
+    int id = m_renderer.pick((float)mx, (float)my);
+    m_selected = id;
     m_renderer.setSelected(id);
-    if (id != kNull)
+    int key = 0;
+    int h = 0;
+    int s = 0;
+    int b = 0;
+    int d = 0;
+    if (id != kNull && m_renderer.nodeInfo(id, key, h, s, b, d))
     {
-        // INTEGRATION: build PlayerAction{ClickNode, id} and call GameSession::apply().
-        m_log.addLine("Clicked #" + std::to_string(id));
+        m_field.setValue(key);
     }
 }
 
 void LevelScreen::handleEvent(const sf::Event& e)
 {
     // Esc is handled by UIManager.
-    if (e.type == sf::Event::KeyPressed)
+    if (!m_ok)
+    {
+        return;
+    }
+    m_field.handleEvent(e);
+
+    if (e.type == sf::Event::KeyPressed && !typing())
     {
         if (e.key.code == sf::Keyboard::Space)
         {
-            togglePlay();
+            if (m_anim.busy())
+            {
+                m_anim.togglePause();
+                refreshStatus();
+            }
             return;
         }
         if (e.key.code == sf::Keyboard::Right)
         {
-            stepOnce();
-            return;
-        }
-        if (e.key.code == sf::Keyboard::Left)
-        {
-            m_log.addLine("Step back is not supported. Use Undo (Z) to undo the whole action.");
+            if (m_anim.busy())
+            {
+                m_anim.pause();
+                m_anim.stepOne();
+                refreshStatus();
+            }
             return;
         }
         if (e.key.code == sf::Keyboard::Z)
@@ -638,6 +564,10 @@ void LevelScreen::handleEvent(const sf::Event& e)
     }
 
     m_toolbar.handleEvent(e);
+    for (int i = 0; i < m_actCount; ++i)
+    {
+        m_act[i].handleEvent(e);
+    }
     m_log.handleEvent(e);
 
     bool camera = m_renderer.handleCameraEvent(e);
@@ -683,13 +613,31 @@ void LevelScreen::handleEvent(const sf::Event& e)
 
 void LevelScreen::update(float dt)
 {
-    m_toolbar.update(dt);
     m_hud.update(dt);
     m_log.update(dt);
+    m_toolbar.update(dt);
+    if (!m_ok)
+    {
+        return;
+    }
+    m_field.update(dt);
+    for (int i = 0; i < m_actCount; ++i)
+    {
+        m_act[i].update(dt);
+    }
     m_renderer.update(dt);
-
     m_anim.setSpeed(m_toolbar.speed());
     m_anim.update(dt);
+
+    if (m_endTimer > 0.f && !m_anim.busy())
+    {
+        m_endTimer -= dt;
+        if (m_endTimer <= 0.f)
+        {
+            m_endTimer = 0.f;
+            goToResult();
+        }
+    }
 }
 
 void LevelScreen::draw(sf::RenderWindow& window)
@@ -697,8 +645,24 @@ void LevelScreen::draw(sf::RenderWindow& window)
     window.draw(m_background);
     window.draw(m_dim);
     window.draw(m_canvasBox);
+
+    if (!m_ok)
+    {
+        window.draw(m_notice);
+        m_hud.draw(window);
+        return;
+    }
+
     m_renderer.draw(window);
-    window.draw(m_canvasHint);
+    window.draw(m_hint);
+    window.draw(m_msg);
+    window.draw(m_bar);
+    m_field.draw(window);
+    window.draw(m_targetText);
+    for (int i = 0; i < m_actCount; ++i)
+    {
+        m_act[i].draw(window);
+    }
 
     m_hud.draw(window);
     m_log.draw(window);
