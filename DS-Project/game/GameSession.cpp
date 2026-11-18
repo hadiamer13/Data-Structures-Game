@@ -19,6 +19,48 @@ namespace
         "50 30 # # 70 60 # 65 # # 80 # #"
     };
 
+    // Level 2.4 packs its bounds into "param" as lo * 1000 + hi.
+    void decodeRange(int param, int& lo, int& hi)
+    {
+        lo = param / 1000;
+        hi = param % 1000;
+    }
+    int findValueId(const BinaryTree& t, int value)
+    {
+        const NodePtrArray& pool = t.pool();
+        for (int i = 0; i < pool.size(); i++)
+        {
+            if (t.isAlive(i) && pool[i]->value == value)
+            {
+                return i;
+            }
+        }
+        return kNull;
+    }
+
+    // Node in the hidden tree at the same position as a node of the built tree.
+    const TreeNode* hiddenCounterpart(const BinaryTree& hidden, const TreeNode* node)
+    {
+        int sides[256];
+        int depth = 0;
+        const TreeNode* cur = node;
+        while (cur->parent != nullptr)
+        {
+            if (depth >= 256)
+            {
+                return nullptr;
+            }
+            sides[depth++] = (cur->parent->left == cur) ? Side::Left : Side::Right;
+            cur = cur->parent;
+        }
+        const TreeNode* h = hidden.root();
+        for (int i = depth - 1; i >= 0 && h != nullptr; i--)
+        {
+            h = (sides[i] == Side::Left) ? h->left : h->right;
+        }
+        return h;
+    }
+
     void findDeepest(const TreeNode* node, int depth, int& bestDepth, int& bestKey)
     {
         if (node == nullptr)
@@ -176,7 +218,8 @@ bool GameSession::supportsMission(int mission)
 {
     return isBinaryMission(mission) || mission == MissionKind::BstSearch ||
         mission == MissionKind::BstInsert || mission == MissionKind::BstDelete ||
-        mission == MissionKind::BstBoss || isAvlMission(mission) || isHeapMission(mission);
+        mission == MissionKind::BstRange || mission == MissionKind::BstBoss ||
+        isAvlMission(mission) || isHeapMission(mission);
 }
 
 int GameSession::pathCost(int key) const
@@ -220,10 +263,16 @@ int GameSession::pickTarget(const LevelDef& level) const
 
 bool GameSession::startLevel(const LevelDef& level)
 {
+    m_rangeExpected.clear();
+    m_rangeFound.clear();
+    m_rangeLo = kNull;
+    m_rangeHi = kNull;
+    m_rangeOptimal = 0;
     m_tree.clear();
     m_avl.clear();
     m_bin.clear();
     m_originalBin.clear();
+    m_built.clear();
     m_undo.clear();
     m_lastLog.clear();
     m_level = level;
@@ -284,6 +333,32 @@ bool GameSession::startLevel(const LevelDef& level)
         return false;
     }
     m_initialTree = Serializer::serializeBST(m_tree);
+
+    if (level.mission == MissionKind::BstRange)
+    {
+        decodeRange(level.param, m_rangeLo, m_rangeHi);
+        if (m_rangeLo > m_rangeHi)
+        {
+            m_tree.clear();
+            m_started = false;
+            return false;
+        }
+
+        // Expected answer: every key in range, in order. Computed by the model.
+        m_rangeExpected = m_tree.rangeQuery(m_rangeLo, m_rangeHi, nullptr);
+
+        // Optimal steps: visits made by the query on the unmodified tree.
+        EventLog scratch;
+        m_tree.rangeQuery(m_rangeLo, m_rangeHi, &scratch);
+        m_rangeOptimal = scratch.totalAlarmCost();
+        if (m_rangeOptimal < 1)
+        {
+            m_rangeOptimal = 1;
+        }
+        m_score.configure(m_rangeOptimal, level.objective);
+        m_started = true;
+        return true;
+    }
 
     int optimal = 1;
     if (supportsMission(level.mission))
@@ -354,6 +429,7 @@ ActionResult GameSession::applyBinary(const PlayerAction& action)
     int extraAlarm = 0;
     int penalty = 0;
     std::string message;
+    std::string before;
 
     if (mission == MissionKind::Traversal && action.kind == ActionKind::SubmitSequence)
     {
@@ -411,6 +487,81 @@ ActionResult GameSession::applyBinary(const PlayerAction& action)
         completed = LevelManager::mirrorMatches(m_originalBin, m_bin);
         message = "Children swapped.";
     }
+    else if (mission == MissionKind::Reconstruct && action.kind == ActionKind::Place)
+    {
+        const int value = action.a;
+        const int parentId = action.b;
+        const int side = action.c;
+        if (findValueId(m_bin, value) == kNull || findValueId(m_built, value) != kNull)
+        {
+            return makeResult(false, "That token is not on the shelf.");
+        }
+        TreeNode* parent = nullptr;
+        if (parentId == kNull)
+        {
+            if (m_built.root() != nullptr)
+            {
+                return makeResult(false, "The root is already placed.");
+            }
+        }
+        else
+        {
+            if (parentId < 0 || parentId >= m_built.pool().size() || !m_built.isAlive(parentId))
+            {
+                return makeResult(false, "Drop the token on a placed room.");
+            }
+            parent = m_built.pool()[parentId];
+            if ((side != Side::Left && side != Side::Right) ||
+                (side == Side::Left ? parent->left : parent->right) != nullptr)
+            {
+                return makeResult(false, "That slot is not free.");
+            }
+        }
+
+        bool correct = false;
+        if (parent == nullptr)
+        {
+            correct = m_bin.root() != nullptr && m_bin.root()->value == value;
+        }
+        else
+        {
+            const TreeNode* h = hiddenCounterpart(m_bin, parent);
+            if (h != nullptr)
+            {
+                const TreeNode* c = (side == Side::Left) ? h->left : h->right;
+                correct = c != nullptr && c->value == value;
+            }
+        }
+
+        if (correct)
+        {
+            before = Serializer::serializeBinaryTree(m_built);
+            TreeNode* node = m_built.createNode(value);
+            if (parent == nullptr)
+            {
+                m_built.setRoot(node, &m_lastLog);
+            }
+            else if (side == Side::Left)
+            {
+                m_built.attachLeft(parent, node, &m_lastLog);
+            }
+            else
+            {
+                m_built.attachRight(parent, node, &m_lastLog);
+            }
+            accepted = true;
+            changed = true;
+            extraAlarm = 1;           // one step per placement
+            completed = m_built.nodeCount() == m_bin.nodeCount() && LevelManager::reconstructMatches(m_bin, m_built);
+            message = "Token " + std::to_string(value) + " placed.";
+        }
+        else
+        {
+            extraAlarm = 1;
+            penalty = kWrongClickPenalty;
+            message = "That token does not belong in that slot. +1 alarm";
+        }
+    }
     else
     {
         return makeResult(false, "That action is not used in this mission.");
@@ -419,7 +570,7 @@ ActionResult GameSession::applyBinary(const PlayerAction& action)
     // Mirror is its own inverse, so undo simply mirrors again (see apply()).
     if (changed)
     {
-        m_undo.push("mirror");
+        m_undo.push(mission == MissionKind::Reconstruct ? before : std::string("mirror"));
     }
 
     const int alarmCost = m_lastLog.totalAlarmCost() + extraAlarm;
@@ -666,6 +817,7 @@ void GameSession::resetMissionState()
     m_cursor = kNull;
     m_rankLeft = m_rankStart;
     m_queuePos = 0;
+    m_rangeFound.clear();
 }
 
 void GameSession::restoreInitial()
@@ -674,6 +826,7 @@ void GameSession::restoreInitial()
     {
         // Rebuild instead of deserializing a snapshot: rebuilding keeps the room ids that
         // lcaPath targets depend on.
+        m_built.clear();
         buildBinaryTree(m_level, m_bin);
         return;
     }
@@ -689,7 +842,9 @@ void GameSession::restoreInitial()
         resetMissionState();
         return;
     }
+    m_rangeFound.clear();
     Serializer::deserializeBST(m_initialTree, m_tree);
+
 }
 
 // Undo entry for AVL levels: "<queuePos>|<preorder>", so avlAuto undo also rewinds the queue.
@@ -765,8 +920,15 @@ ActionResult GameSession::apply(const PlayerAction& action)
         bool restored = false;
         if (m_isBinary)
         {
-            m_bin.mirror(nullptr);          // the only Act 1 change is a mirror, which is self-inverse
-            restored = true;
+            if (m_level.mission == MissionKind::Reconstruct)
+            {
+                restored = Serializer::deserializeBinaryTree(previous, m_built);
+            }
+            else
+            {
+                m_bin.mirror(nullptr);      // the only other Act 1 change is a mirror, which is self-inverse
+                restored = true;
+            }
         }
         else if (m_isHeap)
         {
@@ -798,6 +960,14 @@ ActionResult GameSession::apply(const PlayerAction& action)
         {
             text = avlHint();
         }
+        else if (isReconstruct())
+        {
+            text = reconstructHint();
+        }
+        else if (m_level.mission == MissionKind::BstRange)
+        {
+            text = "Collect every key with lo <= key <= hi. A subtree whose keys all lie outside the range is skipped. (Star cap: 2)";
+        }
         else if (m_target != kNull)
         {
             const std::string key = std::to_string(m_target);
@@ -823,6 +993,10 @@ ActionResult GameSession::apply(const PlayerAction& action)
     if (m_isAvl)
     {
         return applyAvl(action);
+    }
+    if (m_level.mission == MissionKind::BstRange)
+    {
+        return applyRange(action);
     }
 
     m_lastLog.clear();
@@ -1097,6 +1271,103 @@ ActionResult GameSession::applyAvl(const PlayerAction& action)
     return makeResult(accepted, message);
 }
 
+// ------------------------------------------------------------ Act 2.4 range raid
+
+// Player clicks each key that lies in [lo, hi]. Every click is a ClickNode on a room.
+// A click on a room outside the range, or on a key already collected, is a wrong click.
+// A click on a room that is inside the range is accepted and its key is recorded.
+ActionResult GameSession::applyRange(const PlayerAction& action)
+{
+    m_lastLog.clear();
+    m_lastLog.beginBatch();
+
+    if (action.kind != ActionKind::ClickNode)
+    {
+        return makeResult(false, "Click the keys inside the range.");
+    }
+
+    const BSTNode* node = nullptr;
+    const NodePtrArray& pool = m_tree.pool();
+    if (action.a >= 0 && action.a < pool.size() && m_tree.isAlive(action.a))
+    {
+        node = static_cast<const BSTNode*>(pool[action.a]);
+    }
+    if (node == nullptr)
+    {
+        return makeResult(false, "Click a room.");
+    }
+
+    // Visiting the clicked room costs one alarm step.
+    Event visit(EventType::VISIT);
+    visit.id = node->id;
+    visit.alarmCost = 1;
+    emit(&m_lastLog, visit);
+
+    bool accepted = false;
+    bool completed = false;
+    int extraAlarm = 0;
+    int penalty = 0;
+    std::string message;
+
+    const bool inRange = node->key >= m_rangeLo && node->key <= m_rangeHi;
+    const bool alreadyCollected = m_rangeFound.indexOf(node->key) != kNull;
+
+    if (alreadyCollected)
+    {
+        extraAlarm = 1;
+        penalty = kWrongClickPenalty;
+        message = "Key " + std::to_string(node->key) + " is already collected. +1 alarm";
+    }
+    else if (!inRange)
+    {
+        extraAlarm = 1;
+        penalty = kWrongClickPenalty;
+        message = "Key " + std::to_string(node->key) + " is outside [" + std::to_string(m_rangeLo) + ", " +
+            std::to_string(m_rangeHi) + "]. +1 alarm";
+    }
+    else
+    {
+        m_rangeFound.push(node->key);
+        accepted = true;
+        completed = (m_rangeFound.size() == m_rangeExpected.size());
+        message = "Collected " + std::to_string(node->key) + " (" + std::to_string(m_rangeFound.size()) +
+            " of " + std::to_string(m_rangeExpected.size()) + ").";
+    }
+
+    const int alarmCost = m_lastLog.totalAlarmCost() + extraAlarm;
+    m_score.recordAction(alarmCost, penalty);
+    if (m_score.status() == HudStatus::Playing && completed)
+    {
+        m_score.markWon();
+    }
+    Event done(EventType::DONE);
+    done.key = alarmCost;
+    done.alarmCost = 0;
+    emit(&m_lastLog, done);
+    return makeResult(accepted, message);
+}
+
+int GameSession::rangeLo() const
+{
+    return m_level.mission == MissionKind::BstRange ? m_rangeLo : kNull;
+}
+
+int GameSession::rangeHi() const
+{
+    return m_level.mission == MissionKind::BstRange ? m_rangeHi : kNull;
+}
+
+int GameSession::rangeOptimal() const
+{
+    return m_level.mission == MissionKind::BstRange ? m_rangeOptimal : 0;
+}
+
+std::string GameSession::rangePrompt() const
+{
+    return "Collect every key in [" + std::to_string(m_rangeLo) + ", " + std::to_string(m_rangeHi) + "]: " +
+        std::to_string(m_rangeFound.size()) + " of " + std::to_string(m_rangeExpected.size()) + " collected.";
+}
+
 // ------------------------------------------------------------------ queries
 
 int GameSession::orderExpected() const
@@ -1203,6 +1474,10 @@ std::string GameSession::prompt() const
     {
         return "Steal the " + std::to_string(m_k) + "-th most valuable treasure. Click rooms from the root down.";
     }
+    if (mission == MissionKind::BstRange)
+    {
+        return rangePrompt();
+    }
     if (m_target != kNull)
     {
         return "Target key: " + std::to_string(m_target);
@@ -1212,6 +1487,10 @@ std::string GameSession::prompt() const
 
 ViewSnapshot GameSession::snapshot() const
 {
+    if (isReconstruct()) 
+    {
+        return SnapshotBuilder::fromBinaryTree(m_built); 
+    }
     if (m_isHeap)
     {
         return SnapshotBuilder::fromMaxHeap(m_heap);
@@ -1284,6 +1563,13 @@ int GameSession::orderK() const
 
 int GameSession::targetNodeId() const
 {
+    if (isReconstruct())
+    {
+        int v = 0;
+        int p = kNull;
+        int s = Side::None;
+        return nextPlacement(v, p, s) ? p : kNull;
+    }
     if (m_isHeap)
     {
         return heapTargetIndex();
@@ -1699,4 +1985,107 @@ ActionResult GameSession::applyHeap(const PlayerAction& action)
     done.key = stepCost;
     emit(&m_lastLog, done);
     return makeResult(accepted, message);
+}
+
+const BinaryTree& GameSession::builtTree() const
+{
+    return m_built;
+}
+
+bool GameSession::isReconstruct() const
+{
+    return m_isBinary && m_level.mission == MissionKind::Reconstruct;
+}
+
+IntArray GameSession::reconstructTokens() const
+{
+    IntArray out;
+    if (!isReconstruct())
+    {
+        return out;
+    }
+    const NodePtrArray& pool = m_bin.pool();
+    for (int i = 0; i < pool.size(); i++)
+    {
+        if (m_bin.isAlive(i) && findValueId(m_built, pool[i]->value) == kNull)
+        {
+            out.push(pool[i]->value);
+        }
+    }
+    for (int i = 1; i < out.size(); i++)      // ascending, so the shelf order leaks nothing
+    {
+        const int v = out[i];
+        int j = i;
+        while (j > 0 && out[j - 1] > v)
+        {
+            out[j] = out[j - 1];
+            j--;
+        }
+        out[j] = v;
+    }
+    return out;
+}
+
+std::string GameSession::reconstructClue() const
+{
+    if (!isReconstruct())
+    {
+        return "";
+    }
+    const bool post = (m_level.param == 1);       // param 0: preorder + inorder, 1: postorder + inorder
+    const IntArray first = post ? m_bin.postorder() : m_bin.preorder();
+    const IntArray in = m_bin.inorder();
+    std::string s = post ? "Postorder:" : "Preorder:";
+    for (int i = 0; i < first.size(); i++)
+    {
+        s += " " + std::to_string(m_bin.pool()[first[i]]->value);
+    }
+    s += "   Inorder:";
+    for (int i = 0; i < in.size(); i++)
+    {
+        s += " " + std::to_string(m_bin.pool()[in[i]]->value);
+    }
+    return s;
+}
+
+// Next correct placement: first hidden node (level order) that is not built yet.
+bool GameSession::nextPlacement(int& value, int& parentId, int& side) const
+{
+    const IntArray order = m_bin.levelOrder(nullptr);
+    for (int i = 0; i < order.size(); i++)
+    {
+        const TreeNode* h = m_bin.pool()[order[i]];
+        if (findValueId(m_built, h->value) != kNull)
+        {
+            continue;
+        }
+        value = h->value;
+        if (h->parent == nullptr)
+        {
+            parentId = kNull;
+            side = Side::None;
+            return true;
+        }
+        parentId = findValueId(m_built, h->parent->value);
+        side = (h->parent->left == h) ? Side::Left : Side::Right;
+        return parentId != kNull;
+    }
+    return false;
+}
+
+std::string GameSession::reconstructHint() const
+{
+    int v = 0;
+    int p = kNull;
+    int s = Side::None;
+    if (!nextPlacement(v, p, s))
+    {
+        return "Every token is placed.";
+    }
+    if (p == kNull)
+    {
+        return "Place token " + std::to_string(v) + " as the ROOT. (Star cap: 2)";
+    }
+    return "Place token " + std::to_string(v) + " on the " + (s == Side::Left ? "left" : "right") +
+        " of room " + std::to_string(m_built.pool()[p]->value) + ". (Star cap: 2)";
 }

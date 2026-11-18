@@ -189,6 +189,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="gui\Assets.cpp" />
+    <ClCompile Include="gui\screens\HeapLevel.cpp" />
     <ClCompile Include="gui\UIManager.cpp" />
     <ClCompile Include="gui\AnimationController.cpp" />
     <ClCompile Include="gui\LayoutEngine.cpp" />
@@ -216,6 +217,12 @@
     <ClCompile Include="model\Sorts.cpp" />
     <ClCompile Include="model\TreeNode.cpp" />
     <ClCompile Include="model\Validator.cpp" />
+    <ClCompile Include="tests\test_act1_act4.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Containers.h" />
@@ -243,8 +250,14 @@
     <ClInclude Include="gui\IEventVisualizer.h" />
     <ClInclude Include="gui\LayoutEngine.h" />
     <ClInclude Include="gui\Renderer.h" />
+    <ClInclude Include="gui\screens\HeapLevel.h" />
     <ClInclude Include="gui\Theme.h" />
-    <ClInclude Include="gui\UIManager.h" />
+    <ClInclude Include="gui\UIManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="gui\screens\BriefingScreen.h" />
     <ClInclude Include="gui\screens\CampaignMap.h" />
     <ClInclude Include="gui\screens\LevelScreen.h" />

@@ -5,6 +5,7 @@
 
 
 // Screen IDs as plain ints (no enums).
+// Screen IDs as plain ints (no enums).
 namespace ScreenId {
     inline const int MainMenu = 0;
     inline const int Campaign = 1;
@@ -14,7 +15,8 @@ namespace ScreenId {
     inline const int Settings = 5;
     inline const int Briefing = 6;
     inline const int Level = 7;
-    inline const int Result = 8;      
+    inline const int Result = 8;
+    inline const int HeapLevel = 9;   // Act 4 (campaign index 15..19)
     inline const int None = -1;
 }  // namespace ScreenId
 

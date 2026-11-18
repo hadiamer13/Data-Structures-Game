@@ -5,6 +5,7 @@
 #include "screens/CampaignMap.h"
 #include "screens/BriefingScreen.h"
 #include "screens/LevelScreen.h"
+#include "screens/HeapLevel.h"
 #include "screens/SandboxScreen.h"
 #include "screens/ResultScreen.h"
 
@@ -37,8 +38,7 @@ void UIManager::requestQuit()
 Screen* UIManager::makeScreen(int id)
 {
     // ---- INTEGRATION POINT -------------------------------------------
-    // This is the ONLY place to edit when a real screen replaces a
-    // placeholder. Later: Act 4 levels go to a HeapLevel screen.
+    // The only place that maps a screen ID to a screen object.
     // ------------------------------------------------------------------
     switch (id)
     {
@@ -58,6 +58,8 @@ Screen* UIManager::makeScreen(int id)
         return new BriefingScreen(m_ctx);
     case ScreenId::Level:
         return new LevelScreen(m_ctx);
+    case ScreenId::HeapLevel:
+        return new HeapLevel(m_ctx);
     case ScreenId::Result:
         return new ResultScreen(m_ctx);
     default:
@@ -84,11 +86,12 @@ void UIManager::applyPending()
 
 void UIManager::handleEvent(const sf::Event& e)
 {
-    // Global Esc: Briefing and Level step back to the Campaign Map,
+    // Global Esc: Briefing, Level, HeapLevel and Result step back to the Campaign Map,
     // every other screen returns to the Main Menu.
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape)
     {
-        if (m_currentId == ScreenId::Briefing || m_currentId == ScreenId::Level || m_currentId == ScreenId::Result)
+        if (m_currentId == ScreenId::Briefing || m_currentId == ScreenId::Level ||
+            m_currentId == ScreenId::HeapLevel || m_currentId == ScreenId::Result)
         {
             requestScreen(ScreenId::Campaign);
             return;

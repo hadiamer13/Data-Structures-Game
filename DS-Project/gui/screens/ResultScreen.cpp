@@ -166,9 +166,8 @@ void ResultScreen::onCampaignClick(void* context)
 
 void ResultScreen::onRetry()
 {
-    // INTEGRATION: Act 4 levels may later go to a HeapLevel screen instead.
     m_ctx.selectedLevel = m_ctx.result.levelIndex;
-    m_ctx.ui->requestScreen(ScreenId::Level);
+    m_ctx.ui->requestScreen(m_ctx.result.levelIndex >= 15 ? ScreenId::HeapLevel : ScreenId::Level);
 }
 
 void ResultScreen::onNext()

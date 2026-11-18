@@ -4,7 +4,20 @@
     { "index": 1, "name": "Search the Wing", "concept": "BST search", "objective": "Find the target key.", "treeKind": "bst", "mission": "bstSearch", "seed": 201, "nodeCount": 9, "style": "random", "param": 5, "boss": false, "preorder": "" },
     { "index": 2, "name": "Stash the Loot", "concept": "BST insertion", "objective": "Insert the target key.", "treeKind": "bst", "mission": "bstInsert", "seed": 202, "nodeCount": 9, "style": "random", "param": 17, "boss": false, "preorder": "" },
     { "index": 3, "name": "Collapse the Corridor", "concept": "BST deletion", "objective": "Remove the marked key.", "treeKind": "bst", "mission": "bstDelete", "seed": 203, "nodeCount": 10, "style": "random", "param": 4, "boss": false, "preorder": "" },
-    { "index": 4, "name": "Range Raid", "concept": "Pruned range query", "objective": "Collect keys inside the target range.", "treeKind": "bst", "mission": "bstRange", "seed": 204, "nodeCount": 11, "style": "random", "param": 0, "boss": false, "preorder": "" },
+    {
+        "index": 4,
+        "name": "Range Raid",
+        "concept": "Pruned range query",
+        "objective": "Collect every key inside the target range.",
+        "treeKind": "bst",
+        "mission": "bstRange",
+        "seed": 204,
+        "nodeCount": 11,
+        "style": "random",
+        "param": 4009,
+        "boss": false,
+        "preorder": ""
+    },
     { "index": 5, "name": "Lazy Architect", "concept": "Degenerate BST", "objective": "Search the corridor before the alarm fills.", "treeKind": "bst", "mission": "bstBoss", "seed": 205, "nodeCount": 12, "style": "skewed", "param": 12, "boss": true, "preorder": "" }
   ]
 }
