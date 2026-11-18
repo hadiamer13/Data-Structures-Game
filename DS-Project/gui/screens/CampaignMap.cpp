@@ -2,30 +2,45 @@
 #include "CampaignMap.h"
 #include "../UIManager.h"
 #include "../Theme.h"
-#include "../FakeCampaignData.h"   // INTEGRATION: remove at integration
 #include <cstdio>
 #include <cmath>
+#include <string>
 
-namespace {
+namespace
+{
+    float minF(float a, float b)
+    {
+        return a < b ? a : b;
+    }
 
-    float minF(float a, float b) { return a < b ? a : b; }
-    float maxF(float a, float b) { return a > b ? a : b; }
+    float maxF(float a, float b)
+    {
+        return a > b ? a : b;
+    }
 
-    // Act names alone (FakeCampaign::ActTitles has two lines, not suited here).
-    const char* const ActNames[4] = {
+    // Act names alone.
+    const char* const ActNames[4] =
+    {
         "The Blueprint Wing", "The Sorted Wing",
         "The Architect's Wing", "The Heap Fortress"
     };
 
-    void centerOrigin(sf::Text& t) {
+    void centerOrigin(sf::Text& t)
+    {
         sf::FloatRect b = t.getLocalBounds();
         t.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
     }
 
-}  // namespace
+    // "1.1  Guard Patrol" for the info panel title.
+    std::string levelTitle(int act, int slot, const std::string& name)
+    {
+        return std::to_string(act + 1) + "." + std::to_string(slot + 1) + "  " + name;
+    }
+}
 
 void CampaignMap::styleText(sf::Text& t, const sf::Font& font, unsigned size,
-    const sf::Color& col, float x, float y) {
+    const sf::Color& col, float x, float y)
+{
     t.setFont(font);                          // SFML 2.x API
     t.setCharacterSize(size);
     t.setFillColor(col);
@@ -34,7 +49,8 @@ void CampaignMap::styleText(sf::Text& t, const sf::Font& font, unsigned size,
     t.setPosition(x, y);
 }
 
-void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy) {
+void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy)
+{
     s.setPointCount(3);
     float d = left ? -1.f : 1.f;
     s.setPoint(0, sf::Vector2f(d * 14.f, 0.f));      // tip
@@ -44,12 +60,15 @@ void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy) 
     s.setOutlineThickness(2.f);
 }
 
-void CampaignMap::buildStars(float x, float y) {
+void CampaignMap::buildStars(float x, float y)
+{
     const float outer = 14.f;
     const float inner = outer * 0.45f;
-    for (int s = 0; s < 3; ++s) {
+    for (int s = 0; s < 3; ++s)
+    {
         m_star[s].setPointCount(10);
-        for (int p = 0; p < 10; ++p) {
+        for (int p = 0; p < 10; ++p)
+        {
             float r = (p % 2 == 0) ? outer : inner;
             float a = -Theme::Pi / 2.f + p * (Theme::Pi / 5.f);
             m_star[s].setPoint(p, sf::Vector2f(r * std::cos(a), r * std::sin(a)));
@@ -59,8 +78,10 @@ void CampaignMap::buildStars(float x, float y) {
     }
 }
 
-CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
-    const sf::Font& font = ctx.assets->font();
+CampaignMap::CampaignMap(AppContext& ctx)
+    : m_ctx(ctx), m_campaign(ctx.campaign), m_font(&ctx.assets->font())
+{
+    const sf::Font& font = *m_font;
     const float W = static_cast<float>(Theme::WindowW);
     const float H = static_cast<float>(Theme::WindowH);
 
@@ -68,8 +89,6 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
     m_arrowHover[0] = m_arrowHover[1] = false;
 
     // ---- Background -------------------------------------------------
-    // TODO(YOU): image path is Theme::CampaignBgPath (Theme.h). A dark
-    // red background suits this screen best.
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x),
@@ -78,15 +97,14 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
     m_dim.setFillColor(sf::Color(0, 0, 0, 110));
 
     // ---- Corner decoration (4 L shapes made of 2 bars each) ----------
-    // TODO(YOU): swap for your corner image from the pack if you want;
-    // load it in Assets and draw a sprite per corner instead.
     {
         const float inset = 12.f, len = 70.f, th = 3.f;
         const float xs[4] = { inset, W - inset, inset, W - inset };
         const float ys[4] = { inset, inset, H - inset, H - inset };
         const float dx[4] = { 1.f, -1.f, 1.f, -1.f };
         const float dy[4] = { 1.f, 1.f, -1.f, -1.f };
-        for (int c = 0; c < 4; ++c) {
+        for (int c = 0; c < 4; ++c)
+        {
             sf::RectangleShape& h = m_corner[c * 2];
             sf::RectangleShape& v = m_corner[c * 2 + 1];
             h.setSize(sf::Vector2f(len * dx[c], th));
@@ -100,7 +118,8 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
 
     // ---- Top bar: tabs ------------------------------------------------
     const float tabY = 30.f;
-    for (int a = 0; a < ActCount; ++a) {
+    for (int a = 0; a < ActCount; ++a)
+    {
         char buf[16];
         std::snprintf(buf, sizeof(buf), "ACT %d", a + 1);
         float cx = W / 2.f + (a - 1.5f) * 190.f;
@@ -137,15 +156,10 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
     m_diamond.setFillColor(Theme::NodeGlow);
 
     // ---- Banners ----------------------------------------------------
-    // TODO(YOU): if your banner frame looks too wide/narrow, change the
-    // 215 px spacing below and Theme::BannerH.
-    const float bannerY = 262.f;
-    for (int i = 0; i < PerAct; ++i) {
-        char num[8];
-        std::snprintf(num, sizeof(num), "%d", i + 1);
-        m_banner[i].init(num, font, ctx.assets->banner(), ctx.assets->skull(),
-            sf::Vector2f(W / 2.f + (i - 2) * 215.f, bannerY),
-            Theme::BannerH, false);   // boss flag set in setAct
+    // Positions, numbers, boss flags and states come from initBanners() and
+    // loadBannerStates(), called by setAct(). Only the callbacks are set here.
+    for (int i = 0; i < PerAct; ++i)
+    {
         m_bannerCtx[i].map = this;
         m_bannerCtx[i].slot = i;
         m_banner[i].setCallback(&CampaignMap::onBannerClick, &m_bannerCtx[i]);
@@ -182,9 +196,18 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
         sf::Vector2f(150.f, 42.f));
     m_back.setCallback(&CampaignMap::onBackClick, this);
 
+    // DEBUG button: bottom-left of the info panel, clear of the text and Start.
+    m_debug.init("DEBUG: UNLOCK ALL (OFF)", font,
+        sf::Vector2f(m_panelX + 150.f, m_panelY + m_panelH - 55.f),
+        sf::Vector2f(260.f, 42.f));
+    m_debug.setCallback(&CampaignMap::onDebugClick, this);
+    refreshDebugLabel();
+
     // ---- Restore position when coming back from the Briefing -----------------
-    int act = 0, sel = 0;
-    if (ctx.selectedLevel >= 0 && ctx.selectedLevel < ActCount * PerAct) {
+    int act = 0;
+    int sel = 0;
+    if (ctx.selectedLevel >= 0 && ctx.selectedLevel < ActCount * PerAct)
+    {
         act = ctx.selectedLevel / PerAct;
         sel = ctx.selectedLevel % PerAct;
     }
@@ -194,44 +217,57 @@ CampaignMap::CampaignMap(AppContext& ctx) : m_ctx(ctx) {
     setSelected(sel);
 }
 
-void CampaignMap::loadBannerStates() {
-    // ---- INTEGRATION POINT ------------------------------------------
-    // Replace FakeCampaign::Stars / Unlocked with SaveManager and
-    // LevelManager results, e.g. save->starsFor(i), lm->isUnlocked(i).
-    // -----------------------------------------------------------------
-    for (int s = 0; s < PerAct; ++s) {
-        int i = m_act * PerAct + s;
-        m_banner[s].setState(FakeCampaign::Stars[i], FakeCampaign::Unlocked[i] != 0);
+// Banner number, boss flag and layout for the current act.
+void CampaignMap::initBanners()
+{
+    const float W = static_cast<float>(Theme::WindowW);
+    for (int i = 0; i < PerAct; ++i)
+    {
+        char num[8];
+        std::snprintf(num, sizeof(num), "%d", i + 1);
+        const bool boss = m_campaign->isBoss(m_act * PerAct + i);
+        m_banner[i].init(num, *m_font, m_ctx.assets->banner(), m_ctx.assets->skull(),
+            sf::Vector2f(W / 2.f + (i - 2) * 215.f, 262.f),
+            Theme::BannerH, boss);
     }
 }
 
-void CampaignMap::refreshFromData() {
+void CampaignMap::loadBannerStates()
+{
+    for (int s = 0; s < PerAct; ++s)
+    {
+        const int i = m_act * PerAct + s;
+        m_banner[s].setState(m_campaign->stars(i), m_campaign->isUnlocked(i));
+    }
+}
+
+void CampaignMap::refreshFromData()
+{
     loadBannerStates();
     refreshInfo();
 }
 
-void CampaignMap::setAct(int act) {
-    if (act < 0) act = 0;
-    if (act >= ActCount) act = ActCount - 1;
+void CampaignMap::setAct(int act)
+{
+    if (act < 0)
+    {
+        act = 0;
+    }
+    if (act >= ActCount)
+    {
+        act = ActCount - 1;
+    }
     m_act = act;
 
-    // Boss flag: slot 4 of acts 2..4. LevelBanner::init set it to false,
-    // so re-init the four banners that can be a boss only via a fresh init.
-    const sf::Font& font = *m_status.getFont();
     const float W = static_cast<float>(Theme::WindowW);
-    for (int i = 0; i < PerAct; ++i) {
-        char num[8];
-        std::snprintf(num, sizeof(num), "%d", i + 1);
-        bool boss = (act >= 1 && i == PerAct - 1);
-        m_banner[i].init(num, font, m_ctx.assets->banner(), m_ctx.assets->skull(),
-            sf::Vector2f(W / 2.f + (i - 2) * 215.f, 262.f),
-            Theme::BannerH, boss);
-    }
+    initBanners();
     loadBannerStates();
 
     // Tab visuals
     for (int a = 0; a < ActCount; ++a)
+    {
         m_tab[a].setFillColor(a == act ? Theme::NodeGlow : Theme::TextColor);
+    }
     m_tabUnder.setOrigin(55.f, 1.5f);
     m_tabUnder.setPosition(m_tab[act].getPosition().x,
         m_tab[act].getPosition().y + 24.f);
@@ -242,9 +278,11 @@ void CampaignMap::setAct(int act) {
 
     // Select the first level still to play (or the first one).
     int pick = 0;
-    for (int s = 0; s < PerAct; ++s) {
-        int i = act * PerAct + s;
-        if (FakeCampaign::Unlocked[i] != 0 && FakeCampaign::Stars[i] == 0) {
+    for (int s = 0; s < PerAct; ++s)
+    {
+        const int i = act * PerAct + s;
+        if (m_campaign->isUnlocked(i) && m_campaign->stars(i) == 0)
+        {
             pick = s;
             break;
         }
@@ -252,144 +290,289 @@ void CampaignMap::setAct(int act) {
     setSelected(pick);
 }
 
-void CampaignMap::setSelected(int slot) {
-    if (slot < 0) slot = 0;
-    if (slot >= PerAct) slot = PerAct - 1;
+void CampaignMap::setSelected(int slot)
+{
+    if (slot < 0)
+    {
+        slot = 0;
+    }
+    if (slot >= PerAct)
+    {
+        slot = PerAct - 1;
+    }
     m_sel = slot;
-    for (int s = 0; s < PerAct; ++s) m_banner[s].setSelected(s == slot);
+    for (int s = 0; s < PerAct; ++s)
+    {
+        m_banner[s].setSelected(s == slot);
+    }
     refreshInfo();
 }
 
-void CampaignMap::refreshInfo() {
-    // Strings are only rewritten here (on change), never per frame.
-    int i = levelIndex();
-    bool unlocked = FakeCampaign::Unlocked[i] != 0;
-    int stars = unlocked ? FakeCampaign::Stars[i] : 0;
-    bool boss = (m_act >= 1 && m_sel == PerAct - 1);
+bool CampaignMap::startEnabled() const
+{
+    return m_campaign->loaded() && m_campaign->isUnlocked(levelIndex());
+}
 
-    m_title.setString(FakeCampaign::Names[i]);
-    m_concept.setString(FakeCampaign::Concepts[i]);
-    m_objective.setString(FakeCampaign::Objectives[i]);
+void CampaignMap::refreshDebugLabel()
+{
+    m_debug.setLabel(m_campaign->unlockAll() ? "DEBUG: UNLOCK ALL (ON)" : "DEBUG: UNLOCK ALL (OFF)");
+}
+
+void CampaignMap::refreshInfo()
+{
+    // Strings are only rewritten here (on change), never per frame.
+    if (!m_campaign->loaded())
+    {
+        m_title.setString("CAMPAIGN DATA MISSING");
+        m_status.setString("ERROR");
+        m_concept.setString(m_campaign->error());
+        m_objective.setString("Check that levels/act1.json to act4.json sit next to the game.");
+        m_bestLabel.setString("");
+        for (int s = 0; s < 3; ++s)
+        {
+            m_star[s].setFillColor(sf::Color(0, 0, 0, 0));
+            m_star[s].setOutlineColor(Theme::StarOff);
+        }
+        return;
+    }
+
+    const int i = levelIndex();
+    const LevelDef& def = m_campaign->level(i);
+    const bool unlocked = m_campaign->isUnlocked(i);
+    const int stars = unlocked ? m_campaign->stars(i) : 0;
+    const bool boss = m_campaign->isBoss(i);
+
+    m_title.setString(levelTitle(m_act, m_sel, def.name));
+    m_concept.setString(def.conceptText);
+    m_objective.setString(def.objective);
 
     // Not colour alone: status is a word.
     const char* word = "OPEN";
-    if (!unlocked)      word = "LOCKED";
-    else if (stars > 0) word = boss ? "CLEARED  -  BOSS LEVEL" : "CLEARED";
-    else if (boss)      word = "OPEN  -  BOSS LEVEL";
+    if (!unlocked)
+    {
+        word = "LOCKED";
+    }
+    else if (stars > 0)
+    {
+        word = boss ? "CLEARED  -  BOSS LEVEL" : "CLEARED";
+    }
+    else if (boss)
+    {
+        word = "OPEN  -  BOSS LEVEL";
+    }
     m_status.setString(word);
 
     m_bestLabel.setString("BEST");
-    for (int s = 0; s < 3; ++s) {
-        bool on = s < stars;
+    for (int s = 0; s < 3; ++s)
+    {
+        const bool on = s < stars;
         m_star[s].setFillColor(on ? Theme::StarOn : sf::Color(0, 0, 0, 0));
         m_star[s].setOutlineColor(on ? Theme::StarOn : Theme::StarOff);
     }
 }
 
-void CampaignMap::onBannerClick(void* context) {
+void CampaignMap::onBannerClick(void* context)
+{
     BannerCtx* c = static_cast<BannerCtx*>(context);
     c->map->onBannerClicked(c->slot);
 }
-void CampaignMap::onStartClick(void* context) {
+
+void CampaignMap::onStartClick(void* context)
+{
     static_cast<CampaignMap*>(context)->onStart();
 }
-void CampaignMap::onBackClick(void* context) {
+
+void CampaignMap::onBackClick(void* context)
+{
     static_cast<CampaignMap*>(context)->onBack();
 }
 
-void CampaignMap::onBannerClicked(int slot) {
-    // First click selects; clicking the selected banner opens the Briefing.
-    if (slot == m_sel) onStart();
-    else               setSelected(slot);
+void CampaignMap::onDebugClick(void* context)
+{
+    static_cast<CampaignMap*>(context)->onDebugUnlock();
 }
 
-void CampaignMap::onStart() {
-    int i = levelIndex();
-    if (FakeCampaign::Unlocked[i] == 0) return;      // locked: nothing happens
-    // ---- INTEGRATION POINT ------------------------------------------
-    // Later: pass a LevelDef (from LevelLoader) instead of a bare index.
-    // -----------------------------------------------------------------
-    m_ctx.selectedLevel = i;
+void CampaignMap::onBannerClicked(int slot)
+{
+    // First click selects; clicking the selected banner opens the Briefing.
+    if (slot == m_sel)
+    {
+        onStart();
+    }
+    else
+    {
+        setSelected(slot);
+    }
+}
+
+void CampaignMap::onStart()
+{
+    if (!startEnabled())
+    {
+        return;      // locked or data missing: nothing happens
+    }
+    m_ctx.selectedLevel = levelIndex();
     m_ctx.ui->requestScreen(ScreenId::Briefing);
 }
 
-void CampaignMap::onBack() {
+void CampaignMap::onBack()
+{
     m_ctx.ui->requestScreen(ScreenId::MainMenu);
 }
 
-void CampaignMap::handleEvent(const sf::Event& e) {
+void CampaignMap::onDebugUnlock()
+{
+    if (!m_campaign->loaded())
+    {
+        return;
+    }
+    m_campaign->toggleUnlockAll();
+    loadBannerStates();
+    refreshDebugLabel();
+    refreshInfo();
+}
+
+void CampaignMap::handleEvent(const sf::Event& e)
+{
     // Esc is handled globally by UIManager.
-    if (e.type == sf::Event::KeyPressed) {
+    if (e.type == sf::Event::KeyPressed)
+    {
         sf::Keyboard::Key k = e.key.code;
-        if (k == sf::Keyboard::Left || k == sf::Keyboard::Q) setAct(m_act - 1);
-        if (k == sf::Keyboard::Right || k == sf::Keyboard::E) setAct(m_act + 1);
-        if (k == sf::Keyboard::Return) onStart();
+        if (k == sf::Keyboard::Left || k == sf::Keyboard::Q)
+        {
+            setAct(m_act - 1);
+        }
+        if (k == sf::Keyboard::Right || k == sf::Keyboard::E)
+        {
+            setAct(m_act + 1);
+        }
+        if (k == sf::Keyboard::Return)
+        {
+            onStart();
+        }
     }
 
-    if (e.type == sf::Event::MouseMoved) {
+    if (e.type == sf::Event::MouseMoved)
+    {
         float mx = static_cast<float>(e.mouseMove.x);
         float my = static_cast<float>(e.mouseMove.y);
         m_tabHover = -1;
         for (int a = 0; a < ActCount; ++a)
-            if (m_tabRect[a].contains(mx, my)) m_tabHover = a;
+        {
+            if (m_tabRect[a].contains(mx, my))
+            {
+                m_tabHover = a;
+            }
+        }
         for (int s = 0; s < 2; ++s)
+        {
             m_arrowHover[s] = m_arrowRect[s].contains(mx, my);
+        }
     }
 
-    if (e.type == sf::Event::MouseButtonPressed &&
-        e.mouseButton.button == sf::Mouse::Left) {
+    if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left)
+    {
         float mx = static_cast<float>(e.mouseButton.x);
         float my = static_cast<float>(e.mouseButton.y);
-        if (m_arrowRect[0].contains(mx, my)) setAct(m_act - 1);
-        if (m_arrowRect[1].contains(mx, my)) setAct(m_act + 1);
+        if (m_arrowRect[0].contains(mx, my))
+        {
+            setAct(m_act - 1);
+        }
+        if (m_arrowRect[1].contains(mx, my))
+        {
+            setAct(m_act + 1);
+        }
         for (int a = 0; a < ActCount; ++a)
-            if (m_tabRect[a].contains(mx, my)) setAct(a);
+        {
+            if (m_tabRect[a].contains(mx, my))
+            {
+                setAct(a);
+            }
+        }
     }
 
-    for (int s = 0; s < PerAct; ++s) m_banner[s].handleEvent(e);
+    for (int s = 0; s < PerAct; ++s)
+    {
+        m_banner[s].handleEvent(e);
+    }
     m_back.handleEvent(e);
-    if (FakeCampaign::Unlocked[levelIndex()] != 0) m_start.handleEvent(e);
+    m_debug.handleEvent(e);
+    if (startEnabled())
+    {
+        m_start.handleEvent(e);
+    }
 }
 
-void CampaignMap::update(float dt) {
-    for (int s = 0; s < PerAct; ++s) m_banner[s].update(dt);
+void CampaignMap::update(float dt)
+{
+    for (int s = 0; s < PerAct; ++s)
+    {
+        m_banner[s].update(dt);
+    }
     m_back.update(dt);
+    m_debug.update(dt);
     m_start.update(dt);
 
     // Tab hover: brighten (current act stays highlighted).
-    for (int a = 0; a < ActCount; ++a) {
-        if (a == m_act) m_tab[a].setFillColor(Theme::NodeGlow);
-        else if (a == m_tabHover) m_tab[a].setFillColor(Theme::BannerHover);
-        else m_tab[a].setFillColor(Theme::TextColor);
+    for (int a = 0; a < ActCount; ++a)
+    {
+        if (a == m_act)
+        {
+            m_tab[a].setFillColor(Theme::NodeGlow);
+        }
+        else if (a == m_tabHover)
+        {
+            m_tab[a].setFillColor(Theme::BannerHover);
+        }
+        else
+        {
+            m_tab[a].setFillColor(Theme::TextColor);
+        }
     }
 
     // Arrows: ease the hover scale; dim at the ends (not colour alone:
     // an arrow at the end is also drawn smaller and without outline).
-    for (int s = 0; s < 2; ++s) {
+    for (int s = 0; s < 2; ++s)
+    {
         float t = m_arrowHover[s] ? 1.f : 0.f;
         float st = 8.f * dt;
-        if (m_arrowAmt[s] < t) m_arrowAmt[s] = minF(t, m_arrowAmt[s] + st);
-        else                   m_arrowAmt[s] = maxF(t, m_arrowAmt[s] - st);
+        if (m_arrowAmt[s] < t)
+        {
+            m_arrowAmt[s] = minF(t, m_arrowAmt[s] + st);
+        }
+        else
+        {
+            m_arrowAmt[s] = maxF(t, m_arrowAmt[s] - st);
+        }
 
         bool atEnd = (s == 0 && m_act == 0) || (s == 1 && m_act == ActCount - 1);
         float sc = (atEnd ? 0.7f : 1.f) + 0.25f * m_arrowAmt[s];
         m_arrow[s].setScale(sc, sc);
         sf::Color fill = atEnd ? Theme::StarOff : Theme::NodeLine;
-        if (!atEnd && m_arrowAmt[s] > 0.5f) fill = Theme::NodeGlow;
+        if (!atEnd && m_arrowAmt[s] > 0.5f)
+        {
+            fill = Theme::NodeGlow;
+        }
         m_arrow[s].setFillColor(fill);
-        m_arrow[s].setOutlineColor(atEnd ? sf::Color(0, 0, 0, 0)
-            : sf::Color(0, 0, 0, 200));
+        m_arrow[s].setOutlineColor(atEnd ? sf::Color(0, 0, 0, 0) : sf::Color(0, 0, 0, 200));
     }
 }
 
-void CampaignMap::draw(sf::RenderWindow& window) {
+void CampaignMap::draw(sf::RenderWindow& window)
+{
     window.draw(m_background);
     window.draw(m_dim);
-    for (int c = 0; c < 8; ++c) window.draw(m_corner[c]);
+    for (int c = 0; c < 8; ++c)
+    {
+        window.draw(m_corner[c]);
+    }
 
     // Top bar
     m_back.draw(window);
-    for (int a = 0; a < ActCount; ++a) window.draw(m_tab[a]);
+    for (int a = 0; a < ActCount; ++a)
+    {
+        window.draw(m_tab[a]);
+    }
     window.draw(m_tabUnder);
     window.draw(m_arrow[0]);
     window.draw(m_arrow[1]);
@@ -399,7 +582,12 @@ void CampaignMap::draw(sf::RenderWindow& window) {
 
     // Banners: selected one last so its glow and scale sit on top.
     for (int s = 0; s < PerAct; ++s)
-        if (s != m_sel) m_banner[s].draw(window);
+    {
+        if (s != m_sel)
+        {
+            m_banner[s].draw(window);
+        }
+    }
     m_banner[m_sel].draw(window);
 
     // Info panel
@@ -409,8 +597,18 @@ void CampaignMap::draw(sf::RenderWindow& window) {
     window.draw(m_concept);
     window.draw(m_objective);
     window.draw(m_bestLabel);
-    for (int s = 0; s < 3; ++s) window.draw(m_star[s]);
+    for (int s = 0; s < 3; ++s)
+    {
+        window.draw(m_star[s]);
+    }
 
-    if (FakeCampaign::Unlocked[levelIndex()] != 0) m_start.draw(window);
-    else                                           window.draw(m_lockedMsg);
+    m_debug.draw(window);
+    if (startEnabled())
+    {
+        m_start.draw(window);
+    }
+    else
+    {
+        window.draw(m_lockedMsg);
+    }
 }

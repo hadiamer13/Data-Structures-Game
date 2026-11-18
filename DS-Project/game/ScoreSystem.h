@@ -26,9 +26,13 @@ public:
     int status() const;
     HudState hud() const;
 
+    void useHint();
+    bool hintUsed() const;
+
 private:
     int m_alarm;
     int m_alarmCap;
+    bool m_hintUsed;
     int m_stepsTaken;
     int m_optimalSteps;
     int m_penalties;

@@ -4,8 +4,10 @@
 #include "../AppContext.h"
 #include "../widgets/Button.h"
 #include "../widgets/LevelBanner.h"
+#include "../../game/Campaign.h"
 
-class CampaignMap : public Screen {
+class CampaignMap : public Screen
+{
 public:
     explicit CampaignMap(AppContext& ctx);
 
@@ -13,38 +15,47 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the static callbacks (public so they can reach it).
+    // Called by the static callbacks (public so they can reach them).
     void onBannerClicked(int slot);
     void onStart();
     void onBack();
+    void onDebugUnlock();
 
-    // INTEGRATION (later): call after SaveManager loads or a level ends,
-    // so stars/locks update without rebuilding the screen.
+    // Re-reads stars and locks from the Campaign (e.g. after a result is saved).
     void refreshFromData();
 
 private:
     static const int ActCount = 4;
     static const int PerAct = 5;
 
-    struct BannerCtx {
+    struct BannerCtx
+    {
         CampaignMap* map;
-        int          slot;     // 0..4 inside the current act
+        int slot;     // 0..4 inside the current act
     };
+
     static void onBannerClick(void* context);
     static void onStartClick(void* context);
     static void onBackClick(void* context);
+    static void onDebugClick(void* context);
 
-    int  levelIndex() const { return m_act * PerAct + m_sel; }
+    int levelIndex() const { return m_act * PerAct + m_sel; }
+    bool startEnabled() const;
     void setAct(int act);
     void setSelected(int slot);
+    void initBanners();
     void refreshInfo();
     void loadBannerStates();
+    void refreshDebugLabel();
     void buildArrow(sf::ConvexShape& s, bool left, float cx, float cy);
     void buildStars(float x, float y);
     void styleText(sf::Text& t, const sf::Font& font, unsigned size,
         const sf::Color& col, float x, float y);
 
     AppContext& m_ctx;
+    Campaign* m_campaign;
+    const sf::Font* m_font;
+
     int m_act = 0;      // 0..3
     int m_sel = 0;      // 0..4 (selected banner in this act)
 
@@ -79,4 +90,5 @@ private:
 
     Button m_start;
     Button m_back;
+    Button m_debug;     // DEBUG: toggles unlock-all
 };

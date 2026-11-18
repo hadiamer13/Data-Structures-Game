@@ -34,6 +34,7 @@ public:
     bool isMaxHeap() const;
     bool isMaxHeap(int heapSize) const;
     bool isSortedAscending() const;
+    bool loadRaw(const IntArray& values, int activeSize);
 
 private:
     void siftDownRaw(int index, int heapSize, int reason, EventLog* log);
