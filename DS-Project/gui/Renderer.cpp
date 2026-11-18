@@ -259,7 +259,7 @@ void Renderer::refreshLabel(int i)
         s += std::to_string(r.balance);
         m_badge[i]->setString(s);
     }
-    else if (m_kind == TreeKind::MaxHeap && i == 0)
+    else if (m_kind == TreeKind::MaxHeap && i == 0 && m_activeSize > 0)
     {
         m_badge[i]->setString("MAX");
     }
@@ -581,6 +581,16 @@ void Renderer::beginEvent(const Event& e)
         }
         m_edgesDirty = true;
     }
+    else if (t == EventType::HEAP_BUILD)
+    {
+        // idx = first index to sift (n/2 - 1). Show the whole active region as the work area.
+        if (validIdx(e.idx))
+        {
+            m_nodes[e.idx].mark = NodeMark::Visit;
+            m_nodes[e.idx].pulse = 1.f;
+        }
+        m_edgesDirty = true;
+    }
     else if (t == EventType::COMPARE)
     {
         if (validIdx(e.id))
@@ -697,10 +707,12 @@ void Renderer::beginEvent(const Event& e)
     }
     else if (t == EventType::EXTRACT_MAX)
     {
-        if (validIdx(e.idx))
+        // After HEAP_SWAP(root, last), the old maximum sits at idx2 (the last active index).
+        int maxCell = e.idx2;
+        if (validIdx(maxCell))
         {
-            m_nodes[e.idx].mark = NodeMark::Result;
-            m_nodes[e.idx].pulse = 1.f;
+            m_nodes[maxCell].mark = NodeMark::Result;
+            m_nodes[maxCell].pulse = 1.f;
             m_edgesDirty = true;
         }
     }
@@ -780,10 +792,15 @@ void Renderer::endEvent(const Event& e)
     {
         for (int i = 0; i < m_count; i++)
         {
-            if (m_nodes[i].mark == NodeMark::Visit || m_nodes[i].mark == NodeMark::Compare
-                || m_nodes[i].mark == NodeMark::Trail)
+            RenderNode& r = m_nodes[i];
+            if (r.mark == NodeMark::Visit || r.mark == NodeMark::Compare || r.mark == NodeMark::Trail)
             {
-                m_nodes[i].mark = NodeMark::None;
+                r.mark = NodeMark::None;
+            }
+            // Gold marks belong only to the sorted region; drop them from the active heap.
+            if (r.mark == NodeMark::Result && i < m_activeSize)
+            {
+                r.mark = NodeMark::None;
             }
         }
         m_edgesDirty = true;
@@ -1233,7 +1250,7 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
     }
 
     bool avl = (m_kind == TreeKind::AVL);
-    bool maxTag = (isHeap() && i == 0);
+    bool maxTag = (isHeap() && i == 0 && m_activeSize > 0);
     if (m_zoom >= BadgeMinZoom && (avl || maxTag))
     {
         sf::FloatRect b = m_badge[i]->getLocalBounds();

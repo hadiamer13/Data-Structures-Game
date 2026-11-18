@@ -130,9 +130,14 @@ bool LevelScreen::loadLevel()
     }
     m_def = defs[slot];
 
-    if (!GameSession::supportsMission(m_def.mission))
+    if (!GameSession::supportsMission(m_def.mission) && !GameSession::isBinaryMission(m_def.mission))
     {
-        m_error = "Level " + std::to_string(act) + "." + std::to_string(slot + 1) + " (" + m_def.name + ") is not implemented yet.";
+        m_error = "Level " + std::to_string(act) + "." + std::to_string(slot + 1) + " is not implemented yet.";
+        return false;
+    }
+    if (GameSession::isHeapMission(m_def.mission))
+    {
+        m_error = "The Heap Fortress needs the HeapLevel screen (next step).";
         return false;
     }
     if (!m_session.startLevel(m_def))

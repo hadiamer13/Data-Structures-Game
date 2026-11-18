@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="game\Campaign.cpp" />
+    <ClCompile Include="game\LevelManager.cpp" />
     <ClCompile Include="game\SandboxSession.cpp" />
     <ClCompile Include="gui\screens\ResultScreen.cpp" />
     <ClCompile Include="gui\screens\SandboxScreen.cpp" />
@@ -183,6 +184,12 @@
     <ClCompile Include="gui\widgets\LevelBanner.cpp" />
     <ClCompile Include="gui\widgets\Toolbar.cpp" />
     <ClCompile Include="gui\widgets\Tooltip.cpp" />
+    <ClCompile Include="tests\Test level manager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="tests\test_act3.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -205,6 +212,7 @@
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
     <ClInclude Include="game\Campaign.h" />
+    <ClInclude Include="game\LevelManager.h" />
     <ClInclude Include="game\SandboxSession.h" />
     <ClInclude Include="gui\EventText.h" />
     <ClInclude Include="gui\screens\ResultScreen.h" />
@@ -263,6 +271,7 @@
     <None Include="levels\act2.json" />
     <None Include="levels\act3.json" />
     <None Include="levels\act4.json" />
+    <None Include="levels\Endless.json" />
     <None Include="levels\GUIDE.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

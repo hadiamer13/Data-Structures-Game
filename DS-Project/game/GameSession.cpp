@@ -1,6 +1,8 @@
 #include "GameSession.h"
 #include "LevelGenerator.h"
+#include "LevelManager.h"
 #include <cstdint>
+#include <sstream>
 
 namespace
 {
@@ -137,12 +139,30 @@ namespace
     {
         return id >= 0 && id < t.pool().size() && t.isAlive(id);
     }
+
+    // Single construction path for Act 1 trees. LevelManager::optimalSteps uses the same
+    // rules, so room ids (and therefore the lcaPath targets) match the computed optimum.
+    bool buildBinaryTree(const LevelDef& level, BinaryTree& tree)
+    {
+        tree.clear();
+        if (!level.preorder.empty())
+        {
+            return Serializer::deserializeBinaryTree(level.preorder, tree);
+        }
+        return LevelGenerator::generateBinaryTree(level, tree);
+    }
 }
 
 GameSession::GameSession()
     : m_target(kNull), m_started(false), m_isAvl(false), m_queuePos(0),
-    m_cursor(kNull), m_rankStart(0), m_rankLeft(0), m_k(kNull)
+    m_cursor(kNull), m_rankStart(0), m_rankLeft(0), m_k(kNull), m_isHeap(false), m_opsUsed(0), m_opLimit(0),
+    m_lcaA(kNull), m_lcaB(kNull), m_isBinary(false)
 {
+}
+
+bool GameSession::isBinaryMission(int mission)
+{
+    return mission >= MissionKind::Traversal && mission <= MissionKind::Mirror;
 }
 
 bool GameSession::isAvlMission(int mission)
@@ -154,9 +174,9 @@ bool GameSession::isAvlMission(int mission)
 
 bool GameSession::supportsMission(int mission)
 {
-    return mission == MissionKind::BstSearch || mission == MissionKind::BstInsert ||
-        mission == MissionKind::BstDelete || mission == MissionKind::BstBoss ||
-        isAvlMission(mission);
+    return isBinaryMission(mission) || mission == MissionKind::BstSearch ||
+        mission == MissionKind::BstInsert || mission == MissionKind::BstDelete ||
+        mission == MissionKind::BstBoss || isAvlMission(mission) || isHeapMission(mission);
 }
 
 int GameSession::pathCost(int key) const
@@ -202,11 +222,19 @@ bool GameSession::startLevel(const LevelDef& level)
 {
     m_tree.clear();
     m_avl.clear();
+    m_bin.clear();
+    m_originalBin.clear();
     m_undo.clear();
     m_lastLog.clear();
     m_level = level;
     m_target = kNull;
+    m_isBinary = isBinaryMission(level.mission);
     m_isAvl = isAvlMission(level.mission);
+    m_isHeap = isHeapMission(level.mission);
+    m_heap.loadRaw(IntArray(), 0);
+    m_initialHeap.clear();
+    m_opsUsed = 0;
+    m_opLimit = 0;
     m_violIds.clear();
     m_found.clear();
     m_queue.clear();
@@ -215,10 +243,20 @@ bool GameSession::startLevel(const LevelDef& level)
     m_rankStart = 0;
     m_rankLeft = 0;
     m_k = kNull;
+    m_lcaA = kNull;
+    m_lcaB = kNull;
 
+    if (m_isBinary)
+    {
+        return startBinary(level);
+    }
     if (m_isAvl)
     {
         return startAvl(level);
+    }
+    if (m_isHeap)
+    {
+        return startHeap(level);
     }
 
     if (!level.preorder.empty())
@@ -259,6 +297,142 @@ bool GameSession::startLevel(const LevelDef& level)
     m_score.configure(optimal, level.objective);
     m_started = true;
     return true;
+}
+
+// ------------------------------------------------------------ Act 1 setup
+
+bool GameSession::startBinary(const LevelDef& level)
+{
+    m_started = false;
+
+    if (!buildBinaryTree(level, m_bin))
+    {
+        m_bin.clear();
+        return false;
+    }
+
+    // Unmirrored copy for the 1.5 win check. Structural comparison (values and shape),
+    // so the copy's ids do not need to match m_bin.
+    if (!Serializer::deserializeBinaryTree(Serializer::serializeBinaryTree(m_bin), m_originalBin))
+    {
+        m_bin.clear();
+        return false;
+    }
+
+    // Same ids LevelManager::optimalSteps uses for lcaPath (a = n-1, b = n/2).
+    const int n = m_bin.nodeCount();
+    if (n < 1)
+    {
+        m_bin.clear();
+        return false;
+    }
+    m_lcaA = n - 1;
+    m_lcaB = n / 2;
+
+    int optimal = 1;
+    if (!LevelManager::optimalSteps(level, optimal))
+    {
+        optimal = 1;
+    }
+
+    m_isBinary = true;
+    m_isAvl = false;
+    m_isHeap = false;
+    m_score.configure(optimal, level.objective);
+    m_started = true;
+    return true;
+}
+
+ActionResult GameSession::applyBinary(const PlayerAction& action)
+{
+    m_lastLog.clear();
+    m_lastLog.beginBatch();
+    const int mission = m_level.mission;
+    bool accepted = false;
+    bool changed = false;
+    bool completed = false;
+    int extraAlarm = 0;
+    int penalty = 0;
+    std::string message;
+
+    if (mission == MissionKind::Traversal && action.kind == ActionKind::SubmitSequence)
+    {
+        accepted = LevelManager::traversalMatches(m_bin, m_level.param, action.seq);
+        completed = accepted;
+        message = accepted ? "Patrol route matches." : "That order does not match the patrol.";
+        if (!accepted)
+        {
+            extraAlarm = 1;
+            penalty = kWrongClickPenalty;
+        }
+    }
+    else if (mission == MissionKind::HeightDiameter && action.kind == ActionKind::SubmitSequence)
+    {
+        const bool heightOk = action.a == m_bin.height();
+        const bool diameterOk = action.b == m_bin.diameter();
+        accepted = heightOk && diameterOk;
+        completed = accepted;
+        message = accepted ? "Height and diameter confirmed." : "One of those values is wrong.";
+        if (!accepted)
+        {
+            extraAlarm = 1;
+            penalty = kWrongClickPenalty;
+        }
+    }
+    else if (mission == MissionKind::LcaPath && action.kind == ActionKind::ClickNode)
+    {
+        if (!validRoom(m_avl, action.a) && (action.a < 0 || action.a >= m_bin.pool().size() || !m_bin.isAlive(action.a)))
+        {
+            return makeResult(false, "Click a room.");
+        }
+
+        // Visiting the clicked room costs one alarm step.
+        Event visit(EventType::VISIT);
+        visit.id = action.a;
+        visit.alarmCost = 1;
+        emit(&m_lastLog, visit);
+
+        // The expected answer is computed without recording events, so it costs no alarm.
+        const int common = m_bin.lca(m_lcaA, m_lcaB, nullptr);
+        accepted = (action.a == common);
+        completed = accepted;
+        message = accepted ? "Meeting room found." : "That is not where the routes meet.";
+        if (!accepted)
+        {
+            extraAlarm = 1;
+            penalty = kWrongClickPenalty;
+        }
+    }
+    else if (mission == MissionKind::Mirror && action.kind == ActionKind::Rotate)
+    {
+        m_bin.mirror(&m_lastLog);
+        accepted = true;
+        changed = true;
+        completed = LevelManager::mirrorMatches(m_originalBin, m_bin);
+        message = "Children swapped.";
+    }
+    else
+    {
+        return makeResult(false, "That action is not used in this mission.");
+    }
+
+    // Mirror is its own inverse, so undo simply mirrors again (see apply()).
+    if (changed)
+    {
+        m_undo.push("mirror");
+    }
+
+    const int alarmCost = m_lastLog.totalAlarmCost() + extraAlarm;
+    m_score.recordAction(alarmCost, penalty);
+    if (m_score.status() == HudStatus::Playing && completed)
+    {
+        m_score.markWon();
+    }
+    Event done(EventType::DONE);
+    done.key = alarmCost;
+    done.alarmCost = 0;
+    emit(&m_lastLog, done);
+    return makeResult(accepted, message);
 }
 
 // ------------------------------------------------------------ AVL level setup
@@ -496,6 +670,19 @@ void GameSession::resetMissionState()
 
 void GameSession::restoreInitial()
 {
+    if (m_isBinary)
+    {
+        // Rebuild instead of deserializing a snapshot: rebuilding keeps the room ids that
+        // lcaPath targets depend on.
+        buildBinaryTree(m_level, m_bin);
+        return;
+    }
+    if (m_isHeap)
+    {
+        restoreHeap(m_initialHeap);
+        m_opsUsed = 0;
+        return;
+    }
     if (m_isAvl)
     {
         Serializer::deserializeAVL(m_initialTree, m_avl);
@@ -575,7 +762,24 @@ ActionResult GameSession::apply(const PlayerAction& action)
         }
         const std::string previous = m_undo.back();
         m_undo.pop();
-        const bool restored = m_isAvl ? restoreAvl(previous) : Serializer::deserializeBST(previous, m_tree);
+        bool restored = false;
+        if (m_isBinary)
+        {
+            m_bin.mirror(nullptr);          // the only Act 1 change is a mirror, which is self-inverse
+            restored = true;
+        }
+        else if (m_isHeap)
+        {
+            restored = restoreHeap(previous);
+        }
+        else if (m_isAvl)
+        {
+            restored = restoreAvl(previous);
+        }
+        else
+        {
+            restored = Serializer::deserializeBST(previous, m_tree);
+        }
         m_lastLog.clear();
         m_lastLog.beginBatch();
         return makeResult(restored, restored ? "Move undone" : "Undo snapshot was invalid");
@@ -586,7 +790,11 @@ ActionResult GameSession::apply(const PlayerAction& action)
         m_lastLog.clear();
         m_lastLog.beginBatch();
         std::string text = "No hint for this level.";
-        if (m_isAvl)
+        if (m_isHeap)
+        {
+            text = heapHint();
+        }
+        else if (m_isAvl)
         {
             text = avlHint();
         }
@@ -604,7 +812,14 @@ ActionResult GameSession::apply(const PlayerAction& action)
         }
         return makeResult(true, text);
     }
-
+    if (m_isBinary)
+    {
+        return applyBinary(action);
+    }
+    if (m_isHeap)
+    {
+        return applyHeap(action);
+    }
     if (m_isAvl)
     {
         return applyAvl(action);
@@ -963,6 +1178,10 @@ std::string GameSession::prompt() const
         return "";
     }
     const int mission = m_level.mission;
+    if (m_isHeap)
+    {
+        return heapPrompt();
+    }
     if (mission == MissionKind::AvlBadges)
     {
         return "Unbalanced rooms found: " + std::to_string(m_found.size()) + " / " + std::to_string(m_violIds.size());
@@ -993,6 +1212,14 @@ std::string GameSession::prompt() const
 
 ViewSnapshot GameSession::snapshot() const
 {
+    if (m_isHeap)
+    {
+        return SnapshotBuilder::fromMaxHeap(m_heap);
+    }
+    if (m_isBinary)
+    {
+        return SnapshotBuilder::fromBinaryTree(m_bin);
+    }
     return m_isAvl ? SnapshotBuilder::fromAVL(m_avl) : SnapshotBuilder::fromBST(m_tree);
 }
 
@@ -1021,9 +1248,24 @@ const AVLTree& GameSession::avlTree() const
     return m_avl;
 }
 
+const BinaryTree& GameSession::binaryTree() const
+{
+    return m_bin;
+}
+
 int GameSession::targetKey() const
 {
-    return m_isAvl ? kNull : m_target;
+    return (m_isAvl || m_isBinary) ? kNull : m_target;
+}
+
+int GameSession::lcaTargetA() const
+{
+    return m_isBinary ? m_lcaA : kNull;
+}
+
+int GameSession::lcaTargetB() const
+{
+    return m_isBinary ? m_lcaB : kNull;
 }
 
 int GameSession::nextInsertKey() const
@@ -1042,14 +1284,419 @@ int GameSession::orderK() const
 
 int GameSession::targetNodeId() const
 {
+    if (m_isHeap)
+    {
+        return heapTargetIndex();
+    }
     if (m_isAvl)
     {
         return avlTargetNode();
     }
-    if (m_target == kNull || m_level.mission == MissionKind::BstInsert)
+    if (m_isBinary || m_target == kNull || m_level.mission == MissionKind::BstInsert)
     {
         return kNull;
     }
     BSTNode* node = m_tree.search(m_target, nullptr);
     return node == nullptr ? kNull : node->id;
+}
+
+
+// ============================================================================
+// Act 4: Max Heap missions (4.1 to 4.5)
+// ============================================================================
+
+namespace
+{
+    int countEventType(const EventLog& log, int type)
+    {
+        int count = 0;
+        for (int i = 0; i < log.size(); i++)
+        {
+            if (log.at(i).type == type)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    bool isParentOf(int parent, int child)
+    {
+        return child > 0 && (child - 1) / 2 == parent;
+    }
+}
+
+bool GameSession::isHeapMission(int mission)
+{
+    return mission >= MissionKind::HeapBuild && mission <= MissionKind::HeapBoss;
+}
+
+const MaxHeap& GameSession::heap() const
+{
+    return m_heap;
+}
+
+int GameSession::opsUsed() const
+{
+    return m_opsUsed;
+}
+
+int GameSession::opLimit() const
+{
+    return m_opLimit;
+}
+
+// Start state per mission:
+//   4.1 heapBuild   : unbuilt array
+//   4.2 heapRepair  : valid heap whose root has been overwritten with 0
+//   4.3 heapExtract : valid heap
+//   4.4 / 4.5       : unbuilt array
+bool GameSession::startHeap(const LevelDef& level)
+{
+    int n = level.nodeCount;
+    if (n < 3 || n > 31)
+    {
+        n = 12;
+    }
+
+    std::uint32_t state = static_cast<std::uint32_t>(level.seed) * 2654435761u + 11u;
+    IntArray values;
+    for (int i = 0; i < n; i++)
+    {
+        int value = 0;
+        if (level.style == 2)
+        {
+            value = (i + 1) * 3;                                    // sorted ascending
+        }
+        else if (level.style == 3)
+        {
+            value = (n - i) * 3;                                    // reverse sorted
+        }
+        else if (level.style == 5)
+        {
+            value = static_cast<int>(nextRandom(state) % 5u) + 1;   // duplicate-heavy
+        }
+        else
+        {
+            value = static_cast<int>(nextRandom(state) % 90u) + 10;
+        }
+        values.push(value);
+    }
+
+    const int mission = level.mission;
+    if (mission == MissionKind::HeapExtract || mission == MissionKind::HeapRepair)
+    {
+        m_heap.buildMaxHeap(values);
+    }
+    else
+    {
+        m_heap.loadRaw(values, n);
+    }
+
+    if (mission == MissionKind::HeapRepair)
+    {
+        IntArray disturbed = m_heap.array();
+        disturbed[0] = 0;                                           // root now violates the heap property
+        m_heap.loadRaw(disturbed, n);
+    }
+
+    m_opLimit = (mission == MissionKind::HeapRace && level.param > 0) ? level.param : 0;
+    m_initialHeap = captureHeap();
+
+    // Optimal steps: run the canonical solution on a scratch heap and count its operations.
+    MaxHeap scratch;
+    scratch.loadRaw(m_heap.array(), m_heap.activeSize());
+    EventLog canonical;
+    int optimal = 1;
+    if (mission == MissionKind::HeapBuild)
+    {
+        scratch.buildMaxHeap(&canonical);
+        optimal = countEventType(canonical, EventType::HEAPIFY_START);
+    }
+    else if (mission == MissionKind::HeapRepair)
+    {
+        scratch.siftDown(0, scratch.activeSize(), &canonical);
+        optimal = countEventType(canonical, EventType::HEAPIFY_START);
+    }
+    else if (mission == MissionKind::HeapExtract)
+    {
+        int ignored = 0;
+        while (scratch.activeSize() > 0)
+        {
+            scratch.extractMax(ignored, &canonical);
+        }
+        optimal = countEventType(canonical, EventType::EXTRACT_MAX);
+    }
+    else
+    {
+        scratch.heapSort(&canonical);
+        optimal = 1 + countEventType(canonical, EventType::EXTRACT_MAX);   // one build + n extractions
+    }
+    if (optimal < 1)
+    {
+        optimal = 1;
+    }
+
+    m_score.configure(optimal, level.objective);
+    m_started = true;
+    return true;
+}
+
+// Undo/reset snapshot: "<active> <total> v0 v1 ...". Written by hand (not Serializer) so that
+// disturbed heaps mid-level can still be restored.
+std::string GameSession::captureHeap() const
+{
+    const IntArray& values = m_heap.array();
+    std::ostringstream out;
+    out << m_heap.activeSize() << ' ' << values.size();
+    for (int i = 0; i < values.size(); i++)
+    {
+        out << ' ' << values[i];
+    }
+    return out.str();
+}
+
+bool GameSession::restoreHeap(const std::string& text)
+{
+    std::istringstream in(text);
+    int active = 0;
+    int total = 0;
+    if (!(in >> active >> total) || total < 0 || active < 0 || active > total)
+    {
+        return false;
+    }
+    IntArray values;
+    for (int i = 0; i < total; i++)
+    {
+        int value = 0;
+        if (!(in >> value))
+        {
+            return false;
+        }
+        values.push(value);
+    }
+    return m_heap.loadRaw(values, active);
+}
+
+int GameSession::heapTargetIndex() const
+{
+    const int active = m_heap.activeSize();
+    const IntArray& a = m_heap.array();
+    for (int i = 0; i < active; i++)
+    {
+        const int l = 2 * i + 1;
+        const int r = l + 1;
+        if ((l < active && a[l] > a[i]) || (r < active && a[r] > a[i]))
+        {
+            return i;                                   // first parent that needs a sift
+        }
+    }
+    const bool extracting = m_level.mission == MissionKind::HeapExtract ||
+        m_level.mission == MissionKind::HeapRace || m_level.mission == MissionKind::HeapBoss;
+    if (extracting && active > 0)
+    {
+        return 0;                                       // the root is the next maximum
+    }
+    return kNull;
+}
+
+std::string GameSession::heapHint() const
+{
+    const int target = heapTargetIndex();
+    if (target == kNull)
+    {
+        return "Nothing to fix here: pick the next step. (Star cap: 2)";
+    }
+    const int active = m_heap.activeSize();
+    const IntArray& a = m_heap.array();
+    const int l = 2 * target + 1;
+    const int r = l + 1;
+    const bool violated = (l < active && a[l] > a[target]) || (r < active && a[r] > a[target]);
+    if (violated)
+    {
+        return "Index " + std::to_string(target) + " is smaller than a child. Swap it with the larger child, or Heapify " +
+            std::to_string(target) + ". (Star cap: 2)";
+    }
+    return "The root holds the greatest active value. Extract it. (Star cap: 2)";
+}
+
+std::string GameSession::heapPrompt() const
+{
+    const int total = m_heap.totalSize();
+    const int active = m_heap.activeSize();
+    std::string text = "Active heap: " + std::to_string(active) + " of " + std::to_string(total) +
+        " cells. Sorted region: " + std::to_string(total - active) + ".";
+    if (m_opLimit > 0)
+    {
+        text += " Operations: " + std::to_string(m_opsUsed) + " / " + std::to_string(m_opLimit) + ".";
+    }
+    return text;
+}
+
+// Step rule: every accepted action costs one step (one alarm). An invalid action costs
+// two alarm and a penalty. Heap Sort is never a single click.
+ActionResult GameSession::applyHeap(const PlayerAction& action)
+{
+    m_lastLog.clear();
+    m_lastLog.beginBatch();
+    const int mission = m_level.mission;
+
+    const bool buildsAndSorts = mission == MissionKind::HeapRace || mission == MissionKind::HeapBoss;
+    const bool canSwapAndHeapify = mission == MissionKind::HeapBuild ||
+        mission == MissionKind::HeapRepair || buildsAndSorts;
+    const bool canExtract = mission == MissionKind::HeapExtract || buildsAndSorts;
+
+    if (action.kind == ActionKind::HeapSort)
+    {
+        return makeResult(false, "Heap Sort is not one click here: build the heap and extract each maximum yourself.");
+    }
+
+    bool allowed = false;
+    if (action.kind == ActionKind::SwapHeap || action.kind == ActionKind::Heapify)
+    {
+        allowed = canSwapAndHeapify;
+    }
+    else if (action.kind == ActionKind::ExtractMax)
+    {
+        allowed = canExtract;
+    }
+    else if (action.kind == ActionKind::BuildHeap)
+    {
+        allowed = buildsAndSorts;
+    }
+    if (!allowed)
+    {
+        return makeResult(false, "That action is not used in this mission.");
+    }
+
+    const std::string before = captureHeap();
+    const int active = m_heap.activeSize();
+    const IntArray& a = m_heap.array();
+    m_opsUsed++;
+
+    bool accepted = false;
+    bool changed = false;
+    int stepCost = 1;
+    int penalty = 0;
+    std::string message;
+
+    if (action.kind == ActionKind::SwapHeap)
+    {
+        const int i = action.a;
+        const int j = action.b;
+        int parent = kNull;
+        int child = kNull;
+        if (i >= 0 && j >= 0 && i < active && j < active)
+        {
+            if (isParentOf(i, j))
+            {
+                parent = i;
+                child = j;
+            }
+            else if (isParentOf(j, i))
+            {
+                parent = j;
+                child = i;
+            }
+        }
+
+        if (parent == kNull)
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "Pick a parent and one of its children inside the active heap. +1 alarm";
+        }
+        else if (a[child] <= a[parent])
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "That swap breaks the heap: only a larger child can rise above its parent. +1 alarm";
+        }
+        else
+        {
+            m_heap.swapIdx(parent, child, &m_lastLog);
+            accepted = true;
+            changed = true;
+            message = "Swapped " + std::to_string(parent) + " and " + std::to_string(child) + ".";
+        }
+    }
+    else if (action.kind == ActionKind::Heapify)
+    {
+        if (action.a < 0 || action.a >= active)
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "That index is outside the active heap. +1 alarm";
+        }
+        else
+        {
+            m_heap.siftDown(action.a, active, &m_lastLog);
+            accepted = true;
+            changed = true;
+            message = "Heapified from index " + std::to_string(action.a) + ".";
+        }
+    }
+    else if (action.kind == ActionKind::BuildHeap)
+    {
+        if (active != m_heap.totalSize())
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "Build only before the first extraction. +1 alarm";
+        }
+        else
+        {
+            m_heap.buildMaxHeap(&m_lastLog);
+            accepted = true;
+            changed = true;
+            message = "Bottom-up heap construction over the whole array.";
+        }
+    }
+    else if (action.kind == ActionKind::ExtractMax)
+    {
+        if (active == 0)
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "Nothing is left in the active heap. +1 alarm";
+        }
+        else if (!m_heap.isMaxHeap())
+        {
+            stepCost = 2;
+            penalty = kWrongClickPenalty;
+            message = "The heap property is broken: repair it before extracting. +1 alarm";
+        }
+        else
+        {
+            int value = 0;
+            m_heap.extractMax(value, &m_lastLog);
+            accepted = true;
+            changed = true;
+            message = "Extracted maximum " + std::to_string(value) + " into the sorted region.";
+        }
+    }
+
+    if (changed)
+    {
+        m_undo.push(before);
+    }
+    m_score.recordAction(stepCost, penalty);
+
+    if (m_score.status() == HudStatus::Playing)
+    {
+        if (LevelManager::heapWon(mission, m_heap))
+        {
+            m_score.markWon();
+        }
+        else if (m_opLimit > 0 && m_opsUsed >= m_opLimit)
+        {
+            m_score.markLost();
+            message += " Operation limit reached.";
+        }
+    }
+
+    Event done(EventType::DONE);
+    done.key = stepCost;
+    emit(&m_lastLog, done);
+    return makeResult(accepted, message);
 }

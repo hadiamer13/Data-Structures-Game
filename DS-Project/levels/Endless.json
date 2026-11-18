@@ -1,0 +1,38 @@
+{
+    "mode": "endless",
+    "name": "Endless Survival",
+    "treeKind": "avl",
+    "seed": 4242,
+    "startSize": 15,
+    "keyRange": 200,
+    "insertPercent": 60,
+    "phases": [
+        {
+            "afterSeconds": 0,
+            "secondsPerOperation": 6,
+            "burst": 1
+        },
+        {
+            "afterSeconds": 30,
+            "secondsPerOperation": 4,
+            "burst": 1
+        },
+        {
+            "afterSeconds": 60,
+            "secondsPerOperation": 3,
+            "burst": 2
+        },
+        {
+            "afterSeconds": 120,
+            "secondsPerOperation": 2,
+            "burst": 2
+        },
+        {
+            "afterSeconds": 180,
+            "secondsPerOperation": 1,
+            "burst": 3
+        }
+    ],
+    "scorePerSecond": 10,
+    "failOnInvalidTree": true
+}

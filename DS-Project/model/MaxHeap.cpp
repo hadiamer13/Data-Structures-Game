@@ -22,6 +22,19 @@ const IntArray& MaxHeap::array() const
 std::uint64_t MaxHeap::comparisonCount() const { return m_comparisons; }
 std::uint64_t MaxHeap::swapCount() const { return m_swaps; }
 
+bool MaxHeap::loadRaw(const IntArray& values, int activeSize)
+{
+    if (activeSize < 0 || activeSize > values.size())
+    {
+        return false;
+    }
+    m_array = values;
+    m_activeSize = activeSize;
+    m_comparisons = 0;
+    m_swaps = 0;
+    return true;
+}
+
 void MaxHeap::swapIndices(int indexA, int indexB, int reason, EventLog* log)
 {
     if (indexA == indexB)

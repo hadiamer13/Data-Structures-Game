@@ -15,6 +15,7 @@ void runScoreTests();
 void runGameSessionTests();
 void runSortTests();
 void runCampaignSupportTests();
+void runAct4SessionTests();
 
 TEST_CASE("AVL tree operations")
 {
@@ -84,4 +85,9 @@ TEST_CASE("Custom sorting algorithms")
 TEST_CASE("Campaign JSON, generation, save, and leaderboard")
 {
     runCampaignSupportTests();
+}
+
+TEST_CASE("Act 4 heap missions") 
+{
+    runAct4SessionTests(); 
 }

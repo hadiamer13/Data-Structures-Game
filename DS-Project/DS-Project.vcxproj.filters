@@ -138,6 +138,12 @@
     <ClCompile Include="game\Campaign.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\LevelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Test level manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Types.h">
@@ -299,6 +305,9 @@
     <ClInclude Include="game\Campaign.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\LevelManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="contracts\LevelSchema.md" />
@@ -308,5 +317,6 @@
     <None Include="levels\act2.json" />
     <None Include="levels\act3.json" />
     <None Include="levels\GUIDE.md" />
+    <None Include="levels\Endless.json" />
   </ItemGroup>
 </Project>
