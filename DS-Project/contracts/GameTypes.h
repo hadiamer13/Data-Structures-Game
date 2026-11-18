@@ -26,7 +26,8 @@ namespace ActionKind
     inline const int Undo = 12;
     inline const int Reset = 13;
     inline const int Hint = 14;
-    inline const int Count = 15;
+    inline const int Place = 15;          // Reconstruct: a = token value, b = parent room id in the built tree (kNull = root), c = Side
+    inline const int Count = 16;
 }
 
 namespace HudStatus

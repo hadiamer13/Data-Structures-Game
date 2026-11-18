@@ -33,6 +33,7 @@ public:
     void clear();
 
 private:
+    void emitSkipped(BSTNode* subtreeRoot, EventLog* log) const;
     friend class Serializer;
     bool owns(const BSTNode* node) const;
     BSTNode* findWithoutEvents(int key) const;

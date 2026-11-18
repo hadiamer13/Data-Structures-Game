@@ -82,7 +82,20 @@ public:
     static bool isAvlMission(int mission);
     static bool isHeapMission(int mission);
 
+    const BinaryTree& builtTree() const;     // 1.2: the tree the player has built so far
+    bool isReconstruct() const;
+    IntArray reconstructTokens() const;      // 1.2: values still on the shelf, ascending
+    std::string reconstructClue() const;     // 1.2: "Preorder: ...   Inorder: ..."
+
+    int rangeLo() const;         // bstRange: lower bound of the query, else kNull
+    int rangeHi() const;         // bstRange: upper bound of the query, else kNull
+    int rangeOptimal() const;    // bstRange: visits made by the unmodified query
+
 private:
+    std::string reconstructHint() const;
+    bool nextPlacement(int& value, int& parentId, int& side) const;
+    BinaryTree m_built;                      // 1.2: player's tree (m_bin stays the hidden answer)
+
     void restoreInitial();
     int pickTarget(const LevelDef& level) const;
     int pathCost(int key) const;
@@ -144,6 +157,17 @@ private:
     int m_lcaA;               // lcaPath: first room (n-1), same id LevelManager uses
     int m_lcaB;               // lcaPath: second room (n/2), same id LevelManager uses
     bool m_isBinary;
+
+    IntArray m_rangeExpected;    // bstRange: keys that must be collected
+    IntArray m_rangeFound;       // bstRange: keys the player has clicked correctly
+    int m_rangeLo;
+    int m_rangeHi;
+    int m_rangeOptimal;
+
+    ActionResult applyRange(const PlayerAction& action);
+    std::string rangePrompt() const;
+    bool isRangeMission() const;
+
 };
 
 #endif

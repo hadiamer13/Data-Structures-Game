@@ -141,8 +141,8 @@ void BriefingScreen::onBack()
 
 void BriefingScreen::onStart()
 {
-    // INTEGRATION: Act 4 levels will go to a HeapLevel screen instead of Level.
-    m_ctx.ui->requestScreen(ScreenId::Level);
+    // Act 4 (campaign index 15 and up) runs on the heap screen.
+    m_ctx.ui->requestScreen(m_index >= 15 ? ScreenId::HeapLevel : ScreenId::Level);
 }
 
 void BriefingScreen::handleEvent(const sf::Event& e)

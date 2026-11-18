@@ -251,22 +251,44 @@ void BST::rangeRec(BSTNode* node, int low, int high, IntArray& out, EventLog* lo
     {
         return;
     }
-    if (node->key > low)
-    {
-        rangeRec(static_cast<BSTNode*>(node->left), low, high, out, log);
-    }
+
     Event visit(EventType::VISIT);
     visit.id = node->id;
     visit.alarmCost = 1;
     emit(log, visit);
+
     if (node->key >= low && node->key <= high)
     {
         out.push(node->key);
     }
+
+    // Left subtree holds keys below node->key. Skip it when every such key is below low.
+    if (node->key > low)
+    {
+        rangeRec(static_cast<BSTNode*>(node->left), low, high, out, log);
+    }
+    else if (node->left != nullptr)
+    {
+        emitSkipped(static_cast<BSTNode*>(node->left), log);
+    }
+
+    // Right subtree holds keys above node->key. Skip it when every such key is above high.
     if (node->key < high)
     {
         rangeRec(static_cast<BSTNode*>(node->right), low, high, out, log);
     }
+    else if (node->right != nullptr)
+    {
+        emitSkipped(static_cast<BSTNode*>(node->right), log);
+    }
+}
+
+void BST::emitSkipped(BSTNode* subtreeRoot, EventLog* log) const
+{
+    Event skip(EventType::HIGHLIGHT_SUBTREE);
+    skip.id = subtreeRoot->id;
+    skip.result = HighlightMode::Skipped;
+    emit(log, skip);
 }
 
 void BST::rangeQuery(int low, int high, IntArray& out, EventLog* log) const
