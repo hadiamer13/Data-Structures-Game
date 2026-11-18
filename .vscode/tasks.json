@@ -16,7 +16,7 @@
             "group": "test"
         },
         {
-            "label": "Build SFML Game (Release x64)",
+            "label": "Build Full Project with Test Runner (Release x64)",
             "type": "process",
             "command": "powershell.exe",
             "args": [
