@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -87,19 +87,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <LocalDebuggerEnvironment>PATH=$(SolutionDir)lib\bin;$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <LocalDebuggerEnvironment>PATH=$(SolutionDir)lib\bin;$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <LocalDebuggerEnvironment>PATH=$(SolutionDir)lib\bin;$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)</LocalDebuggerWorkingDirectory>
     <LocalDebuggerEnvironment>PATH=$(SolutionDir)lib\bin;$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -172,11 +172,41 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="game\Campaign.cpp" />
+    <ClCompile Include="game\GameSession.cpp" />
+    <ClCompile Include="game\Json.cpp" />
+    <ClCompile Include="game\LevelGenerator.cpp" />
+    <ClCompile Include="game\LevelLoader.cpp" />
     <ClCompile Include="game\LevelManager.cpp" />
+    <ClCompile Include="game\Leaderboard.cpp" />
     <ClCompile Include="game\SandboxSession.cpp" />
+    <ClCompile Include="game\SaveManager.cpp" />
+    <ClCompile Include="game\ScoreSystem.cpp" />
+    <ClCompile Include="game\SnapshotBuilder.cpp" />
+    <ClCompile Include="gui\main_gui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="gui\Assets.cpp" />
+    <ClCompile Include="gui\UIManager.cpp" />
+    <ClCompile Include="gui\AnimationController.cpp" />
+    <ClCompile Include="gui\LayoutEngine.cpp" />
+    <ClCompile Include="gui\Renderer.cpp" />
+    <ClCompile Include="gui\screens\BriefingScreen.cpp" />
+    <ClCompile Include="gui\screens\CampaignMap.cpp" />
+    <ClCompile Include="gui\screens\LevelScreen.cpp" />
+    <ClCompile Include="gui\screens\MainMenu.cpp" />
+    <ClCompile Include="gui\screens\PlaceholderScreen.cpp" />
     <ClCompile Include="gui\screens\ResultScreen.cpp" />
     <ClCompile Include="gui\screens\SandboxScreen.cpp" />
+    <ClCompile Include="gui\widgets\Button.cpp" />
+    <ClCompile Include="gui\widgets\EventLogPanel.cpp" />
+    <ClCompile Include="gui\widgets\Hud.cpp" />
+    <ClCompile Include="gui\widgets\LevelBanner.cpp" />
     <ClCompile Include="gui\widgets\NumberField.cpp" />
+    <ClCompile Include="gui\widgets\Toolbar.cpp" />
+    <ClCompile Include="gui\widgets\Tooltip.cpp" />
     <ClCompile Include="model\AVLTree.cpp" />
     <ClCompile Include="model\BinaryTree.cpp" />
     <ClCompile Include="model\BST.cpp" />
@@ -186,123 +216,61 @@
     <ClCompile Include="model\Sorts.cpp" />
     <ClCompile Include="model\TreeNode.cpp" />
     <ClCompile Include="model\Validator.cpp" />
-    <ClCompile Include="game\GameSession.cpp" />
-    <ClCompile Include="game\Json.cpp" />
-    <ClCompile Include="game\LevelGenerator.cpp" />
-    <ClCompile Include="game\LevelLoader.cpp" />
-    <ClCompile Include="game\Leaderboard.cpp" />
-    <ClCompile Include="game\ScoreSystem.cpp" />
-    <ClCompile Include="game\SaveManager.cpp" />
-    <ClCompile Include="game\SnapshotBuilder.cpp" />
-    <ClCompile Include="gui\AnimationController.cpp" />
-    <ClCompile Include="gui\Assets.cpp" />
-    <ClCompile Include="gui\main_gui.cpp" />
-    <ClCompile Include="tests\test_main.cpp" />
-    <ClCompile Include="tests\test_avl.cpp" />
-    <ClCompile Include="tests\test_bst.cpp" />
-    <ClCompile Include="tests\test_binary_tree.cpp" />
-    <ClCompile Include="tests\test_campaign_support.cpp" />
-    <ClCompile Include="tests\test_containers.cpp" />
-    <ClCompile Include="tests\test_game_logic.cpp" />
-    <ClCompile Include="tests\test_heapsort.cpp" />
-    <ClCompile Include="tests\test_maxheap.cpp" />
-    <ClCompile Include="tests\test_node_pool.cpp" />
-    <ClCompile Include="tests\test_order_stats.cpp" />
-    <ClCompile Include="tests\test_serializer.cpp" />
-    <ClCompile Include="tests\test_sorts.cpp" />
-    <ClCompile Include="tests\test_validator.cpp" />
-    <ClCompile Include="gui\screens\BriefingScreen.cpp" />
-    <ClCompile Include="gui\screens\CampaignMap.cpp" />
-    <ClCompile Include="gui\screens\LevelScreen.cpp" />
-    <ClCompile Include="gui\screens\MainMenu.cpp" />
-    <ClCompile Include="gui\screens\PlaceholderScreen.cpp" />
-    <ClCompile Include="gui\UIManager.cpp" />
-    <ClCompile Include="gui\widgets\Button.cpp" />
-    <ClCompile Include="gui\widgets\EventLogPanel.cpp" />
-    <ClCompile Include="gui\widgets\Hud.cpp" />
-    <ClCompile Include="gui\widgets\LevelBanner.cpp" />
-    <ClCompile Include="gui\widgets\Toolbar.cpp" />
-    <ClCompile Include="gui\widgets\Tooltip.cpp" />
-    <ClCompile Include="tests\Test level manager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="tests\test_act3.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="tests\test_main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Containers.h" />
+    <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\GameTypes.h" />
     <ClInclude Include="contracts\NodeDefs.h" />
     <ClInclude Include="contracts\Types.h" />
-    <ClInclude Include="contracts\Event.h" />
     <ClInclude Include="contracts\Util.h" />
     <ClInclude Include="contracts\ViewSnapshot.h" />
     <ClInclude Include="game\Campaign.h" />
-    <ClInclude Include="game\LevelManager.h" />
-    <ClInclude Include="game\SandboxSession.h" />
-    <ClInclude Include="gui\EventText.h" />
-    <ClInclude Include="gui\screens\ResultScreen.h" />
-    <ClInclude Include="gui\screens\SandboxScreen.h" />
-    <ClInclude Include="gui\widgets\NumberField.h" />
-    <ClInclude Include="model\AVLTree.h" />
-    <ClInclude Include="model\BinaryTree.h" />
-    <ClInclude Include="model\EventLog.h" />
-    <ClInclude Include="model\MaxHeap.h" />
-    <ClInclude Include="model\Validator.h" />
-    <ClInclude Include="tests\TestSupport.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="third_party\doctest\doctest.h" />
-    <ClInclude Include="tests\TestSupport.h" />
-    <ClInclude Include="model\BST.h" />
-    <ClInclude Include="model\NodePool.h" />
-    <ClInclude Include="model\Serializer.h" />
-    <ClInclude Include="model\Sorts.h" />
-    <ClInclude Include="model\TreeNode.h" />
     <ClInclude Include="game\GameSession.h" />
     <ClInclude Include="game\Json.h" />
     <ClInclude Include="game\LevelGenerator.h" />
     <ClInclude Include="game\LevelLoader.h" />
+    <ClInclude Include="game\LevelManager.h" />
     <ClInclude Include="game\Leaderboard.h" />
+    <ClInclude Include="game\SandboxSession.h" />
     <ClInclude Include="game\SaveManager.h" />
     <ClInclude Include="game\ScoreSystem.h" />
     <ClInclude Include="game\SnapshotBuilder.h" />
     <ClInclude Include="gui\AnimationController.h" />
     <ClInclude Include="gui\AppContext.h" />
     <ClInclude Include="gui\Assets.h" />
+    <ClInclude Include="gui\EventText.h" />
     <ClInclude Include="gui\IEventVisualizer.h" />
     <ClInclude Include="gui\LayoutEngine.h" />
     <ClInclude Include="gui\Renderer.h" />
+    <ClInclude Include="gui\Theme.h" />
+    <ClInclude Include="gui\UIManager.h" />
     <ClInclude Include="gui\screens\BriefingScreen.h" />
     <ClInclude Include="gui\screens\CampaignMap.h" />
     <ClInclude Include="gui\screens\LevelScreen.h" />
     <ClInclude Include="gui\screens\MainMenu.h" />
     <ClInclude Include="gui\screens\PlaceholderScreen.h" />
+    <ClInclude Include="gui\screens\ResultScreen.h" />
+    <ClInclude Include="gui\screens\SandboxScreen.h" />
     <ClInclude Include="gui\screens\Screen.h" />
-    <ClInclude Include="gui\UIManager.h" />
     <ClInclude Include="gui\widgets\Button.h" />
-    <ClInclude Include="gui\Theme.h" />
     <ClInclude Include="gui\widgets\EventLogPanel.h" />
     <ClInclude Include="gui\widgets\Hud.h" />
     <ClInclude Include="gui\widgets\LevelBanner.h" />
+    <ClInclude Include="gui\widgets\NumberField.h" />
     <ClInclude Include="gui\widgets\Toolbar.h" />
     <ClInclude Include="gui\widgets\Tooltip.h" />
+    <ClInclude Include="model\AVLTree.h" />
+    <ClInclude Include="model\BinaryTree.h" />
+    <ClInclude Include="model\BST.h" />
+    <ClInclude Include="model\EventLog.h" />
+    <ClInclude Include="model\MaxHeap.h" />
+    <ClInclude Include="model\NodePool.h" />
+    <ClInclude Include="model\Serializer.h" />
+    <ClInclude Include="model\Sorts.h" />
+    <ClInclude Include="model\TreeNode.h" />
+    <ClInclude Include="model\Validator.h" />
+    <ClInclude Include="third_party\doctest\doctest.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="contracts\LevelSchema.md" />
