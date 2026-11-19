@@ -16,7 +16,7 @@
             "group": "test"
         },
         {
-            "label": "Build Full Project with Test Runner (Release x64)",
+            "label": "Build SFML Game (Release x64)",
             "type": "process",
             "command": "powershell.exe",
             "args": [
@@ -31,6 +31,20 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Build Model Test Runner (Release x64)",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\.vscode\\test-models.ps1",
+                "-BuildOnly"
+            ],
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "Run Model Benchmarks",

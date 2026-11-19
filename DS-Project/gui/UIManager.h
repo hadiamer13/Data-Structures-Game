@@ -17,6 +17,7 @@ namespace ScreenId {
     inline const int Level = 7;
     inline const int Result = 8;
     inline const int HeapLevel = 9;   // Act 4 (campaign index 15..19)
+    inline const int Reports = 10;
     inline const int None = -1;
 }  // namespace ScreenId
 

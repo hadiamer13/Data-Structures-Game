@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -196,11 +196,15 @@
     <ClCompile Include="gui\Renderer.cpp" />
     <ClCompile Include="gui\screens\BriefingScreen.cpp" />
     <ClCompile Include="gui\screens\CampaignMap.cpp" />
+    <ClCompile Include="gui\screens\EndlessScreen.cpp" />
+    <ClCompile Include="gui\screens\LeaderboardScreen.cpp" />
     <ClCompile Include="gui\screens\LevelScreen.cpp" />
     <ClCompile Include="gui\screens\MainMenu.cpp" />
     <ClCompile Include="gui\screens\PlaceholderScreen.cpp" />
+    <ClCompile Include="gui\screens\ReportScreen.cpp" />
     <ClCompile Include="gui\screens\ResultScreen.cpp" />
     <ClCompile Include="gui\screens\SandboxScreen.cpp" />
+    <ClCompile Include="gui\screens\SettingsScreen.cpp" />
     <ClCompile Include="gui\widgets\Button.cpp" />
     <ClCompile Include="gui\widgets\EventLogPanel.cpp" />
     <ClCompile Include="gui\widgets\Hud.cpp" />
@@ -260,11 +264,15 @@
     </ClInclude>
     <ClInclude Include="gui\screens\BriefingScreen.h" />
     <ClInclude Include="gui\screens\CampaignMap.h" />
+    <ClInclude Include="gui\screens\EndlessScreen.h" />
+    <ClInclude Include="gui\screens\LeaderboardScreen.h" />
     <ClInclude Include="gui\screens\LevelScreen.h" />
     <ClInclude Include="gui\screens\MainMenu.h" />
     <ClInclude Include="gui\screens\PlaceholderScreen.h" />
+    <ClInclude Include="gui\screens\ReportScreen.h" />
     <ClInclude Include="gui\screens\ResultScreen.h" />
     <ClInclude Include="gui\screens\SandboxScreen.h" />
+    <ClInclude Include="gui\screens\SettingsScreen.h" />
     <ClInclude Include="gui\screens\Screen.h" />
     <ClInclude Include="gui\widgets\Button.h" />
     <ClInclude Include="gui\widgets\EventLogPanel.h" />
