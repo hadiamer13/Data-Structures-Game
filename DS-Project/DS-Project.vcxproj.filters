@@ -71,6 +71,12 @@
     <ClCompile Include="gui\screens\CampaignMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gui\screens\EndlessScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\screens\LeaderboardScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="gui\screens\LevelScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,10 +86,16 @@
     <ClCompile Include="gui\screens\PlaceholderScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gui\screens\ReportScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="gui\screens\ResultScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gui\screens\SandboxScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\screens\SettingsScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gui\widgets\Button.cpp">
@@ -229,6 +241,12 @@
     <ClInclude Include="gui\screens\CampaignMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gui\screens\EndlessScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\screens\LeaderboardScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="gui\screens\LevelScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -238,10 +256,16 @@
     <ClInclude Include="gui\screens\PlaceholderScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gui\screens\ReportScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="gui\screens\ResultScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\screens\SandboxScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\screens\SettingsScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\screens\Screen.h">

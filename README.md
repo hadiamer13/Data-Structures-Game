@@ -1,10 +1,14 @@
 # Data-Structures-Game
 
-## Run the integrated project test runner
+## Run the game
 
-In VS Code, press **F5** and choose **Run Full Project Tests (Release x64)**. The pre-launch build compiles the SFML GUI, game/model modules, and the test suite into one executable, then starts `tests/test_main.cpp`'s doctest runner. The former SFML window entry point in `DS-Project/gui/main_gui.cpp` is disabled for this build.
+In VS Code, choose **Run Vault Heist GUI (Release x64)** in the Run and Debug panel, then click the green start button. This builds the SFML GUI and starts it from `DS-Project` so its assets load. If F5 controls your laptop volume, use the on-screen start button or **Run → Start Debugging**.
 
-To build and run only the model suite from a terminal, use:
+## Run the model tests
+
+Choose **Run Model Tests (Release x64)** in the Run and Debug panel, or run the test task from the Terminal menu. The test runner is a separate executable built from `tests/test_main.cpp`.
+
+To build and run the tests from a terminal, use:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .vscode/test-models.ps1

@@ -9,6 +9,17 @@ class UIManager;
 class GameSession;
 class Campaign;
 
+struct GameSettings
+{
+    unsigned int antialiasingLevel;
+    float animationSpeed;
+    bool recreateWindow;
+
+    GameSettings() : antialiasingLevel(4), animationSpeed(1.f), recreateWindow(false)
+    {
+    }
+};
+
 // Filled by the Level screen when a level ends, read by the Result screen.
 struct LevelResult
 {
@@ -36,6 +47,7 @@ struct AppContext
     UIManager* ui = nullptr;           // main_gui.cpp sets this to &uiManager
     GameSession* session = nullptr;    // main_gui.cpp sets this (stub or real)
     Campaign* campaign = nullptr;      // main_gui.cpp sets this; levels + star progress
+    GameSettings* settings = nullptr;  // shared display and animation settings
 
     int selectedLevel = -1;            // index = act * 5 + level (0..19), -1 = none
     LevelResult result;
