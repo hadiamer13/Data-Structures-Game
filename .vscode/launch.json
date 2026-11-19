@@ -2,12 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Full Project Tests (Release x64)",
+            "name": "Run Vault Heist GUI (Release x64)",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\DS-Project\\x64\\Release\\DS-Project.exe",
+            "cwd": "${workspaceFolder}\\DS-Project",
+            "preLaunchTask": "Build SFML Game (Release x64)",
+            "externalConsole": false
+        },
+        {
+            "name": "Run Model Tests (Release x64)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\DS-Project\\tests\\x64\\Release\\model_tests.exe",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build Full Project with Test Runner (Release x64)",
+            "preLaunchTask": "Build Model Test Runner (Release x64)",
             "externalConsole": false
         }
     ]

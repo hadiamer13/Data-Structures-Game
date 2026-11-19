@@ -8,6 +8,10 @@
 #include "screens/HeapLevel.h"
 #include "screens/SandboxScreen.h"
 #include "screens/ResultScreen.h"
+#include "screens/EndlessScreen.h"
+#include "screens/LeaderboardScreen.h"
+#include "screens/SettingsScreen.h"
+#include "screens/ReportScreen.h"
 
 UIManager::UIManager(AppContext& ctx) : m_ctx(ctx)
 {
@@ -47,13 +51,15 @@ Screen* UIManager::makeScreen(int id)
     case ScreenId::Campaign:
         return new CampaignMap(m_ctx);
     case ScreenId::Endless:
-        return new PlaceholderScreen(m_ctx, "Endless Mode");
+        return new EndlessScreen(m_ctx);
     case ScreenId::Sandbox:
         return new SandboxScreen(m_ctx);
     case ScreenId::Leaderboard:
-        return new PlaceholderScreen(m_ctx, "Leaderboard");
+        return new LeaderboardScreen(m_ctx);
     case ScreenId::Settings:
-        return new PlaceholderScreen(m_ctx, "Settings");
+        return new SettingsScreen(m_ctx);
+    case ScreenId::Reports:
+        return new ReportScreen(m_ctx);
     case ScreenId::Briefing:
         return new BriefingScreen(m_ctx);
     case ScreenId::Level:
