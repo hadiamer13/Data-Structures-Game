@@ -135,7 +135,10 @@ void LevelBanner::applyLayout(float s) {
     m_status.setScale(s, s);
     m_status.setPosition(cx, cy + 0.10f * H);
 
-    m_skull.setScale(s * 0.9f, s * 0.9f);
+    // Scale to a fixed share of the banner height, whatever the texture's native size.
+    const float skullH = 0.14f * m_height * s;
+    const float skullScale = skullH / static_cast<float>(m_skull.getTexture()->getSize().y);
+    m_skull.setScale(skullScale, skullScale);
     m_skull.setPosition(cx, cy - 0.33f * H);
 
     // Stars (cleared/unlocked) or padlock (locked) share the bottom slot.

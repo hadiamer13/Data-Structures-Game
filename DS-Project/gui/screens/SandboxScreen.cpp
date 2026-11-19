@@ -150,6 +150,7 @@ SandboxScreen::SandboxScreen(AppContext& ctx)
     }
 
     buildLayout();
+    m_renderer.setRingTexture(&ctx.assets->nodeRing());
     m_anim.setCallbacks(&SandboxScreen::onAnimEvent, &SandboxScreen::onAnimDone, this);
     loadKind(TreeKind::BST, false);
 }

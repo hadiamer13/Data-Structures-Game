@@ -1,6 +1,7 @@
 // gui/screens/CampaignMap.cpp
 #include "CampaignMap.h"
 #include "../UIManager.h"
+#include "../widgets/Ornament.h"
 #include "../Theme.h"
 #include <cstdio>
 #include <cmath>
@@ -97,22 +98,17 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_dim.setFillColor(sf::Color(0, 0, 0, 110));
 
     // ---- Corner decoration (4 L shapes made of 2 bars each) ----------
+        // ---- Corner ornaments (one sprite, mirrored for each corner) ----
     {
-        const float inset = 12.f, len = 70.f, th = 3.f;
-        const float xs[4] = { inset, W - inset, inset, W - inset };
-        const float ys[4] = { inset, inset, H - inset, H - inset };
-        const float dx[4] = { 1.f, -1.f, 1.f, -1.f };
-        const float dy[4] = { 1.f, 1.f, -1.f, -1.f };
-        for (int c = 0; c < 4; ++c)
-        {
-            sf::RectangleShape& h = m_corner[c * 2];
-            sf::RectangleShape& v = m_corner[c * 2 + 1];
-            h.setSize(sf::Vector2f(len * dx[c], th));
-            h.setPosition(xs[c], ys[c] - (dy[c] > 0 ? 0.f : th));
-            v.setSize(sf::Vector2f(th, len * dy[c]));
-            v.setPosition(xs[c] - (dx[c] > 0 ? 0.f : th), ys[c]);
-            h.setFillColor(Theme::NodeLine);
-            v.setFillColor(Theme::NodeLine);
+        const sf::Texture& ct = ctx.assets->corner();
+        const float inset = 12.f;
+        const float cs = 70.f;
+        placeCorner(m_corners[0], ct, inset, inset, cs, false, false);
+        placeCorner(m_corners[1], ct, W - inset, inset, cs, true, false);
+        placeCorner(m_corners[2], ct, inset, H - inset, cs, false, true);
+        placeCorner(m_corners[3], ct, W - inset, H - inset, cs, true, true);
+        for (int c = 0; c < 4; ++c) {
+            m_corners[c].setColor(Theme::NodeLine);
         }
     }
 
@@ -129,8 +125,15 @@ CampaignMap::CampaignMap(AppContext& ctx)
         m_tab[a].setPosition(cx, tabY);
         m_tabRect[a] = sf::FloatRect(cx - 80.f, tabY - 20.f, 160.f, 40.f);
     }
-    m_tabUnder.setSize(sf::Vector2f(110.f, 3.f));
-    m_tabUnder.setFillColor(Theme::NodeGlow);
+    // Act highlighter: the T-shaped sprite, scaled to a fixed width, origin at top centre.
+    const sf::Texture& hl = ctx.assets->highlight();
+    const sf::Vector2u hs = hl.getSize();
+    const float hlWidth = 120.f;
+    const float hlScale = hlWidth / static_cast<float>(hs.x);
+    m_tabHighlight.setTexture(hl);
+    m_tabHighlight.setOrigin(hs.x / 2.f, 0.f);
+    m_tabHighlight.setScale(hlScale, hlScale);
+    m_tabHighlight.setColor(Theme::NodeGlow);
 
     // Arrows sit just outside the first and last tab.
     float lx = W / 2.f - 1.5f * 190.f - 130.f;
@@ -142,18 +145,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
 
     styleText(m_actName, font, 18, Theme::NodeGlow, W / 2.f, 64.f);
 
-    // Divider with a diamond in the middle.
-    m_divider.setSize(sf::Vector2f(700.f, 2.f));
-    m_divider.setOrigin(350.f, 1.f);
-    m_divider.setPosition(W / 2.f, 82.f);
-    m_divider.setFillColor(Theme::NodeLine);
-    m_diamond.setPointCount(4);
-    m_diamond.setPoint(0, sf::Vector2f(0.f, -7.f));
-    m_diamond.setPoint(1, sf::Vector2f(7.f, 0.f));
-    m_diamond.setPoint(2, sf::Vector2f(0.f, 7.f));
-    m_diamond.setPoint(3, sf::Vector2f(-7.f, 0.f));
-    m_diamond.setPosition(W / 2.f, 82.f);
-    m_diamond.setFillColor(Theme::NodeGlow);
+    // ---- Divider under the act name ----
+    placeDivider(m_divider, ctx.assets->divider(), W / 2.f, 82.f, 400.f);
+    m_divider.setColor(Theme::NodeGlow);
 
     // ---- Banners ----------------------------------------------------
     // Positions, numbers, boss flags and states come from initBanners() and
@@ -191,16 +185,19 @@ CampaignMap::CampaignMap(AppContext& ctx)
         sf::Vector2f(m_panelX + m_panelW - 150.f, m_panelY + m_panelH - 55.f),
         sf::Vector2f(240.f, Theme::ButtonH));
     m_start.setCallback(&CampaignMap::onStartClick, this);
+    m_start.setFrame(&ctx.assets->buttonFrame());
 
     m_back.init("Back", font, sf::Vector2f(110.f, tabY),
         sf::Vector2f(150.f, 42.f));
     m_back.setCallback(&CampaignMap::onBackClick, this);
+    m_back.setFrame(&ctx.assets->buttonFrame());
 
     // DEBUG button: bottom-left of the info panel, clear of the text and Start.
     m_debug.init("DEBUG: UNLOCK ALL (OFF)", font,
         sf::Vector2f(m_panelX + 150.f, m_panelY + m_panelH - 55.f),
         sf::Vector2f(260.f, 42.f));
     m_debug.setCallback(&CampaignMap::onDebugClick, this);
+    m_debug.setFrame(&ctx.assets->buttonFrame());
     refreshDebugLabel();
 
     // ---- Restore position when coming back from the Briefing -----------------
@@ -268,9 +265,8 @@ void CampaignMap::setAct(int act)
     {
         m_tab[a].setFillColor(a == act ? Theme::NodeGlow : Theme::TextColor);
     }
-    m_tabUnder.setOrigin(55.f, 1.5f);
-    m_tabUnder.setPosition(m_tab[act].getPosition().x,
-        m_tab[act].getPosition().y + 24.f);
+    m_tabHighlight.setPosition(m_tab[act].getPosition().x,
+        m_tab[act].getPosition().y + 26.f);
 
     m_actName.setString(ActNames[act]);
     centerOrigin(m_actName);
@@ -562,9 +558,9 @@ void CampaignMap::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);
     window.draw(m_dim);
-    for (int c = 0; c < 8; ++c)
+    for (int c = 0; c < 4; ++c)
     {
-        window.draw(m_corner[c]);
+        window.draw(m_corners[c]);
     }
 
     // Top bar
@@ -573,12 +569,12 @@ void CampaignMap::draw(sf::RenderWindow& window)
     {
         window.draw(m_tab[a]);
     }
-    window.draw(m_tabUnder);
+    window.draw(m_tabHighlight);
     window.draw(m_arrow[0]);
     window.draw(m_arrow[1]);
     window.draw(m_actName);
     window.draw(m_divider);
-    window.draw(m_diamond);
+  
 
     // Banners: selected one last so its glow and scale sit on top.
     for (int s = 0; s < PerAct; ++s)

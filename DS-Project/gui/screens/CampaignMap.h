@@ -62,13 +62,12 @@ private:
     // Backdrop and decoration
     sf::Sprite         m_background;
     sf::RectangleShape m_dim;
-    sf::RectangleShape m_corner[8];     // 4 L-shaped corners, 2 bars each
-    sf::RectangleShape m_divider;
-    sf::ConvexShape    m_diamond;
+    sf::Sprite         m_corners[4];   // TL, TR, BL, BR
+    sf::Sprite         m_divider;      // star ornament under the act name
 
     // Top bar
     sf::Text           m_tab[ActCount];
-    sf::RectangleShape m_tabUnder;
+    sf::Sprite         m_tabHighlight;  // T-shaped marker under the selected act
     sf::FloatRect      m_tabRect[ActCount];
     int                m_tabHover = -1;
     sf::ConvexShape    m_arrow[2];      // 0 = left, 1 = right

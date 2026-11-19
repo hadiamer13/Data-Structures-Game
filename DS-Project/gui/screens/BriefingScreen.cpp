@@ -3,13 +3,27 @@
 #include "../UIManager.h"
 #include "../Theme.h"
 #include "../../game/Campaign.h"
+#include "../widgets/Ornament.h"
 #include <cmath>
 #include <cstdio>
 
 void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
     const char* str, unsigned size,
     const sf::Color& col, float x, float y)
+
 {
+    if (m_ctx.campaign->isBoss(m_index))
+    {
+        const sf::Texture& skullTex = m_ctx.assets->skull();
+        const float iconH = 30.f;
+        const float iconScale = iconH / static_cast<float>(skullTex.getSize().y);
+        const sf::Vector2f panelPos = m_panel.getPosition();
+        const sf::Vector2f panelSize = m_panel.getSize();
+        m_bossIcon.setTexture(skullTex);
+        m_bossIcon.setScale(iconScale, iconScale);
+        m_bossIcon.setColor(Theme::StarOn);
+        m_bossIcon.setPosition(panelPos.x + panelSize.x - 226.f, panelPos.y + 20.f);
+    }
     t.setFont(font);                       // SFML 2.x API
     t.setString(str);
     t.setCharacterSize(size);
@@ -91,9 +105,8 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     // Boss tag: text, not colour alone. Flag comes from the level JSON.
     makeLabel(m_boss, font, "BOSS LEVEL", 20, Theme::StarOn, px + pw - 190.f, py + 24.f);
 
-    m_divider.setSize(sf::Vector2f(pw - 80.f, 2.f));
-    m_divider.setPosition(lx, py + 115.f);
-    m_divider.setFillColor(Theme::NodeLine);
+    placeDivider(m_divider, ctx.assets->divider(), px + pw / 2.f, py + 115.f, pw - 80.f);
+    m_divider.setColor(Theme::NodeLine);
 
     // ---- Text blocks -----------------------------------------------------
     makeLabel(m_objHead, font, "OBJECTIVE", 18, Theme::NodeGlow, lx, py + 135.f);
@@ -118,10 +131,12 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     m_backBtn.init("Back", font, sf::Vector2f(W / 2.f - 180.f, by),
         sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
     m_backBtn.setCallback(&BriefingScreen::onBackClick, this);
+    m_backBtn.setFrame(&ctx.assets->buttonFrame());
 
     m_start.init("Start", font, sf::Vector2f(W / 2.f + 180.f, by),
         sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
     m_start.setCallback(&BriefingScreen::onStartClick, this);
+    m_start.setFrame(&ctx.assets->buttonFrame());
 }
 
 void BriefingScreen::onStartClick(void* context)
@@ -185,6 +200,7 @@ void BriefingScreen::draw(sf::RenderWindow& window)
     window.draw(m_title);
     if (m_ctx.campaign->isBoss(m_index))
     {
+        window.draw(m_bossIcon);
         window.draw(m_boss);
     }
     window.draw(m_divider);

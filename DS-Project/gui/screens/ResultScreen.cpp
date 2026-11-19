@@ -147,6 +147,10 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_retry.setCallback(&ResultScreen::onRetryClick, this);
     m_next.setCallback(&ResultScreen::onNextClick, this);
     m_campaign.setCallback(&ResultScreen::onCampaignClick, this);
+
+    m_retry.setFrame(&ctx.assets->buttonFrame());
+    m_next.setFrame(&ctx.assets->buttonFrame());
+    m_campaign.setFrame(&ctx.assets->buttonFrame());
 }
 
 void ResultScreen::onRetryClick(void* context)

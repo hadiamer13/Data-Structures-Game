@@ -22,7 +22,10 @@ namespace {
 }  // namespace
 
 void Button::init(const char* label, const sf::Font& font,
-    sf::Vector2f center, sf::Vector2f size) {
+    sf::Vector2f center, sf::Vector2f size) 
+{
+    m_center = center;
+    m_size = size;
     m_box.setSize(size);
     m_box.setOrigin(size.x / 2.f, size.y / 2.f);
     m_box.setPosition(center);
@@ -39,6 +42,20 @@ void Button::init(const char* label, const sf::Font& font,
 void Button::setLabel(const char* label) {
     m_text.setString(label);
     centerText();
+}
+
+void Button::setFrame(const sf::Texture* frame) {
+    m_frameTex = nullptr;
+    if (frame == nullptr || frame->getSize().x == 0 || frame->getSize().y == 0) {
+        return;   // texture missing or failed to load: keep the plain button
+    }
+    m_frameTex = frame;
+    const float pad = 8.f;
+    const sf::Vector2u ts = frame->getSize();
+    m_frame.setTexture(*frame);
+    m_frame.setOrigin(ts.x / 2.f, ts.y / 2.f);
+    m_frame.setPosition(m_center);
+    m_frame.setScale((m_size.x + 2.f * pad) / ts.x, (m_size.y + 2.f * pad) / ts.y);
 }
 
 void Button::centerText() {
@@ -92,10 +109,21 @@ void Button::update(float dt) {
     m_box.setFillColor(fill);
 
     // Not colour alone: outline gets thicker on hover/press.
-    m_box.setOutlineThickness(2.f + 2.f * m_hoverAmt);
+    if (m_frameTex != nullptr) {
+        // The frame carries the outline, so the box outline is hidden.
+        m_box.setOutlineThickness(0.f);
+        m_frame.setColor(lerpColor(Theme::BtnOutline, Theme::NodeGlow, m_hoverAmt));
+    }
+    else {
+        m_box.setOutlineThickness(2.f + 2.f * m_hoverAmt);
+    }
 }
 
-void Button::draw(sf::RenderWindow& window) const {
+void Button::draw(sf::RenderWindow& window) const 
+{
     window.draw(m_box);
+    if (m_frameTex != nullptr) {
+        window.draw(m_frame);
+    }
     window.draw(m_text);
 }

@@ -23,6 +23,8 @@ public:
         m_context = context;
     }
     void setLabel(const char* label);
+    // Optional frame sprite drawn over the fill. Call after init().
+    void setFrame(const sf::Texture* frame);
 
     void handleEvent(const sf::Event& e);
     void update(float dt);
@@ -38,6 +40,10 @@ private:
 
     sf::RectangleShape m_box;
     sf::Text           m_text;          // created once, only setString on change
+    sf::Sprite         m_frame;
+    const sf::Texture* m_frameTex = nullptr;
+    sf::Vector2f       m_center;
+    sf::Vector2f       m_size;
     int                m_state = StateIdle;
     float              m_hoverAmt = 0.f;  // 0..1, eased for smooth colour fade
     ButtonCallback     m_onClick = nullptr;

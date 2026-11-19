@@ -206,6 +206,7 @@
     <ClCompile Include="gui\widgets\Hud.cpp" />
     <ClCompile Include="gui\widgets\LevelBanner.cpp" />
     <ClCompile Include="gui\widgets\NumberField.cpp" />
+    <ClCompile Include="gui\widgets\Ornament.cpp" />
     <ClCompile Include="gui\widgets\Toolbar.cpp" />
     <ClCompile Include="gui\widgets\Tooltip.cpp" />
     <ClCompile Include="model\AVLTree.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="gui\widgets\Hud.h" />
     <ClInclude Include="gui\widgets\LevelBanner.h" />
     <ClInclude Include="gui\widgets\NumberField.h" />
+    <ClInclude Include="gui\widgets\Ornament.h" />
     <ClInclude Include="gui\widgets\Toolbar.h" />
     <ClInclude Include="gui\widgets\Tooltip.h" />
     <ClInclude Include="model\AVLTree.h" />

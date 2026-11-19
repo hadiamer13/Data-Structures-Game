@@ -106,6 +106,7 @@ LevelScreen::LevelScreen(AppContext& ctx)
 
     buildLayout();
     m_anim.setCallbacks(&LevelScreen::onAnimEvent, &LevelScreen::onAnimDone, this);
+    m_renderer.setRingTexture(&ctx.assets->nodeRing());
     m_ok = loadLevel();
 
     if (m_ok)
@@ -376,6 +377,7 @@ void LevelScreen::buildActionButtons()
         float cx = x0 + (float)i * step;
         m_act[i].init(labels[i], font, sf::Vector2f(cx, barY + 34.f), sf::Vector2f(w, 38.f));
         m_act[i].setCallback(&LevelScreen::onActionClick, &m_actCtx[i]);
+        m_act[i].setFrame(&m_ctx.assets->buttonFrame());
     }
 }
 

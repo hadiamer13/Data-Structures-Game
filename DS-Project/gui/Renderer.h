@@ -105,10 +105,16 @@ public:
 
     int kind() const;
     bool isHeap() const;
+    
+    // Optional ornament drawn around each node. Pass nullptr to keep the plain circle.
+    void setRingTexture(const sf::Texture* tex);
 
 private:
     Renderer(const Renderer&);
     Renderer& operator=(const Renderer&);
+
+    const sf::Texture* m_ringTex;
+    sf::Sprite         m_ringSprite;
 
     void resetNode(RenderNode& r) const;
     void ensureCapacity(int n);

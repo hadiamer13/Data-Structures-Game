@@ -140,6 +140,9 @@
     <ClCompile Include="tests\test_act1_act4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gui\widgets\Ornament.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contracts\Containers.h">
@@ -302,6 +305,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\screens\HeapLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\widgets\Ornament.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

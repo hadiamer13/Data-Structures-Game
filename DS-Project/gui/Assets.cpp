@@ -3,56 +3,42 @@
 #include "Theme.h"
 #include <cstdio>
 
+namespace {
+
+    // Loads one texture, smooths it for scaling, and reports failures by path.
+    bool loadTexture(sf::Texture& tex, const char* path) {
+        if (!tex.loadFromFile(path)) {
+            std::fprintf(stderr, "[Assets] Failed to load texture: %s\n", path);
+            return false;
+        }
+        tex.setSmooth(true);
+        return true;
+    }
+
+}  // namespace
+
 bool Assets::loadAll() {
     bool ok = true;
 
-    // TODO(YOU): make sure this file exists at assets/fonts/vault.ttf
+    // Required: the game cannot run without these.
     if (!m_font.loadFromFile(Theme::FontPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load font: %s\n",
-            Theme::FontPath);
+        std::fprintf(stderr, "[Assets] Failed to load font: %s\n", Theme::FontPath);
         ok = false;
     }
+    ok = loadTexture(m_menuBg, Theme::MenuBgPath) && ok;
+    ok = loadTexture(m_campaignBg, Theme::CampaignBgPath) && ok;
+    ok = loadTexture(m_banner, Theme::BannerPath) && ok;
 
-    // TODO(YOU): make sure this file exists at assets/images/menu_bg.png
-    if (!m_menuBg.loadFromFile(Theme::MenuBgPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load menu background: %s\n",
-            Theme::MenuBgPath);
-        ok = false;
-    }
-    else {
-        m_menuBg.setSmooth(true);
-    }
-
-    // TODO(YOU): make sure this file exists at assets/images/campaign_bg.png
-    if (!m_campaignBg.loadFromFile(Theme::CampaignBgPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load campaign background: %s\n",
-            Theme::CampaignBgPath);
-        ok = false;
-    }
-    else {
-        m_campaignBg.setSmooth(true);
-    }
-
-    // TODO(YOU): make sure these exist (see Theme.h BannerPath / SkullPath)
-    if (!m_banner.loadFromFile(Theme::BannerPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load banner: %s\n", Theme::BannerPath);
-        ok = false;
-    }
-    else {
-        m_banner.setSmooth(true);
-    }
-    if (!m_skull.loadFromFile(Theme::SkullPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load skull icon: %s\n", Theme::SkullPath);
-        ok = false;
-    }
-    else {
-        m_skull.setSmooth(true);
-    }
-
-    // TODO(YOU, later): load more images here, e.g.
-    // m_campaignBg.loadFromFile("assets/images/campaign_bg.png");
-    //   m_vaultDoor.loadFromFile("assets/images/vault_door.png");
-    // and add matching accessors in Assets.h.
+    // Optional: decorative pieces. A missing file only prints a warning,
+    // and setFrame / setRingTexture / placeCorner fall back to plain drawing.
+    loadTexture(m_skull, Theme::SkullPath);
+    loadTexture(m_nodeRing, Theme::NodeRingPath);
+    loadTexture(m_buttonFrame, Theme::ButtonFramePath);
+    loadTexture(m_divider, Theme::DividerPath);
+    loadTexture(m_dividerAlt, Theme::DividerAltPath);
+    loadTexture(m_highlight, Theme::HighlightPath);
+    loadTexture(m_corner, Theme::CornerPath);
+    loadTexture(m_cornerSmall, Theme::CornerSmallPath);
 
     return ok;
 }
