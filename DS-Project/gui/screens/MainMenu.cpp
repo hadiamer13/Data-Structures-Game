@@ -66,6 +66,7 @@ MainMenu::MainMenu(AppContext& ctx) : m_ctx(ctx) {
             sf::Vector2f(cx, firstY + stepY * i),
             sf::Vector2f(Theme::ButtonW, Theme::ButtonH));
         m_buttons[i].setCallback(&MainMenu::onButtonClick, &m_btnCtx[i]);
+        m_buttons[i].setFrame(&ctx.assets->buttonFrame());
     }
 }
 

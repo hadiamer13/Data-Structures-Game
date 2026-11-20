@@ -31,13 +31,14 @@ private:
     sf::Sprite         m_background;
     sf::RectangleShape m_dim;
     sf::RectangleShape m_panel;
-    sf::RectangleShape m_divider;
+    sf::Sprite         m_divider;
 
     sf::Text m_act, m_title, m_boss;
     sf::Text m_objHead, m_objective;
     sf::Text m_conceptHead, m_concept;
     sf::Text m_ruleHead, m_rule;
     sf::Text m_bestLabel;
+    sf::Sprite m_bossIcon;         // skull shown next to the BOSS LEVEL tag
 
     sf::ConvexShape m_star[3];
 

@@ -81,6 +81,7 @@ Renderer::Renderer(const sf::Font& font)
     m_userMoved(false), m_hasFit(false), m_dragging(false), m_lastMx(0), m_lastMy(0),
     m_swapA(kNull), m_swapB(kNull), m_swapT(0.f)
 {
+    m_ringTex = nullptr;
     m_circle.setPointCount(32);
     m_ring.setPointCount(32);
     m_ring.setFillColor(sf::Color::Transparent);
@@ -141,6 +142,18 @@ static void centreText(sf::Text& t)
 {
     sf::FloatRect b = t.getLocalBounds();
     t.setOrigin(b.left + b.width * 0.5f, b.top + b.height * 0.5f);
+}
+
+void Renderer::setRingTexture(const sf::Texture* tex)
+{
+    m_ringTex = tex;
+    if (tex == nullptr)
+    {
+        return;
+    }
+    m_ringSprite.setTexture(*tex);
+    const sf::Vector2u ts = tex->getSize();
+    m_ringSprite.setOrigin(ts.x / 2.f, ts.y / 2.f);
 }
 
 void Renderer::resetNode(RenderNode& r) const
@@ -1187,9 +1200,21 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
     m_circle.setOrigin(R, R);
     m_circle.setPosition(r.x, r.y);
     m_circle.setFillColor(withAlpha(fill, a));
-    m_circle.setOutlineThickness(thick);
+    m_circle.setOutlineThickness(m_ringTex != nullptr ? 0.f : thick);
     m_circle.setOutlineColor(withAlpha(outline, a));
     w.draw(m_circle);
+
+    if (m_ringTex != nullptr)
+    {
+        // The ring takes the same outline colour as before, so marks still read
+        // (blue visit, gold result, red violation), and it extends past the node edge.
+        const float d = 2.f * R * 1.4f;
+        const float s = d / static_cast<float>(m_ringTex->getSize().x);
+        m_ringSprite.setScale(s, s);
+        m_ringSprite.setPosition(r.x, r.y);
+        m_ringSprite.setColor(withAlpha(outline, a));
+        w.draw(m_ringSprite);
+    }
 
     if (r.mark == NodeMark::Result || r.target)
     {

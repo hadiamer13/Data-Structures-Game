@@ -12,19 +12,24 @@ namespace Theme {
     inline const unsigned FrameLimit = 60;
 
     // ---- Asset paths (relative to project root; run the exe from there) ----
-    // TODO(YOU): put your font file here
     inline const char* const FontPath = "assets/fonts/vault.ttf";
-    // TODO(YOU): put your menu background image here
     inline const char* const MenuBgPath = "assets/images/menu_bg.png";
-    // TODO(YOU): put your campaign background image here
     inline const char* const CampaignBgPath = "assets/images/campaign_bg.png";
-    // TODO(YOU): put your banner frame and skull icon here
     inline const char* const BannerPath = "assets/images/ui/banner.png";
-    inline const char* const SkullPath = "assets/images/ui/icon_skull.png";
+
+    // UI sheet pieces (sliced from the generated sheets, see sprite_cutter.py)
+    inline const char* const SkullPath = "assets/images/ui/ui_skull_01.png";
+    inline const char* const NodeRingPath = "assets/images/ui/ui_ring_01.png";
+    inline const char* const ButtonFramePath = "assets/images/ui/ui_title_06.png";
+    inline const char* const DividerPath = "assets/images/ui/ui_divider_04.png";
+    inline const char* const DividerAltPath = "assets/images/ui/ui_divider_08.png";
+    inline const char* const HighlightPath = "assets/images/ui/ui_corner_07.png";
+    inline const char* const CornerPath = "assets/images/ui/ui_corner_03.png";
+    inline const char* const CornerSmallPath = "assets/images/ui/ui_small_08.png";
 
     // ---- Fonts ----
-    inline const unsigned TitleSize = 64;
-    inline const unsigned ButtonTextSize = 26;
+    inline const unsigned TitleSize = 48;
+    inline const unsigned ButtonTextSize = 20;
     inline const unsigned NodeTextSize = 22;
     inline const unsigned TooltipTextSize = 18;
 
@@ -67,5 +72,9 @@ namespace Theme {
         sf::Color(130, 30, 70, 200),
         sf::Color(190, 50, 40, 200)
     };
+
+    // Width of the untouched corner/edge band of a framed texture, in texture pixels.
+// Tune this if the frame corners look too thick or too thin.
+    inline const int FrameBorderPx = 12;
 
 }  // namespace Theme

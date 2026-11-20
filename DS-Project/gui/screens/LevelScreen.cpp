@@ -106,6 +106,7 @@ LevelScreen::LevelScreen(AppContext& ctx)
 
     buildLayout();
     m_anim.setCallbacks(&LevelScreen::onAnimEvent, &LevelScreen::onAnimDone, this);
+    m_renderer.setRingTexture(&ctx.assets->nodeRing());
     m_ok = loadLevel();
 
     if (m_ok)
@@ -227,6 +228,7 @@ void LevelScreen::buildLayout()
     m_rootBox.setOutlineThickness(3.f);
 
     m_hud.init(font, 0.f, 0.f, W, HudH);
+    m_hud.setFrame(&m_ctx.assets->buttonFrame());
     m_log.init(font, W - LogW, HudH, LogW, H - HudH - ToolbarH);
     m_toolbar.init(font, 0.f, H - ToolbarH, W, ToolbarH);
     m_toolbar.setCallback(&LevelScreen::onToolbarClick, this);
@@ -353,7 +355,7 @@ void LevelScreen::buildActionButtons()
     {
         labels[0] = "Mirror";
         m_actCount = 1;
-        w = 160.f;
+        w = 190.f;
         x0 = 110.f;
         m_hint.setString("Wheel: zoom   Drag: pan   Mirror swaps every room's children   Z: undo");
     }
@@ -371,11 +373,16 @@ void LevelScreen::buildActionButtons()
         m_hint.setString("Wheel: zoom   Drag: pan   Pick the rotation the next insert will cause   H: hint");
     }
 
+    float x = x0;
     for (int i = 0; i < m_actCount; ++i)
     {
-        float cx = x0 + (float)i * step;
-        m_act[i].init(labels[i], font, sf::Vector2f(cx, barY + 34.f), sf::Vector2f(w, 38.f));
+        m_act[i].init(labels[i], font, sf::Vector2f(0.f, barY + 34.f), sf::Vector2f(w, Theme::ButtonH));
+        m_act[i].setPadding(12.f);
         m_act[i].setCallback(&LevelScreen::onActionClick, &m_actCtx[i]);
+        m_act[i].setFrame(&m_ctx.assets->buttonFrame());
+        const float bw = m_act[i].width();
+        m_act[i].setCenter(sf::Vector2f(x + bw * 0.5f, barY + 34.f));
+        x += bw + 14.f;
     }
 }
 

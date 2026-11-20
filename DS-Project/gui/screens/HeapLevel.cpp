@@ -183,6 +183,7 @@ void HeapLevel::buildLayout()
     styleText(m_selText, font, 14, Theme::TextColor, 16.f, barY + 24.f);
 
     m_hud.init(font, 0.f, 0.f, W, HudH);
+    m_hud.setFrame(&m_ctx.assets->buttonFrame());
     m_log.init(font, W - LogW, HudH, LogW, H - HudH - ToolbarH);
     m_toolbar.init(font, 0.f, H - ToolbarH, W, ToolbarH);
     m_toolbar.setCallback(&HeapLevel::onToolbarClick, this);
@@ -248,6 +249,7 @@ bool HeapLevel::allowsSwap() const
 void HeapLevel::buildOpButtons()
 {
     m_opCount = 0;
+    m_opNextX = 170.f;   // clear of the "Selected:" label
     if (allowsBuild())
     {
         addOp(HeapOp::Build, "Build heap");
@@ -271,11 +273,17 @@ void HeapLevel::addOp(int op, const char* label)
     }
     const sf::Font& font = m_ctx.assets->font();
     const float barY = (float)Theme::WindowH - ToolbarH - BarH;
-    const float x = 300.f + (float)m_opCount * 170.f;
+    const float cy = barY + 34.f;
+
     m_opCtx[m_opCount].owner = this;
     m_opCtx[m_opCount].op = op;
-    m_op[m_opCount].init(label, font, sf::Vector2f(x, barY + 34.f), sf::Vector2f(160.f, 38.f));
+    m_op[m_opCount].init(label, font, sf::Vector2f(0.f, cy), sf::Vector2f(120.f, 38.f));
+    m_op[m_opCount].setTextSize(20);
+    m_op[m_opCount].setPadding(12.f);
+    const float w = m_op[m_opCount].width();
+    m_op[m_opCount].setCenter(sf::Vector2f(m_opNextX + w * 0.5f, cy));
     m_op[m_opCount].setCallback(&HeapLevel::onOpClick, &m_opCtx[m_opCount]);
+    m_opNextX += w + 14.f;
     m_opCount++;
 }
 
