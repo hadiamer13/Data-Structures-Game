@@ -8,6 +8,7 @@
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
+#include "NineSlice.h"
 
 class Hud
 {
@@ -15,6 +16,9 @@ public:
     Hud();
 
     void init(const sf::Font& font, float x, float y, float w, float h);
+
+    // Optional ornate frame around the alarm bar. Call after init().
+    void setFrame(const sf::Texture* frame);
 
     void setTitle(const std::string& title);
     void setObjective(const std::string& objective);   // '\n' becomes a space, then word-wrapped
@@ -43,6 +47,8 @@ private:
     int m_steps;
     int m_maxSteps;
     float m_shown;     // eased meter fill 0..1
+
+    NineSlice m_frame;  // ornate frame behind the alarm bar
 
     sf::RectangleShape m_bg;
     sf::RectangleShape m_barBack;

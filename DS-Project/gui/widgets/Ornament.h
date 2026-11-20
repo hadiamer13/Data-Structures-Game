@@ -20,14 +20,20 @@ inline void placeCorner(sf::Sprite& s, const sf::Texture& t,
     s.setPosition(x, y);
 }
 
-// Places a horizontal divider centred at (cx, cy). Scale follows width,
-// so height is set by the art's proportions.
+// Places a horizontal divider centred at (cx, cy).
+// The art keeps its proportions. It is scaled to the requested width,
+// but never taller than maxHeight, so tall ornament peaks can't reach
+// the text above or below. maxHeight <= 0 means no height limit.
 inline void placeDivider(sf::Sprite& s, const sf::Texture& t,
-    float cx, float cy, float width) {
+    float cx, float cy, float width, float maxHeight = 0.f) {
     const sf::Vector2u ts = t.getSize();
     if (ts.x == 0 || ts.y == 0) return;
 
-    const float k = width / static_cast<float>(ts.x);
+    float k = width / static_cast<float>(ts.x);
+    if (maxHeight > 0.f) {
+        const float kH = maxHeight / static_cast<float>(ts.y);
+        if (kH < k) k = kH;
+    }
     s.setTexture(t);
     s.setOrigin(ts.x / 2.f, ts.y / 2.f);
     s.setScale(k, k);

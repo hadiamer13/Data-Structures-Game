@@ -143,10 +143,10 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_arrowRect[0] = sf::FloatRect(lx - 25.f, tabY - 25.f, 50.f, 50.f);
     m_arrowRect[1] = sf::FloatRect(rx - 25.f, tabY - 25.f, 50.f, 50.f);
 
-    styleText(m_actName, font, 18, Theme::NodeGlow, W / 2.f, 64.f);
+    styleText(m_actName, font, 18, Theme::NodeGlow, W / 2.f, 54.f);
 
     // ---- Divider under the act name ----
-    placeDivider(m_divider, ctx.assets->divider(), W / 2.f, 82.f, 400.f);
+    placeDivider(m_divider, ctx.assets->divider(), W / 2.f, 88.f, 400.f, 18.f);
     m_divider.setColor(Theme::NodeGlow);
 
     // ---- Banners ----------------------------------------------------
@@ -194,8 +194,8 @@ CampaignMap::CampaignMap(AppContext& ctx)
 
     // DEBUG button: bottom-left of the info panel, clear of the text and Start.
     m_debug.init("DEBUG: UNLOCK ALL (OFF)", font,
-        sf::Vector2f(m_panelX + 150.f, m_panelY + m_panelH - 55.f),
-        sf::Vector2f(260.f, 42.f));
+        sf::Vector2f(m_panelX + 250.f, m_panelY + m_panelH - 55.f),
+        sf::Vector2f(260.f, Theme::ButtonH));
     m_debug.setCallback(&CampaignMap::onDebugClick, this);
     m_debug.setFrame(&ctx.assets->buttonFrame());
     refreshDebugLabel();
@@ -224,7 +224,7 @@ void CampaignMap::initBanners()
         std::snprintf(num, sizeof(num), "%d", i + 1);
         const bool boss = m_campaign->isBoss(m_act * PerAct + i);
         m_banner[i].init(num, *m_font, m_ctx.assets->banner(), m_ctx.assets->skull(),
-            sf::Vector2f(W / 2.f + (i - 2) * 215.f, 262.f),
+            sf::Vector2f(W / 2.f + (i - 2) * 215.f, 276.f),
             Theme::BannerH, boss);
     }
 }
@@ -270,7 +270,7 @@ void CampaignMap::setAct(int act)
 
     m_actName.setString(ActNames[act]);
     centerOrigin(m_actName);
-    m_actName.setPosition(W / 2.f, 64.f);
+    m_actName.setPosition(W / 2.f, 54.f);
 
     // Select the first level still to play (or the first one).
     int pick = 0;

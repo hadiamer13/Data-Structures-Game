@@ -20,7 +20,7 @@ namespace Theme {
     // UI sheet pieces (sliced from the generated sheets, see sprite_cutter.py)
     inline const char* const SkullPath = "assets/images/ui/ui_skull_01.png";
     inline const char* const NodeRingPath = "assets/images/ui/ui_ring_01.png";
-    inline const char* const ButtonFramePath = "assets/images/ui/ui_panel_03.png";
+    inline const char* const ButtonFramePath = "assets/images/ui/ui_title_06.png";
     inline const char* const DividerPath = "assets/images/ui/ui_divider_04.png";
     inline const char* const DividerAltPath = "assets/images/ui/ui_divider_08.png";
     inline const char* const HighlightPath = "assets/images/ui/ui_corner_07.png";
@@ -28,8 +28,8 @@ namespace Theme {
     inline const char* const CornerSmallPath = "assets/images/ui/ui_small_08.png";
 
     // ---- Fonts ----
-    inline const unsigned TitleSize = 64;
-    inline const unsigned ButtonTextSize = 26;
+    inline const unsigned TitleSize = 48;
+    inline const unsigned ButtonTextSize = 20;
     inline const unsigned NodeTextSize = 22;
     inline const unsigned TooltipTextSize = 18;
 
@@ -73,6 +73,8 @@ namespace Theme {
         sf::Color(190, 50, 40, 200)
     };
 
-
+    // Width of the untouched corner/edge band of a framed texture, in texture pixels.
+// Tune this if the frame corners look too thick or too thin.
+    inline const int FrameBorderPx = 12;
 
 }  // namespace Theme

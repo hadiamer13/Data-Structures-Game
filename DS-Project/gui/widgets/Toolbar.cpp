@@ -29,14 +29,17 @@ void Toolbar::init(const sf::Font& font, float x, float y, float w, float h)
     m_bg.setOutlineThickness(-2.f);
 
     const char* labels[kButtons] = { "Undo", "Replay", "Reset", "Hint" };
-    const float bw = 120.f;
     const float bh = h - 12.f;
     const float cy = y + h * 0.5f;
+    float bx = x + 16.f;
     for (int i = 0; i < kButtons; ++i)
     {
-        float cx = x + 16.f + bw * 0.5f + (float)i * (bw + 14.f);
-        m_btn[i].init(labels[i], font, sf::Vector2f(cx, cy), sf::Vector2f(bw, bh));
+        m_btn[i].init(labels[i], font, sf::Vector2f(0.f, cy), sf::Vector2f(120.f, bh));
+        m_btn[i].setPadding(12.f);
         m_btn[i].setCallback(&Toolbar::onButton, &m_btnCtx[i]);
+        const float bw = m_btn[i].width();
+        m_btn[i].setCenter(sf::Vector2f(bx + bw * 0.5f, cy));
+        bx += bw + 14.f;
     }
 
     // speed slider on the right

@@ -105,7 +105,7 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     // Boss tag: text, not colour alone. Flag comes from the level JSON.
     makeLabel(m_boss, font, "BOSS LEVEL", 20, Theme::StarOn, px + pw - 190.f, py + 24.f);
 
-    placeDivider(m_divider, ctx.assets->divider(), px + pw / 2.f, py + 115.f, pw - 80.f);
+    placeDivider(m_divider, ctx.assets->divider(), px + pw / 2.f, py + 118.f, pw - 80.f, 28.f);
     m_divider.setColor(Theme::NodeLine);
 
     // ---- Text blocks -----------------------------------------------------

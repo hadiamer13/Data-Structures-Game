@@ -9,7 +9,7 @@ namespace
     const float TabH = 44.f;
     const float ToolbarH = 48.f;
     const float LogW = 320.f;
-    const float PanelW = 260.f;
+    const float PanelW = 250.f;
     const float ClickSlop = 5.f;
 
     namespace ScreenOp
@@ -80,7 +80,7 @@ namespace
         return op >= SandboxOp::RotLL && op <= SandboxOp::RotRL;
     }
 
-    // Events that only update labels. They are dropped from the animation (snapshots show the result).
+    
     bool animated(int type)
     {
         return type != EventType::UPDATE_HEIGHT && type != EventType::UPDATE_SIZE;
@@ -91,7 +91,7 @@ namespace
         return type == EventType::INSERT || type == EventType::UNLINK || type == EventType::ROTATE;
     }
 
-    // Greedy word wrap by character count.
+    
     std::string wrapChars(const std::string& s, int width)
     {
         std::string out;
@@ -133,7 +133,7 @@ namespace
     }
 }
 
-// ------------------------------------------------------------ construction
+// constructor
 
 SandboxScreen::SandboxScreen(AppContext& ctx)
     : m_ctx(ctx), m_renderer(ctx.assets->font()), m_anim(&m_renderer)
@@ -154,6 +154,8 @@ SandboxScreen::SandboxScreen(AppContext& ctx)
     m_anim.setCallbacks(&SandboxScreen::onAnimEvent, &SandboxScreen::onAnimDone, this);
     loadKind(TreeKind::BST, false);
 }
+
+// button idher udher karne ke ham 25000 dollar lete hai
 
 void SandboxScreen::buildLayout()
 {
@@ -273,17 +275,42 @@ void SandboxScreen::rebuildOps()
     }
 
     const sf::Font& font = m_ctx.assets->font();
-    float px = (float)Theme::WindowW - PanelW;
-    float y0 = TabH + 160.f;
+    const float px = (float)Theme::WindowW - PanelW;
+    const float y0 = TabH + 160.f;
+    const float rowH = 38.f;
+    const float margin = 15.f;   // inner margin of the panel
+    const float gap = 10.f;      // space between the two columns
+    const float btnH = 30.f;
+
     m_opCount = n;
+
+    // Pass 1: create the buttons with a small label and padding, and find each column's widest button.
+    float colW[2] = { 0.f, 0.f };
     for (int i = 0; i < n; ++i)
     {
-        int col = i % 2;
-        int row = i / 2;
-        float cx = px + 15.f + 56.f + (float)col * 122.f;
+        const int col = i % 2;
         m_opCtx[i].op = defs[i].op;
-        m_op[i].init(defs[i].label, font, sf::Vector2f(cx, y0 + (float)row * 38.f), sf::Vector2f(112.f, 30.f));
+        m_op[i].init(defs[i].label, font, sf::Vector2f(0.f, 0.f), sf::Vector2f(100.f, btnH));
+        m_op[i].setTextSize(16);
+        m_op[i].setPadding(8.f);
         m_op[i].setCallback(&SandboxScreen::onOpClick, &m_opCtx[i]);
+        if (m_op[i].width() > colW[col])
+        {
+            colW[col] = m_op[i].width();
+        }
+    }
+
+    // Pass 2: place each column's buttons centred in that column.
+    const float colX[2] =
+    {
+        px + margin + colW[0] * 0.5f,
+        px + margin + colW[0] + gap + colW[1] * 0.5f
+    };
+    for (int i = 0; i < n; ++i)
+    {
+        const int col = i % 2;
+        const int row = i / 2;
+        m_op[i].setCenter(sf::Vector2f(colX[col], y0 + (float)row * rowH));
     }
 }
 

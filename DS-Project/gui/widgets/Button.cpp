@@ -4,16 +4,15 @@
 
 namespace {
 
-    // Own min/max (no <algorithm>).
+    const unsigned kMinTextSize = 12;   // labels never shrink below this
+
     float minF(float a, float b) { return a < b ? a : b; }
     float maxF(float a, float b) { return a > b ? a : b; }
 
-    // Linear blend of one colour channel.
     sf::Uint8 mixChannel(sf::Uint8 x, sf::Uint8 y, float t) {
         return static_cast<sf::Uint8>(x + (y - x) * t);
     }
 
-    // Linear blend between two colours, t in [0,1].
     sf::Color lerpColor(const sf::Color& a, const sf::Color& b, float t) {
         return sf::Color(mixChannel(a.r, b.r, t), mixChannel(a.g, b.g, t),
             mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
@@ -22,51 +21,91 @@ namespace {
 }  // namespace
 
 void Button::init(const char* label, const sf::Font& font,
-    sf::Vector2f center, sf::Vector2f size) 
-{
+    sf::Vector2f center, sf::Vector2f size) {
     m_center = center;
+    m_minSize = size;
     m_size = size;
-    m_box.setSize(size);
-    m_box.setOrigin(size.x / 2.f, size.y / 2.f);
-    m_box.setPosition(center);
+    m_textSize = Theme::ButtonTextSize;
+
     m_box.setFillColor(Theme::BtnIdle);
     m_box.setOutlineColor(Theme::BtnOutline);
     m_box.setOutlineThickness(2.f);
 
     m_text.setFont(font);                          // SFML 2.x API
-    m_text.setCharacterSize(Theme::ButtonTextSize);
     m_text.setFillColor(Theme::TextColor);
     setLabel(label);
 }
 
 void Button::setLabel(const char* label) {
     m_text.setString(label);
-    centerText();
+    applyLayout();
+}
+
+void Button::setPadding(float padX) {
+    m_padX = padX;
+    applyLayout();
+}
+
+void Button::setMaxWidth(float maxW) {
+    m_maxW = (maxW > 0.f) ? maxW : 0.f;
+    applyLayout();
+}
+
+void Button::setTextSize(unsigned size) {
+    m_textSize = size;
+    applyLayout();
+}
+
+void Button::setCenter(sf::Vector2f c) {
+    m_center = c;
+    applyLayout();
 }
 
 void Button::setFrame(const sf::Texture* frame) {
-    m_frameTex = nullptr;
-    if (frame == nullptr || frame->getSize().x == 0 || frame->getSize().y == 0) {
-        return;   // texture missing or failed to load: keep the plain button
+    m_hasFrame = (frame != nullptr && frame->getSize().x > 0 && frame->getSize().y > 0);
+    if (m_hasFrame) {
+        m_frame.setTexture(frame, Theme::FrameBorderPx);
     }
-    m_frameTex = frame;
-    const float pad = 8.f;
-    const sf::Vector2u ts = frame->getSize();
-    m_frame.setTexture(*frame);
-    m_frame.setOrigin(ts.x / 2.f, ts.y / 2.f);
-    m_frame.setPosition(m_center);
-    m_frame.setScale((m_size.x + 2.f * pad) / ts.x, (m_size.y + 2.f * pad) / ts.y);
+    else {
+        m_frame.setTexture(nullptr, 0);   // texture missing: keep the plain button
+    }
+    applyLayout();
 }
 
-void Button::centerText() {
+// Sizes the label, then the box, then the frame. All three use the same rectangle.
+void Button::applyLayout() {
+    // 1. Start from the base label size and shrink it only if a max width is set.
+    m_text.setCharacterSize(m_textSize);
+    if (m_maxW > 0.f) {
+        while (m_text.getCharacterSize() > kMinTextSize &&
+            m_text.getLocalBounds().width + 2.f * m_padX > m_maxW) {
+            m_text.setCharacterSize(m_text.getCharacterSize() - 1);
+        }
+    }
+
+    // 2. Width = label + padding, not below the minimum, not above the max.
+    float w = maxF(m_minSize.x, m_text.getLocalBounds().width + 2.f * m_padX);
+    if (m_maxW > 0.f) {
+        w = minF(w, m_maxW);
+    }
+    m_size = sf::Vector2f(w, m_minSize.y);
+
+    // 3. Box, centred on m_center.
+    m_box.setSize(m_size);
+    m_box.setOrigin(w / 2.f, m_size.y / 2.f);
+    m_box.setPosition(m_center);
+
+    // 4. Label, centred.
     sf::FloatRect b = m_text.getLocalBounds();
     m_text.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
-    m_text.setPosition(m_box.getPosition());
+    m_text.setPosition(m_center);
+
+    // 5. Frame covers exactly the box, so it never spills into neighbours.
+    m_frame.setRect(sf::FloatRect(m_center.x - w / 2.f, m_center.y - m_size.y / 2.f,
+        w, m_size.y));
 }
 
 void Button::handleEvent(const sf::Event& e) {
-    // NOTE: uses raw window pixel coordinates. If you later apply an
-    // sf::View to the menu, convert with window.mapPixelToCoords first.
     sf::FloatRect bounds = m_box.getGlobalBounds();
 
     if (e.type == sf::Event::MouseMoved) {
@@ -89,41 +128,35 @@ void Button::handleEvent(const sf::Event& e) {
             bool still = bounds.contains(static_cast<float>(e.mouseButton.x),
                 static_cast<float>(e.mouseButton.y));
             m_state = still ? StateHover : StateIdle;
-            // Fire only if released over the button.
-            // INTEGRATION: the owner's callback decides what happens
-            // (switch screen, quit, later: start a game session).
             if (still && m_onClick) m_onClick(m_context);
         }
     }
 }
 
 void Button::update(float dt) {
-    // Ease hover amount toward target (~0.12 s fade).
     float target = (m_state == StateIdle) ? 0.f : 1.f;
     float step = 8.f * dt;
     if (m_hoverAmt < target) m_hoverAmt = minF(target, m_hoverAmt + step);
     else                     m_hoverAmt = maxF(target, m_hoverAmt - step);
 
-    sf::Color fill = lerpColor(Theme::BtnIdle, Theme::BtnHover, m_hoverAmt);
-    if (m_state == StatePressed) fill = Theme::BtnPressed;
-    m_box.setFillColor(fill);
-
-    // Not colour alone: outline gets thicker on hover/press.
-    if (m_frameTex != nullptr) {
-        // The frame carries the outline, so the box outline is hidden.
+    if (m_hasFrame) {
+        // Framed: the fill stays dark. Hover only brightens the frame.
+        m_box.setFillColor(sf::Color::Transparent);
         m_box.setOutlineThickness(0.f);
         m_frame.setColor(lerpColor(Theme::BtnOutline, Theme::NodeGlow, m_hoverAmt));
     }
     else {
+        sf::Color fill = lerpColor(Theme::BtnIdle, Theme::BtnHover, m_hoverAmt);
+        if (m_state == StatePressed) fill = Theme::BtnPressed;
+        m_box.setFillColor(fill);
         m_box.setOutlineThickness(2.f + 2.f * m_hoverAmt);
     }
 }
 
-void Button::draw(sf::RenderWindow& window) const 
-{
+void Button::draw(sf::RenderWindow& window) const {
     window.draw(m_box);
-    if (m_frameTex != nullptr) {
-        window.draw(m_frame);
+    if (m_hasFrame) {
+        m_frame.draw(window);
     }
     window.draw(m_text);
 }

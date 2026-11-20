@@ -96,6 +96,7 @@ private:
     int m_pressY;
     bool m_pressing;
     int m_opCount;
+    float m_opNextX = 170.f;   // x where the next op button starts
 
     sf::Sprite m_background;
     sf::RectangleShape m_dim;
