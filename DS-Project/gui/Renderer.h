@@ -1,16 +1,15 @@
 #pragma once
-// gui/Renderer.h
-// Draws a ViewSnapshot (tree or heap + array row) into a canvas rectangle.
-// Owns the camera (zoom / pan / fit), picking and the per-event visual state.
-// Implements IEventVisualizer.
+// Renderer ek ViewSnapshot (tree ya heap + array row) ko canvas rectangle mein draw karta hai.
+// Camera (zoom / pan / fit), picking aur har event ki visual state isi ke paas hai.
+// IEventVisualizer implement karta hai.
 //
-// How events and snapshots cooperate (important):
-//  * Events only drive EFFECTS: pulses, highlights, arrows, travelling key labels
-//    for swaps, heap-size changes, sorted marks.
-//  * Structure (INSERT / UNLINK / ROTATE results) is applied by the controller
-//    calling animateTo(snapshotAfter) (tweens nodes to new slots, new nodes
-//    grow from their parent, removed nodes fade). snapTo() = hard sync + reset.
-//  * Ids are stable, so a rotation is just "same ids, new links, new slots".
+// Events aur snapshots kaise kaam karte hain (yeh zaroor samjho):
+//  * Events sirf EFFECTS chalate hain: pulses, highlights, arrows, swap ke travelling labels,
+//    heap-size changes, sorted marks.
+//  * Structure (INSERT / UNLINK / ROTATE ke natijay) controller animateTo(snapshotAfter) call karke
+//    lagata hai (nodes naye slots tak tween hote hain, naye nodes parent se nikalte hain,
+//    hatne wale nodes fade hote hain). snapTo() = hard sync aur reset.
+//  * Ids stable hain, is liye rotation ka matlab hai "wohi ids, naye links, naye slots".
 
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -20,26 +19,25 @@
 namespace NodeMark
 {
     inline const int None = 0;
-    inline const int Visit = 1;     // current visit (thick blue ring)
-    inline const int Compare = 2;   // being compared (blue ring)
-    inline const int Skipped = 3;   // pruned (grey + slash)
-    inline const int Result = 4;    // target / result (gold double ring)
-    inline const int Violation = 5; // red thick ring
-    inline const int Trail = 6;     // previously visited (thin blue ring)
-}
+    inline const int Visit = 1;     // current visit (motay blue ring)
+    inline const int Compare = 2;   // compare ho raha hai (blue ring)
+    inline const int Skipped = 3;   
+    inline const int Result = 4;    // target / result 
+    inline const int Violation = 5; // motay laal ring
+    inline const int Trail = 6;     // pehle visit hua 
 
 namespace NodeFx
 {
     inline const int None = 0;
-    inline const int Insert = 1;   // expanding green ring
-    inline const int Unlink = 2;   // expanding red ring
-    inline const int Rotate = 3;   // gold ring on the pivot
+    inline const int Insert = 1;   // green ring
+    inline const int Unlink = 2;   // Red ring
+    inline const int Rotate = 3;   
 }
 
 struct RenderNode
 {
-    bool present;   // exists in the snapshot (heap: cell exists)
-    bool visible;   // drawn in the tree view (heap: index < activeSize)
+    bool present;   // snapshot mein maujood hai (heap: cell maujood hai)
+    bool visible;   // tree view mein dikhta hai (heap: index < activeSize)
     int key;
     int left;
     int right;
@@ -56,8 +54,8 @@ struct RenderNode
     int mark;
     bool selected;
     bool target;
-    bool dying;     // removed node fading out (still drawn, edge retracting)
-    float fx;       // 0..1 effect strength
+    bool dying;     // hatne wala node jo fade ho raha hai (ab bhi draw hota hai, edge sikud rahi hai)
+    float fx;       // effect ki shiddat 0..1
     int fxKind;     // NodeFx::*
 };
 
@@ -67,7 +65,7 @@ public:
     explicit Renderer(const sf::Font& font);
     ~Renderer();
 
-    // Screen-pixel rectangle the tree/heap is drawn into (clipped to it).
+    // Screenpixel rectangle jiske andar tree/heap draw hota hai (usi tak clip hota hai).
     void setCanvasRect(float x, float y, float w, float h);
 
     // Snapshots
@@ -88,16 +86,16 @@ public:
     void fit(bool animate);
     void zoomAt(float sx, float sy, float factor);
     void panBy(float dxScreen, float dyScreen);
-    bool handleCameraEvent(const sf::Event& ev);     // wheel zoom, drag-bg / middle-drag pan
+    bool handleCameraEvent(const sf::Event& ev);     // wheel zoom, background drag / middle drag pan
     float zoom() const;
 
-    // Picking (screen pixels). -1 if nothing.
-    int pick(float sx, float sy) const;              // tree node id (heap: index)
-    int pickCell(float sx, float sy) const;          // array cell index (heap only)
+    // Picking (screen pixels). Kuch na mile to -1.
+    int pick(float sx, float sy) const;              // tree node id or heap: index
+    int pickCell(float sx, float sy) const;          // array cell index (sirf heap)
     bool nodeScreenPos(int id, float& sx, float& sy) const;
     bool nodeInfo(int id, int& key, int& height, int& size, int& balance, int& depth) const;
 
-    // External highlight control (level logic)
+    // Bahar se highlight control (level logic)
     void clearHighlights();
     void setMark(int id, int mark);
     void setSelected(int id);
@@ -105,8 +103,8 @@ public:
 
     int kind() const;
     bool isHeap() const;
-    
-    // Optional ornament drawn around each node. Pass nullptr to keep the plain circle.
+
+    // Har node ke gird optional ornament. nullptr do to saada circle rahega.
     void setRingTexture(const sf::Texture* tex);
 
 private:

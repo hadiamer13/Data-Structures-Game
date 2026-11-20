@@ -3,9 +3,7 @@
 #include "AppContext.h"
 #include "screens/Screen.h"
 
-
-// Screen IDs as plain ints (no enums).
-// Screen IDs as plain ints (no enums).
+// Screen IDs plain int ki tarah hain (enum nahi).
 namespace ScreenId {
     inline const int MainMenu = 0;
     inline const int Campaign = 1;
@@ -19,19 +17,18 @@ namespace ScreenId {
     inline const int HeapLevel = 9;   // Act 4 (campaign index 15..19)
     inline const int Reports = 10;
     inline const int None = -1;
-}  // namespace ScreenId
+}  
 
-// Owns the current screen (raw pointer, deleted on switch / destructor).
+// Current screen ka owner (raw pointer, switch ya destructor par delete hota hai).
 class UIManager {
 public:
     explicit UIManager(AppContext& ctx);
     ~UIManager();
 
-    void start();                       // opens the main menu
+    void start();        // main menu kholta hai
 
-    // Screens call these from callbacks. The switch is DEFERRED to the
-    // start of the next update(), so a screen is never deleted while its
-    // own handleEvent() is still running.
+    // Screens callbacks se yeh call karte hain. Switch DEFERRED hai,
+    // agle update() ke shuru tak. Is se screen apne handleEvent() ke chalte hue delete nahi hoti.
     void requestScreen(int id);
     void requestQuit();
     bool wantsQuit() const { return m_quit; }
@@ -41,7 +38,7 @@ public:
     void draw(sf::RenderWindow& window);
 
 private:
-    UIManager(const UIManager&);              // not copyable
+    UIManager(const UIManager&);             
     UIManager& operator=(const UIManager&);
 
     void    applyPending();
@@ -49,7 +46,7 @@ private:
 
     AppContext& m_ctx;
     Screen* m_current = nullptr;
-    int         m_currentId = ScreenId::None;
-    int         m_pendingId = ScreenId::None;
-    bool        m_quit = false;
+    int m_currentId = ScreenId::None;
+    int m_pendingId = ScreenId::None;
+    bool m_quit = false;
 };

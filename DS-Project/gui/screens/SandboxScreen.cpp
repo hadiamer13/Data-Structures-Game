@@ -12,12 +12,15 @@ namespace
     const float PanelW = 250.f;
     const float ClickSlop = 5.f;
 
+
     namespace ScreenOp
     {
         inline const int Random = 100;
         inline const int Clear = 101;
     }
 
+
+    // different tabs have diff operations which are defined here
     struct OpDef
     {
         int op;
@@ -155,6 +158,7 @@ SandboxScreen::SandboxScreen(AppContext& ctx)
     loadKind(TreeKind::BST, false);
 }
 
+// app bananay ke ham 5000 dollars lete hai aur
 // button idher udher karne ke ham 25000 dollar lete hai
 
 void SandboxScreen::buildLayout()
@@ -224,7 +228,7 @@ void SandboxScreen::buildLayout()
     m_tooltip.init(font);
 }
 
-// ------------------------------------------------------------ kind / ops
+// kind of tree / operations of that tree
 
 void SandboxScreen::loadKind(int kind, bool empty)
 {
@@ -364,7 +368,7 @@ bool SandboxScreen::typing() const
     return m_fieldA.focused() || m_fieldB.focused();
 }
 
-// ---------------------------------------------------------------- callbacks
+//  callbacks
 
 void SandboxScreen::onTabClick(void* context)
 {
@@ -447,7 +451,7 @@ void SandboxScreen::onToolbar(int action)
     }
 }
 
-// ------------------------------------------------------------------ actions
+// actions
 
 void SandboxScreen::doOp(int op)
 {
@@ -512,8 +516,7 @@ void SandboxScreen::doOp(int op)
     play(r);
 }
 
-// Plays one batch. The session only returns the state before and after, so the LAST structural
-// event (INSERT / UNLINK / ROTATE) carries the "after" snapshot; label-only events are dropped.
+// Plays one batch like insert delete and so on
 void SandboxScreen::play(const SandboxResult& r)
 {
     m_pendingFocus = r.focusId;
@@ -560,7 +563,7 @@ void SandboxScreen::doUndo()
 {
     m_anim.clear();
     bool ok = m_session.undo();
-    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.snapTo(m_session.snapshot());     // hard snapping taakay position aik fixed ho final
     m_renderer.setTarget(kNull);
     m_selected = kNull;
     m_renderer.setSelected(kNull);
@@ -582,7 +585,7 @@ void SandboxScreen::doReset()
     setMessage("Reset to the starting state.");
 }
 
-// -------------------------------------------------------------------- input
+// input lena 
 
 void SandboxScreen::updateTooltip(int mx, int my)
 {
@@ -739,7 +742,8 @@ void SandboxScreen::handleEvent(const sf::Event& e)
     }
 }
 
-// ------------------------------------------------------------ update / draw
+//update / draw
+// update changes laata hai in text fields and animations and so on
 
 void SandboxScreen::update(float dt)
 {
@@ -760,6 +764,8 @@ void SandboxScreen::update(float dt)
     m_anim.setSpeed(m_toolbar.speed());
     m_anim.update(dt);
 }
+
+// draw draws those changed stuff
 
 void SandboxScreen::draw(sf::RenderWindow& window)
 {

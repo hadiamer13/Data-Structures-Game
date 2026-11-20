@@ -2,11 +2,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// Loads fonts/textures ONCE and hands out const references.
-// Never load assets inside a screen's draw/update loop.
+// Fonts aur textures sirf aik baar load hote hain.
+// Screen ke draw ya update loop mein kabhi load nahi karna.
 class Assets {
 public:
-    // Returns false if any required asset failed to load.
+    // Agar koi zaroori asset load na ho to false return karta hai.
     bool loadAll();
 
     const sf::Font& font() const { return m_font; }
@@ -14,7 +14,7 @@ public:
     const sf::Texture& campaignBackground() const { return m_campaignBg; }
     const sf::Texture& banner() const { return m_banner; }
 
-    // UI sheet pieces
+    // UI sheet ke hisse
     const sf::Texture& skull() const { return m_skull; }
     const sf::Texture& nodeRing() const { return m_nodeRing; }
     const sf::Texture& buttonFrame() const { return m_buttonFrame; }

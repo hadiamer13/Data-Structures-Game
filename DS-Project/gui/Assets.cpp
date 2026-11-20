@@ -5,10 +5,10 @@
 
 namespace {
 
-    // Loads one texture, smooths it for scaling, and reports failures by path.
+    // Aik texture load karta hai, scaling ke liye smooth karta hai, aur failure par path print karta hai.
     bool loadTexture(sf::Texture& tex, const char* path) {
         if (!tex.loadFromFile(path)) {
-            std::fprintf(stderr, "[Assets] Failed to load texture: %s\n", path);
+            std::fprintf(stderr, "[Assets] Texture load nahi hui: %s\n", path);
             return false;
         }
         tex.setSmooth(true);
@@ -20,17 +20,17 @@ namespace {
 bool Assets::loadAll() {
     bool ok = true;
 
-    // Required: the game cannot run without these.
+    // Zaroori assets: in ke bina game nahi chal sakti.
     if (!m_font.loadFromFile(Theme::FontPath)) {
-        std::fprintf(stderr, "[Assets] Failed to load font: %s\n", Theme::FontPath);
+        std::fprintf(stderr, "[Assets] Font load nahi hua: %s\n", Theme::FontPath);
         ok = false;
     }
     ok = loadTexture(m_menuBg, Theme::MenuBgPath) && ok;
     ok = loadTexture(m_campaignBg, Theme::CampaignBgPath) && ok;
     ok = loadTexture(m_banner, Theme::BannerPath) && ok;
 
-    // Optional: decorative pieces. A missing file only prints a warning,
-    // and setFrame / setRingTexture / placeCorner fall back to plain drawing.
+    // Optional decorative cheezein. Agar file missing ho to sirf warning aayegi,
+    // aur setFrame / setRingTexture / placeCorner saada drawing kar lenge.
     loadTexture(m_skull, Theme::SkullPath);
     loadTexture(m_nodeRing, Theme::NodeRingPath);
     loadTexture(m_buttonFrame, Theme::ButtonFramePath);

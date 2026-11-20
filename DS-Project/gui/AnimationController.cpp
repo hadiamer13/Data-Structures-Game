@@ -3,11 +3,13 @@
 
 namespace
 {
+    // Yeh events structure badalne wale hote hain, is liye pehle snapshot lena zaroori hai.
     bool snapshotBeforeBegin(int t)
     {
         return t == EventType::INSERT || t == EventType::ROTATE;
     }
 
+    // Yeh event shuru hone ke baad structure badalta hai (node fade hota hai).
     bool snapshotAfterBegin(int t)
     {
         return t == EventType::UNLINK;
@@ -37,6 +39,7 @@ void AnimationController::setCallbacks(AnimEventCallback onEvent, AnimDoneCallba
     m_cbContext = context;
 }
 
+// Har event type ka duration (seconds mein, speed 1 par).
 float AnimationController::eventDuration(int type)
 {
     if (type == EventType::VISIT || type == EventType::COMPARE)
@@ -62,8 +65,7 @@ float AnimationController::eventDuration(int type)
     return 0.4f;
 }
 
-// ------------------------------------------------------------ batch building
-
+// Batch banana: queue ke items aur unke snapshots ki memory.
 void AnimationController::freeItems()
 {
     for (int i = 0; i < m_count; i++)
@@ -105,7 +107,8 @@ void AnimationController::enqueue(const Event& e, const ViewSnapshot* afterEvent
         {
             nd[i] = m_items[i];
         }
-        delete[] m_items;   // item snapshot pointers were copied, not deleted
+        // Snapshot pointers copy ho chuke hain, is liye yahan delete nahi karte.
+        delete[] m_items;
         m_items = nd;
         m_cap = newCap;
     }
@@ -133,12 +136,12 @@ void AnimationController::startPlayback()
     m_busy = (m_count > 0);
     if (!m_busy)
     {
-        // nothing to animate: just show the result
+        // Animate karne ko kuch nahi, seedha result dikhao.
         finishBatch();
     }
 }
 
-// ------------------------------------------------------------------ playback
+//  playback
 
 void AnimationController::beginCurrent()
 {
@@ -248,7 +251,7 @@ void AnimationController::update(float dt)
     completeCurrent();
 }
 
-// ------------------------------------------------------------------ controls
+//  controls
 
 void AnimationController::play()
 {
@@ -274,7 +277,7 @@ void AnimationController::stepOne()
     m_paused = true;
     if (m_active)
     {
-        m_stepping = true;   // let the running event finish, then stay paused
+        m_stepping = true;   // chalta hua event khatam hone do, phir pause par ruk jao
     }
     else
     {
@@ -308,7 +311,7 @@ void AnimationController::startReplay()
     }
     if (m_hasStart)
     {
-        m_vis->snapTo(m_start);   // also clears highlights
+        m_vis->snapTo(m_start);   // highlights bhi clear ho jayenge
     }
     startPlayback();
 }
@@ -326,7 +329,7 @@ void AnimationController::setSpeed(float s)
     m_speed = s;
 }
 
-// --------------------------------------------------------------------- state
+//  state
 
 bool AnimationController::busy() const
 {

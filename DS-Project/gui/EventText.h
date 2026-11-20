@@ -1,6 +1,6 @@
 // gui/EventText.h
-// One-line text for an Event (Event Log panel). Header-only, no SFML.
-// INTEGRATION (optional): model/EventLog::describe() can replace it.
+// Event ka aik line ka text (Event Log panel ke liye). Header-only hai, SFML nahi chahiye.
+// Chaaho to model/EventLog::describe() bhi istemal ho sakta hai.
 #pragma once
 #include <string>
 #include "../contracts/Event.h"
@@ -12,7 +12,7 @@ inline std::string describeEventText(const Event& e)
     std::string s;
     if (t == EventType::VISIT)
     {
-        s = "Visit room #" + std::to_string(e.id);
+        s = "Room #" + std::to_string(e.id) + " par visit";
     }
     else if (t == EventType::COMPARE)
     {
@@ -21,15 +21,15 @@ inline std::string describeEventText(const Event& e)
     }
     else if (t == EventType::INSERT)
     {
-        s = "Insert room #" + std::to_string(e.id);
+        s = "Room #" + std::to_string(e.id) + " insert hua";
     }
     else if (t == EventType::UNLINK)
     {
-        s = "Unlink room #" + std::to_string(e.id);
+        s = "Room #" + std::to_string(e.id) + " unlink hua";
     }
     else if (t == EventType::SWAP_VALUE)
     {
-        s = "Swap values of #" + std::to_string(e.id) + " and #" + std::to_string(e.id2);
+        s = "#" + std::to_string(e.id) + " aur #" + std::to_string(e.id2) + " ki values swap";
     }
     else if (t == EventType::ROTATE)
     {
@@ -50,39 +50,39 @@ inline std::string describeEventText(const Event& e)
         {
             r = "RL";
         }
-        s = std::string("Rotate ") + r + " at pivot #" + std::to_string(e.id);
+        s = std::string("Rotate ") + r + " pivot #" + std::to_string(e.id) + " par";
     }
     else if (t == EventType::UPDATE_HEIGHT)
     {
-        s = "Height of #" + std::to_string(e.id) + ": " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
+        s = "#" + std::to_string(e.id) + " ki height: " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
     }
     else if (t == EventType::UPDATE_SIZE)
     {
-        s = "Size of #" + std::to_string(e.id) + ": " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
+        s = "#" + std::to_string(e.id) + " ka size: " + std::to_string(e.oldV) + " -> " + std::to_string(e.newV);
     }
     else if (t == EventType::BALANCE_ALERT)
     {
-        s = "BALANCE ALERT at #" + std::to_string(e.id) + " (bf " + std::to_string(e.newV) + ")";
+        s = "BALANCE ALERT #" + std::to_string(e.id) + " par (bf " + std::to_string(e.newV) + ")";
     }
     else if (t == EventType::HIGHLIGHT_SUBTREE)
     {
-        s = std::string((e.result == HighlightMode::Skipped) ? "Skip" : "Mark") + " subtree at #" + std::to_string(e.id);
+        s = std::string((e.result == HighlightMode::Skipped) ? "Skip" : "Mark") + " subtree #" + std::to_string(e.id) + " par";
     }
     else if (t == EventType::HEAP_BUILD)
     {
-        s = "Build heap, array size " + std::to_string(e.newV);
+        s = "Heap banana, array size " + std::to_string(e.newV);
     }
     else if (t == EventType::HEAP_SWAP)
     {
-        s = "Swap cells [" + std::to_string(e.idx) + "] and [" + std::to_string(e.idx2) + "]";
+        s = "Cells [" + std::to_string(e.idx) + "] aur [" + std::to_string(e.idx2) + "] swap";
     }
     else if (t == EventType::HEAPIFY_START)
     {
-        s = "Heapify from [" + std::to_string(e.idx) + "], heap size " + std::to_string(e.newV);
+        s = "[" + std::to_string(e.idx) + "] se heapify, heap size " + std::to_string(e.newV);
     }
     else if (t == EventType::HEAPIFY_DONE)
     {
-        s = "Heapify done: heap property restored";
+        s = "Heapify khatam: heap property restore ho gayi";
     }
     else if (t == EventType::EXTRACT_MAX)
     {
@@ -90,7 +90,7 @@ inline std::string describeEventText(const Event& e)
     }
     else if (t == EventType::MARK_SORTED)
     {
-        s = "Value " + std::to_string(e.key) + " moved to sorted region";
+        s = "Value " + std::to_string(e.key) + " sorted region mein chali gayi";
     }
     else if (t == EventType::HEAP_SIZE_CHANGE)
     {

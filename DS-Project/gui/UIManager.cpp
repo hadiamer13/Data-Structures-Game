@@ -39,11 +39,9 @@ void UIManager::requestQuit()
     m_quit = true;
 }
 
+// Screen ID ko screen object se jodne wali wahid jagah.
 Screen* UIManager::makeScreen(int id)
 {
-    // ---- INTEGRATION POINT -------------------------------------------
-    // The only place that maps a screen ID to a screen object.
-    // ------------------------------------------------------------------
     switch (id)
     {
     case ScreenId::MainMenu:
@@ -73,6 +71,7 @@ Screen* UIManager::makeScreen(int id)
     }
 }
 
+// Screen switch sirf update ke shuru mein hota hai, taake koi screen apne handler ke andar delete na ho.
 void UIManager::applyPending()
 {
     if (m_pendingId == ScreenId::None)
@@ -83,7 +82,7 @@ void UIManager::applyPending()
     Screen* next = makeScreen(m_pendingId);
     if (next != nullptr)
     {
-        delete m_current;          // safe: we are not inside its handler
+        delete m_current;          // safe: hum uske handler ke andar nahi hain
         m_current = next;
         m_currentId = m_pendingId;
     }
@@ -92,8 +91,8 @@ void UIManager::applyPending()
 
 void UIManager::handleEvent(const sf::Event& e)
 {
-    // Global Esc: Briefing, Level, HeapLevel and Result step back to the Campaign Map,
-    // every other screen returns to the Main Menu.
+    // Global Esc: Briefing, Level, HeapLevel aur Result Campaign Map par le jaate hain,
+    // baaqi sab screens Main Menu par.
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape)
     {
         if (m_currentId == ScreenId::Briefing || m_currentId == ScreenId::Level ||
@@ -116,7 +115,7 @@ void UIManager::handleEvent(const sf::Event& e)
 
 void UIManager::update(float dt)
 {
-    applyPending();                // switches happen here, once per frame
+    applyPending();                // screen switch yahan, har frame mein aik dafa
     if (m_current)
     {
         m_current->update(dt);
