@@ -1,8 +1,8 @@
-// gui/screens/Screen.h
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// Base class for every screen (menu, campaign map, level, ...).
+//  base screen
+// Har screen ka base class. Har screen ko handleEvent, update aur draw dena zaroori hai.
 class Screen {
 public:
     virtual ~Screen() {}

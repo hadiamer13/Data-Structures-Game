@@ -1,4 +1,3 @@
-// gui/screens/LevelScreen.cpp
 #include "LevelScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
@@ -14,18 +13,19 @@ namespace
     const float BarH = 64.f;
     const float ClickSlop = 5.f;
 
+    // Structure badalne wale events, jinke liye snapshot zaroori hai.
     bool structural(int type)
     {
         return type == EventType::INSERT || type == EventType::UNLINK || type == EventType::ROTATE;
     }
 
-    // Label-only events: the snapshots already show the result, so they are not animated.
+    // Sirf label wale events animate nahi hote, kyunke snapshots result dikha dete hain.
     bool animated(int type)
     {
         return type != EventType::UPDATE_HEIGHT && type != EventType::UPDATE_SIZE;
     }
 
-    // True when the pointer moved far enough between press and release to count as a drag.
+    // Press aur release ke beech itna move hua ho to drag maana jaata hai.
     bool movedBeyondSlop(int x0, int y0, int x1, int y1)
     {
         int dx = x1 - x0;
@@ -49,7 +49,7 @@ namespace
         t.setPosition(x, y);
     }
 
-    // Greedy word wrap by character count.
+    // Character count ke hisaab se word wrap karta hai.
     std::string wrapChars(const std::string& s, int width)
     {
         std::string out;
@@ -85,8 +85,8 @@ namespace
     const char* const TraversalNames[4] = { "PREORDER", "INORDER", "POSTORDER", "LEVEL ORDER" };
 }
 
-// ------------------------------------------------------------ construction
-
+//  construction
+// Level load karta hai, layout banata hai, aur pehla HUD tayar karta hai.
 LevelScreen::LevelScreen(AppContext& ctx)
     : m_ctx(ctx), m_index(0), m_ok(false), m_mode(InputMode::Key), m_shownAlarm(0), m_endTimer(0.f),
     m_selected(kNull), m_dragToken(-1), m_dragX(0), m_dragY(0), m_dragPivot(kNull),
@@ -117,19 +117,19 @@ LevelScreen::LevelScreen(AppContext& ctx)
         applyMissionMarks();
         refreshPrompt();
         refreshHud(m_session.hud());
-        m_log.addLine("Level ready. Read the instruction line above the tree.");
-        m_log.addLine("Wheel = zoom, drag background = pan, hover = info.");
+        m_log.addLine("Level ready. Tree ke upar wali instruction line parho.");
+        m_log.addLine("Wheel = zoom, background drag = pan, hover = info.");
     }
     else
     {
         m_hud.setTitle(m_def.name.empty() ? std::string("Level") : m_def.name);
         m_hud.setObjective(m_error);
         m_hud.setStatus("UNAVAILABLE");
-        m_notice.setString(wrapChars(m_error, 60) + "\n\nPress Esc to go back.");
+        m_notice.setString(wrapChars(m_error, 60) + "\n\nEsc dabao, wapas jaane ke liye.");
     }
 }
 
-// Which input scheme a mission uses.
+// Mission ke hisaab se input ka tareeqa chunta hai.
 int LevelScreen::modeFor(int mission)
 {
     if (mission == MissionKind::Reconstruct)
@@ -160,6 +160,7 @@ int LevelScreen::modeFor(int mission)
     return InputMode::Key;     // BST missions
 }
 
+// Canvas, bar, toolbar aur log panel ki positions set karta hai.
 void LevelScreen::buildLayout()
 {
     const sf::Font& font = m_ctx.assets->font();
@@ -203,7 +204,7 @@ void LevelScreen::buildLayout()
     m_field2.setCallback(&LevelScreen::onFieldClick, this);
     styleText(m_targetText, font, 18, Theme::StarOn, 165.f, barY + 22.f);
 
-    // 1.2 token shelf, open-slot markers and the empty-canvas root drop box
+    // 1.2 ka token shelf, khali slot ka marker, aur khali canvas par root drop box.
     m_tokenCircle.setRadius(20.f);
     m_tokenCircle.setOrigin(20.f, 20.f);
     m_tokenCircle.setOutlineThickness(3.f);
@@ -214,7 +215,7 @@ void LevelScreen::buildLayout()
     styleText(m_tokenText, font, 18, Theme::TextColor, 0.f, 0.f);
     styleText(m_slotText, font, 12, sf::Color(200, 190, 190), 0.f, 0.f);
     styleText(m_rootText, font, 20, Theme::TextColor, 0.f, 0.f);
-    m_rootText.setString("Drop the first token here:\nit becomes the ROOT");
+    m_rootText.setString("Pehla token yahan rakho:\nye ROOT banega");
     {
         sf::FloatRect rb = m_rootText.getLocalBounds();
         m_rootText.setOrigin(rb.left + rb.width / 2.f, rb.top + rb.height / 2.f);
@@ -235,7 +236,7 @@ void LevelScreen::buildLayout()
     m_tooltip.init(font);
 }
 
-// Level definition comes from levels/actN.json (LevelLoader), index = act * 5 + level.
+// Level ki definition levels/actN.json se aati hai. Index = act * 5 + level.
 bool LevelScreen::loadLevel()
 {
     const int act = m_index / 5 + 1;
@@ -254,7 +255,7 @@ bool LevelScreen::loadLevel()
 
     if (GameSession::isHeapMission(m_def.mission))
     {
-        m_error = "The Heap Fortress needs the HeapLevel screen (next step).";
+        m_error = "The Heap Fortress needs the HeapLevel screen.";
         return false;
     }
     if (!GameSession::supportsMission(m_def.mission))
@@ -279,6 +280,7 @@ bool LevelScreen::loadLevel()
     return true;
 }
 
+// Mission ke hisaab se action buttons banata hai aur unki position set karta hai.
 void LevelScreen::buildActionButtons()
 {
     const sf::Font& font = m_ctx.assets->font();
@@ -311,7 +313,7 @@ void LevelScreen::buildActionButtons()
             labels[0] = "Search";
             m_actCount = 1;
         }
-        m_hint.setString("Wheel: zoom   Drag: pan   Click a room: fills KEY   Space: pause   Z: undo   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Click a room: KEY bhar jaati hai   Space: pause   Z: undo   H: hint");
     }
     else if (m_mode == InputMode::Sequence)
     {
@@ -321,7 +323,7 @@ void LevelScreen::buildActionButtons()
         w = 180.f;
         step = 190.f;
         x0 = 110.f;
-        m_hint.setString("Wheel: zoom   Drag: pan   Click rooms in order   Z: remove last pick   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Rooms order mein click karo   Z: aakhri pick hatao   H: hint");
     }
     else if (m_mode == InputMode::Numbers)
     {
@@ -329,15 +331,15 @@ void LevelScreen::buildActionButtons()
         m_field2.init("DIAMETER (edges)", font, 170.f, barY + 28.f, 130.f, 28.f);
         labels[0] = "Submit";
         m_actCount = 1;
-        m_hint.setString("Wheel: zoom   Drag: pan   Type both numbers, then Submit (Enter)   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Dono numbers type karo, phir Submit (Enter)   H: hint");
     }
     else if (m_mode == InputMode::Click)
     {
-        m_hint.setString("Wheel: zoom   Drag: pan   Click a room to answer   Z: undo   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Jawab ke liye room click karo   Z: undo   H: hint");
     }
     else if (m_mode == InputMode::Place)
     {
-        m_hint.setString("Wheel: zoom   Drag: pan   Drag a token from the shelf onto the tree   Z: undo   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Shelf se token tree par drag karo   Z: undo   H: hint");
     }
     else if (m_mode == InputMode::Pivot)
     {
@@ -349,7 +351,7 @@ void LevelScreen::buildActionButtons()
         w = 140.f;
         step = 150.f;
         x0 = 90.f;
-        m_hint.setString("Wheel: zoom   Drag: pan   Drag the pivot onto a child, or click it and press a rotation   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Pivot ko child par drag karo, ya click karke rotation dabao   H: hint");
     }
     else if (mission == MissionKind::Mirror)
     {
@@ -357,7 +359,7 @@ void LevelScreen::buildActionButtons()
         m_actCount = 1;
         w = 190.f;
         x0 = 110.f;
-        m_hint.setString("Wheel: zoom   Drag: pan   Mirror swaps every room's children   Z: undo");
+        m_hint.setString("Wheel: zoom   Drag: pan   Mirror har room ke children swap karta hai   Z: undo");
     }
     else
     {
@@ -370,7 +372,7 @@ void LevelScreen::buildActionButtons()
         w = 110.f;
         step = 120.f;
         x0 = 80.f;
-        m_hint.setString("Wheel: zoom   Drag: pan   Pick the rotation the next insert will cause   H: hint");
+        m_hint.setString("Wheel: zoom   Drag: pan   Agle insert se jo rotation hogi, woh chuno   H: hint");
     }
 
     float x = x0;
@@ -386,8 +388,7 @@ void LevelScreen::buildActionButtons()
     }
 }
 
-// ---------------------------------------------------------------- callbacks
-
+//  callbacks
 void LevelScreen::onToolbarClick(void* context, int action)
 {
     static_cast<LevelScreen*>(context)->onToolbar(action);
@@ -421,15 +422,16 @@ void LevelScreen::onAction(int which)
     doAction(which);
 }
 
+// Enter par delete level mein case button se chuna jaata hai, baaqi levels mein pehla action chalta hai.
 void LevelScreen::onFieldEnter()
 {
     if (m_def.mission == MissionKind::BstDelete)
     {
-        setMessage("Pick the delete case with a button.");
+        setMessage("Delete ka case button se chuno.");
     }
     else
     {
-        doAction(0);       // Enter = the single / first action
+        doAction(0);
     }
 }
 
@@ -448,7 +450,7 @@ void LevelScreen::onToolbar(int action)
         if (m_anim.totalCount() > 0)
         {
             m_log.addLine("--- replay ---");
-            m_shownAlarm = m_lastHud.alarm - m_anim.totalCount();   // display only, corrected at the end
+            m_shownAlarm = m_lastHud.alarm - m_anim.totalCount();   // sirf display ke liye, aakhir mein theek hota hai
             if (m_shownAlarm < 0)
             {
                 m_shownAlarm = 0;
@@ -457,7 +459,7 @@ void LevelScreen::onToolbar(int action)
         }
         else
         {
-            setMessage("Nothing to replay yet.");
+            setMessage("Replay karne ke liye abhi kuch nahi hai.");
         }
     }
     else if (action == ToolbarAction::Reset)
@@ -470,8 +472,7 @@ void LevelScreen::onToolbar(int action)
     }
 }
 
-// ------------------------------------------------------------------- HUD
-
+//  HUD
 void LevelScreen::setMessage(const std::string& msg)
 {
     m_msg.setString(wrapChars(msg, 100));
@@ -481,7 +482,7 @@ void LevelScreen::setMessage(const std::string& msg)
     }
 }
 
-// Numbers come from the session's HudState, never from GUI maths.
+// Sab numbers session ki HudState se aate hain, GUI maths se nahi.
 void LevelScreen::refreshHud(const HudState& h)
 {
     m_lastHud = h;
@@ -526,7 +527,7 @@ bool LevelScreen::typing() const
     return fieldsActive() && (m_field.focused() || m_field2.focused());
 }
 
-// Key (value) of a room id as text, "?" if unknown.
+// Room id ki key text mein, nahi mili to "?".
 std::string LevelScreen::keyOf(int id) const
 {
     int key = 0;
@@ -541,7 +542,7 @@ std::string LevelScreen::keyOf(int id) const
     return "?";
 }
 
-// One instruction line under the message line. Text only, no colour needed.
+// Instruction ki ek line jo message line ke neeche hoti hai. Sirf text hai, rang ki zaroorat nahi.
 void LevelScreen::refreshPrompt()
 {
     if (m_mode == InputMode::Place)
@@ -554,7 +555,7 @@ void LevelScreen::refreshPrompt()
     if (mission == MissionKind::Traversal)
     {
         const int type = (m_def.param >= 0 && m_def.param <= 3) ? m_def.param : 0;
-        s = std::string("Click the rooms in ") + TraversalNames[type] + " order. Picked " +
+        s = std::string("Rooms ko ") + TraversalNames[type] + " order mein click karo. Picked " +
             std::to_string(m_clicks.size()) + " of " + std::to_string(m_session.binaryTree().nodeCount()) + ":";
         for (int i = 0; i < m_clicks.size(); ++i)
         {
@@ -563,22 +564,21 @@ void LevelScreen::refreshPrompt()
     }
     else if (mission == MissionKind::HeightDiameter)
     {
-        s = "Enter the height (rooms on the longest root-to-leaf path) and the diameter "
-            "(edges on the longest path between any two rooms), then Submit.";
+        s = "Height likho, yani longest root to leaf path ke rooms, aur diameter, yani kisi bhi do rooms ke beech longest path ke edges, phir Submit.";
     }
     else if (mission == MissionKind::LcaPath)
     {
-        s = "Routes start at rooms " + keyOf(m_session.lcaTargetA()) + " and " + keyOf(m_session.lcaTargetB()) +
-            " (gold rings). Click the room where the two routes meet.";
+        s = "Routes rooms " + keyOf(m_session.lcaTargetA()) + " aur " + keyOf(m_session.lcaTargetB()) +
+            " se shuru hote hain, sunehri rings. Woh room click karo jahan dono routes milte hain.";
     }
     else if (mission == MissionKind::Reconstruct)
     {
-        s = "Drag each token onto the tree: the first is the root, then drop on the left or right side "
-            "of a placed room. " + m_session.reconstructClue();
+        s = "Har token tree par drag karo: pehla root hai, phir placed room ke left ya right par rakho. " +
+            m_session.reconstructClue();
     }
     else if (mission == MissionKind::Mirror)
     {
-        s = "Press Mirror to swap the children of every room. Pressing it again mirrors back.";
+        s = "Mirror dabao to har room ke children swap honge. Dobara dabao to wapas ho jayega.";
     }
     else if (mission == MissionKind::BstRange)
     {
@@ -587,17 +587,17 @@ void LevelScreen::refreshPrompt()
     else if (m_mode == InputMode::Pivot)
     {
         s = m_session.prompt();
-        s += (m_selected == kNull) ? " No pivot picked." : (" Pivot: room " + keyOf(m_selected) + ".");
-        s += " Drag the pivot onto a child, or pick a rotation button.";
+        s += (m_selected == kNull) ? " Koi pivot select nahi hua." : (" Pivot: room " + keyOf(m_selected) + ".");
+        s += " Pivot ko child par drag karo, ya rotation button chuno.";
     }
     else if (m_mode != InputMode::Key)
     {
-        s = m_session.prompt();     // Act 3 prompts come from the session
+        s = m_session.prompt();     // Act 3 ke prompts session se aate hain
     }
     m_prompt.setString(wrapChars(s, 95));
 }
 
-// Marks that belong to the mission (not to an animation). Re-applied after every snapTo.
+// Mission ke marks animation se alag hain, har snapTo ke baad dobara lagte hain.
 void LevelScreen::applyMissionMarks()
 {
     if (m_def.mission == MissionKind::LcaPath)
@@ -611,13 +611,13 @@ void LevelScreen::applyMissionMarks()
     }
 }
 
-// ------------------------------------------------------------------ actions
-
+//  actions
+// Button ya Enter se aaya action banakar session ko bhejta hai.
 void LevelScreen::doAction(int which)
 {
     if (!m_ok || m_anim.busy() || m_endTimer > 0.f)
     {
-        return;      // input is locked while the animation plays
+        return;      // animation chalte waqt input lock hota hai
     }
     const int mission = m_def.mission;
     PlayerAction act;
@@ -626,7 +626,7 @@ void LevelScreen::doAction(int which)
     {
         if (!m_field.hasValue())
         {
-            setMessage("Type a key in the KEY box first.");
+            setMessage("Pehle KEY box mein key type karo.");
             return;
         }
         act.a = m_field.value();
@@ -656,7 +656,7 @@ void LevelScreen::doAction(int which)
         }
         if (m_clicks.size() == 0)
         {
-            setMessage("Click the rooms first.");
+            setMessage("Pehle rooms click karo.");
             return;
         }
         act.kind = ActionKind::SubmitSequence;
@@ -667,7 +667,7 @@ void LevelScreen::doAction(int which)
     {
         if (!m_field.hasValue() || !m_field2.hasValue())
         {
-            setMessage("Type both the height and the diameter.");
+            setMessage("Height aur diameter dono type karo.");
             return;
         }
         act.kind = ActionKind::SubmitSequence;
@@ -678,7 +678,7 @@ void LevelScreen::doAction(int which)
     {
         if (m_selected == kNull)
         {
-            setMessage("Click a room first: it is the pivot.");
+            setMessage("Pehle room click karo, woh pivot hai.");
             return;
         }
         const int types[4] = { RotationType::LL, RotationType::RR, RotationType::LR, RotationType::RL };
@@ -699,7 +699,7 @@ void LevelScreen::doAction(int which)
     }
     else
     {
-        return;      // Click mode has no buttons
+        return;      // Click mode mein buttons nahi hote
     }
 
     submit(act);
@@ -710,7 +710,7 @@ void LevelScreen::doAction(int which)
     }
 }
 
-// Sends one action to the session and plays the resulting events.
+// Ek action session ko bhejta hai aur uske events chalata hai.
 void LevelScreen::submit(const PlayerAction& act)
 {
     m_renderer.setTarget(kNull);
@@ -720,14 +720,13 @@ void LevelScreen::submit(const PlayerAction& act)
     play(before, r);
 }
 
-// One batch. The session returns the final state; the last structural event
-// (INSERT / UNLINK / ROTATE) carries the "after" snapshot so the tree tweens when it plays.
-// Events that only update labels are dropped (the snapshots show the result).
+// Ek batch. Aakhri structural event ke saath "after" snapshot jaata hai taake tree tween ho sake.
+// Label wale events hata diye jaate hain, kyunke snapshots result dikha dete hain.
 void LevelScreen::play(const ViewSnapshot& before, const ActionResult& r)
 {
     if (r.events.size() == 0)
     {
-        refreshHud(r.hud);      // rejected action: nothing to animate
+        refreshHud(r.hud);      // rejected action, animate karne ko kuch nahi
         refreshPrompt();
         return;
     }
@@ -778,15 +777,16 @@ void LevelScreen::animEvent(const Event& e)
     refreshStatus();
 }
 
+// Animation khatam hone par session ke asli numbers dikhte hain. Level khatam ho to timer chalta hai.
 void LevelScreen::animDone()
 {
-    refreshHud(m_lastHud);     // authoritative numbers from the session
+    refreshHud(m_lastHud);
     applyMissionMarks();
     refreshPrompt();
     if (m_lastHud.status != HudStatus::Playing)
     {
         m_log.addLine(m_lastHud.status == HudStatus::Won ? "LEVEL CLEARED" : "ALARM FULL");
-        m_endTimer = 1.0f;     // Result screen only after the animation ends
+        m_endTimer = 1.0f;     // Result screen animation ke baad hi aata hai
     }
 }
 
@@ -798,7 +798,7 @@ void LevelScreen::doUndo()
     }
     if (m_mode == InputMode::Sequence && m_clicks.size() > 0)
     {
-        m_clicks.pop();        // 1.1: Z removes the last pick (no model state yet)
+        m_clicks.pop();        // 1.1 mein Z sirf aakhri pick hata deta hai, model state nahi badalta
         m_renderer.clearHighlights();
         applyMissionMarks();
         refreshPrompt();
@@ -808,7 +808,7 @@ void LevelScreen::doUndo()
     act.kind = ActionKind::Undo;
     ActionResult r = m_session.apply(act);
     m_anim.clear();
-    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.snapTo(m_session.snapshot());     // hard sync, koi purani position na rahe
     m_renderer.setTarget(kNull);
     m_renderer.setSelected(kNull);
     m_selected = kNull;
@@ -852,11 +852,12 @@ void LevelScreen::doHint()
     PlayerAction act;
     act.kind = ActionKind::Hint;
     ActionResult r = m_session.apply(act);
-    m_renderer.setTarget(m_session.targetNodeId());     // gold ring on the target room
+    m_renderer.setTarget(m_session.targetNodeId());     // target room par gold ring
     refreshHud(r.hud);
     setMessage(r.message);
 }
 
+// Result context mein bharta hai aur Result screen par jaata hai.
 void LevelScreen::goToResult()
 {
     LevelResult& res = m_ctx.result;
@@ -872,8 +873,8 @@ void LevelScreen::goToResult()
     m_ctx.ui->requestScreen(ScreenId::Result);
 }
 
-// -------------------------------------------------------------------- input
-
+//  hover and tooltip
+// Mouse ke neeche node ki info tooltip mein dikhati hai. Level 1.3 height nahi batata.
 void LevelScreen::updateTooltip(int mx, int my)
 {
     float sx = (float)mx;
@@ -888,7 +889,6 @@ void LevelScreen::updateTooltip(int mx, int my)
     {
         if (m_def.mission == MissionKind::HeightDiameter)
         {
-            // Level 1.3 asks for the height: do not give it away.
             m_tooltip.showText(sx + 16.f, sy + 16.f,
                 "key: " + std::to_string(key) + "\ndepth: " + std::to_string(depth));
         }
@@ -902,6 +902,9 @@ void LevelScreen::updateTooltip(int mx, int my)
     m_tooltip.hide();
 }
 
+//  canvas click
+// Click ka matlab har mode mein alag hai: BST mein key bharta hai, 1.1 mein route banata hai,
+// aur baaqi modes mein seedha action bhejta hai.
 void LevelScreen::onCanvasClick(int mx, int my)
 {
     if (!m_ok || m_anim.busy() || m_endTimer > 0.f)
@@ -934,7 +937,7 @@ void LevelScreen::onCanvasClick(int mx, int my)
     {
         if (m_clicks.indexOf(id) != -1)
         {
-            setMessage("That room is already picked. Press Z to remove the last pick.");
+            setMessage("Ye room pehle se picked hai. Z dabao to aakhri pick hat jayega.");
             return;
         }
         m_clicks.push(id);
@@ -942,7 +945,7 @@ void LevelScreen::onCanvasClick(int mx, int my)
         refreshPrompt();
         if (m_clicks.size() >= m_session.binaryTree().nodeCount())
         {
-            doAction(0);       // last room picked: submit automatically
+            doAction(0);       // aakhri room pick hua, submit khud ho jaata hai
         }
     }
     else if (m_mode == InputMode::Click)
@@ -960,9 +963,10 @@ void LevelScreen::onCanvasClick(int mx, int my)
     }
 }
 
+//  input
+// Keyboard, toolbar, buttons, camera aur mouse drag sab yahin handle hote hain.
 void LevelScreen::handleEvent(const sf::Event& e)
 {
-    // Esc is handled by UIManager.
     if (!m_ok)
     {
         return;
@@ -1021,7 +1025,7 @@ void LevelScreen::handleEvent(const sf::Event& e)
         handleTokenDrag(e);
     }
 
-    // Pivot drag (3.2 / 3.3): follow the pointer while a pivot room is held.
+    // Pivot drag (3.2 aur 3.3): pivot room pakda ho to pointer ke saath chalta hai.
     if (e.type == sf::Event::MouseMoved && m_dragPivot != kNull)
     {
         m_dragX = e.mouseMove.x;
@@ -1076,8 +1080,7 @@ void LevelScreen::handleEvent(const sf::Event& e)
     }
 }
 
-// ------------------------------------------------------------ update / draw
-
+//  update
 void LevelScreen::update(float dt)
 {
     m_hud.update(dt);
@@ -1114,6 +1117,7 @@ void LevelScreen::update(float dt)
     }
 }
 
+//  draw
 void LevelScreen::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);
@@ -1160,11 +1164,10 @@ void LevelScreen::draw(sf::RenderWindow& window)
     drawPivotDrag(window);
 }
 
-// ------------------------------------------------------ 3.2 / 3.3 pivot drag
-
-// Dropping the pivot on its left child means LL (single) or LR (double);
-// dropping it on its right child means RR (single) or RL (double).
-// Anything else is rejected here, before the model, with a plain message.
+//  3.2 aur 3.3 pivot drag
+// Pivot ko left child par drop karna LL (single) ya LR (double) hai.
+// Right child par drop karna RR (single) ya RL (double) hai.
+// Kisi aur jagah ka drop yahin reject hota hai, model tak jaane se pehle.
 void LevelScreen::dropPivot(int pivot, int mx, int my)
 {
     if (!m_ok || m_anim.busy() || m_endTimer > 0.f)
@@ -1194,7 +1197,7 @@ void LevelScreen::dropPivot(int pivot, int mx, int my)
     }
     if (type == RotationType::None)
     {
-        setMessage("Drag the pivot onto one of its children.");
+        setMessage("Pivot ko uske kisi child par drag karo.");
         return;
     }
 
@@ -1207,7 +1210,7 @@ void LevelScreen::dropPivot(int pivot, int mx, int my)
     m_renderer.setSelected(kNull);
 }
 
-// Line from the held pivot to the pointer, so the drag is visible.
+// Pivot se pointer tak ek line, taake drag saaf nazar aaye.
 void LevelScreen::drawPivotDrag(sf::RenderWindow& window)
 {
     if (m_dragPivot == kNull)
@@ -1226,8 +1229,7 @@ void LevelScreen::drawPivotDrag(sf::RenderWindow& window)
     window.draw(line, 2, sf::Lines);
 }
 
-// ------------------------------------------------------ 1.2 token placement
-
+//  1.2 token placement
 namespace
 {
     const float TokenX0 = 40.f;
@@ -1242,7 +1244,7 @@ namespace
     }
 }
 
-// Shelf index under the pointer, -1 if none.
+// Pointer ke neeche shelf token ka index, nahi mila to -1.
 int LevelScreen::tokenAt(int mx, int my) const
 {
     const float cy = (float)Theme::WindowH - ToolbarH - BarH + 32.f;
@@ -1284,7 +1286,7 @@ void LevelScreen::handleTokenDrag(const sf::Event& e)
     {
         m_dragX = e.mouseMove.x;
         m_dragY = e.mouseMove.y;
-        m_renderer.setSelected(m_renderer.pick((float)m_dragX, (float)m_dragY));   // ring the room under the pointer
+        m_renderer.setSelected(m_renderer.pick((float)m_dragX, (float)m_dragY));   // neeche wale room ko ring karo
     }
     else if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Left && m_dragToken != -1)
     {
@@ -1295,7 +1297,7 @@ void LevelScreen::handleTokenDrag(const sf::Event& e)
     }
 }
 
-// Release point -> Place action. The model decides whether the placement is right.
+// Release point se Place action banta hai. Sahi ya galat, ye model tay karta hai.
 void LevelScreen::dropToken(int token, int mx, int my)
 {
     if (!m_ok || m_anim.busy() || m_endTimer > 0.f || token < 0 || token >= m_tokens.size())
@@ -1306,7 +1308,7 @@ void LevelScreen::dropToken(int token, int mx, int my)
     const float canvasB = (float)Theme::WindowH - ToolbarH - BarH;
     if ((float)mx < 0.f || (float)mx > canvasR || (float)my < HudH || (float)my > canvasB)
     {
-        return;      // dropped outside the canvas: token stays on the shelf
+        return;      // canvas ke bahar drop hua, token shelf par hi rehta hai
     }
 
     const BinaryTree& built = m_session.builtTree();
@@ -1325,14 +1327,14 @@ void LevelScreen::dropToken(int token, int mx, int my)
         float sy = 0.f;
         if (id == kNull || id >= built.pool().size() || !m_renderer.nodeScreenPos(id, sx, sy))
         {
-            setMessage("Drop the token on a placed room (left or right side of it).");
+            setMessage("Token ko placed room par drop karo, uske left ya right side par.");
             return;
         }
         const TreeNode* n = built.pool()[id];
         int side = ((float)mx < sx) ? Side::Left : Side::Right;
         if (side == Side::Left && n->left != nullptr && n->right == nullptr)
         {
-            side = Side::Right;      // only one side is free: use it
+            side = Side::Right;      // sirf ek side khali hai, wahi use karo
         }
         else if (side == Side::Right && n->right != nullptr && n->left == nullptr)
         {
@@ -1391,7 +1393,7 @@ void LevelScreen::drawDragged(sf::RenderWindow& window)
     window.draw(m_tokenText);
 }
 
-// Open child slots next to every placed room. The letter L / R is the signal, not the colour.
+// Har placed room ke saath khali child slots dikhate hain. L ya R letter signal hai, rang nahi.
 void LevelScreen::drawSlotMarkers(sf::RenderWindow& window)
 {
     if (m_mode != InputMode::Place)

@@ -10,12 +10,14 @@
 
 namespace
 {
+    // Score badhne ke saath galti ki saza badhti hai, lekin 15 seconds se zyada nahi.
     int mistakePenalty(int score)
     {
         const int penalty = 5 + score / 500;
         return penalty > 15 ? 15 : penalty;
     }
 
+    // Lambe text ko line width ke hisaab se todta hai.
     std::string wrapText(const std::string& value, int lineWidth)
     {
         std::string result;
@@ -47,10 +49,12 @@ namespace
     }
 }
 
+//  construction
+// Layout banata hai, sandbox session shuru karta hai, aur pehla round start karta hai.
 EndlessScreen::EndlessScreen(AppContext& ctx)
     : m_ctx(ctx), m_renderer(ctx.assets->font()), m_seconds(60.f), m_score(0),
-      m_expectedOperation(SandboxOp::Insert), m_expectedKey(0), m_random(73291u),
-      m_gameOver(false), m_scoreSaved(false)
+    m_expectedOperation(SandboxOp::Insert), m_expectedKey(0), m_random(73291u),
+    m_gameOver(false), m_scoreSaved(false)
 {
     const sf::Font& font = ctx.assets->font();
     const float width = static_cast<float>(Theme::WindowW);
@@ -106,6 +110,7 @@ bool EndlessScreen::containsKey(int key) const
     return false;
 }
 
+// Key ko list se hata deta hai aur baaqi items ko ek jagah shift karta hai.
 void EndlessScreen::removeKey(int key)
 {
     for (int i = 0; i < m_keys.size(); ++i)
@@ -119,6 +124,7 @@ void EndlessScreen::removeKey(int key)
     }
 }
 
+// Agla round: random operation aur key chunta hai. Key list khali ho to sirf insert hota hai.
 void EndlessScreen::startRound()
 {
     m_random = m_random * 1664525u + 1013904223u;
@@ -142,12 +148,13 @@ void EndlessScreen::startRound()
     m_keyField.clear();
 }
 
+// Player ka action check karta hai. Galat ho to time kat jaata hai, sahi ho to score aur time milta hai.
 void EndlessScreen::applyAction(int operation)
 {
     if (m_gameOver) return;
     if (!m_keyField.hasValue())
     {
-        m_feedback = "Enter a key first.";
+        m_feedback = "Pehle key type karo.";
         return;
     }
     const int key = m_keyField.value();
@@ -157,7 +164,7 @@ void EndlessScreen::applyAction(int operation)
     {
         const int penalty = mistakePenalty(m_score);
         m_seconds -= static_cast<float>(penalty);
-        m_feedback = "Wrong move. " + std::to_string(penalty) + " seconds lost.";
+        m_feedback = "Galat move. " + std::to_string(penalty) + " seconds gaye.";
         m_keyField.clear();
         if (m_seconds <= 0.f) finishGame();
         return;
@@ -169,7 +176,7 @@ void EndlessScreen::applyAction(int operation)
         const int penalty = mistakePenalty(m_score);
         m_seconds -= static_cast<float>(penalty);
         m_feedback = result.message.empty() ?
-            "Rejected. " + std::to_string(penalty) + " seconds lost." :
+            "Rejected. " + std::to_string(penalty) + " seconds gaye." :
             wrapText(result.message, 36);
         m_keyField.clear();
         if (m_seconds <= 0.f) finishGame();
@@ -181,11 +188,12 @@ void EndlessScreen::applyAction(int operation)
     m_score += 100;
     m_seconds += 2.f;
     if (m_seconds > 90.f) m_seconds = 90.f;
-    m_feedback = "Correct move! +100 points, +2 seconds.";
+    m_feedback = "Sahi move! +100 points, +2 seconds.";
     m_renderer.snapTo(m_session.snapshot());
     startRound();
 }
 
+// Game khatam hone par score leaderboard file mein ek hi dafa save hota hai.
 void EndlessScreen::finishGame()
 {
     if (m_gameOver) return;
@@ -204,6 +212,7 @@ void EndlessScreen::finishGame()
     }
 }
 
+//  callbacks
 void EndlessScreen::onAction(void* context)
 {
     ActionContext* action = static_cast<ActionContext*>(context);
@@ -216,6 +225,7 @@ void EndlessScreen::onHome(void* context)
     screen->m_ctx.ui->requestScreen(ScreenId::MainMenu);
 }
 
+// Naya round sab kuch reset karke shuru hota hai.
 void EndlessScreen::onRestart(void* context)
 {
     EndlessScreen* screen = static_cast<EndlessScreen*>(context);
@@ -224,12 +234,13 @@ void EndlessScreen::onRestart(void* context)
     screen->m_score = 0;
     screen->m_gameOver = false;
     screen->m_scoreSaved = false;
-    screen->m_feedback = "Round started. Good luck.";
+    screen->m_feedback = "Round shuru. Good luck.";
     screen->m_session.start(TreeKind::BST, static_cast<int>(screen->m_random), true);
     screen->m_renderer.snapTo(screen->m_session.snapshot());
     screen->startRound();
 }
 
+//  input
 void EndlessScreen::handleEvent(const sf::Event& event)
 {
     if (!m_gameOver)
@@ -241,6 +252,8 @@ void EndlessScreen::handleEvent(const sf::Event& event)
     if (m_gameOver) m_restart.handleEvent(event);
 }
 
+//  update
+// Timer har frame ghatta hai. Labels sirf tab update hote hain jab text badle.
 void EndlessScreen::update(float dt)
 {
     if (!m_gameOver)
@@ -272,14 +285,16 @@ void EndlessScreen::update(float dt)
         m_status.setString(statusLabel);
     }
     const std::string hint = m_gameOver ?
-        "Your score is saved to the local leaderboard." :
-        "Match the operation, enter its key, and keep an eye on the timer. Mistakes cost more as your score grows.";
+        "Aapka score local leaderboard mein save ho gaya hai." :
+        "Operation match karo, key likho, aur timer par nazar rakho. Score badhne par galti ki saza badhti hai.";
     if (m_hint.getString().toAnsiString() != hint)
     {
         m_hint.setString(wrapText(hint, 43));
     }
 }
 
+//  draw
+// Panel, timer bar, labels, buttons, aur aakhir mein tree draw hota hai.
 void EndlessScreen::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);

@@ -1,7 +1,7 @@
 // gui/widgets/EventLogPanel.h
 // Scrolling text panel. Lines are wrapped when added and stored in a fixed
-// ring (oldest dropped). Mouse wheel over the panel scrolls; 0 = follow latest.
-// Reused by the Level screen and Act 4 (heap events).
+// ring . Mouse wheel over the panel scrolls; 0 = follow latest.
+// Reused by the Level screen and act 4 wala part
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>

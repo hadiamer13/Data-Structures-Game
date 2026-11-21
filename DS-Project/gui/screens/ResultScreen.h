@@ -1,6 +1,3 @@
-// gui/screens/ResultScreen.h
-// Shows ctx.result (LevelResult): stars, steps vs optimal, penalties, score, sorted array.
-// Retry -> Level, Next -> next Briefing (after 4.5: Main Menu), Campaign.
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -8,6 +5,9 @@
 #include "../AppContext.h"
 #include "../widgets/Button.h"
 
+//  result screen
+// Level ke baad ka result: stars, steps, penalties, score aur act 4 ka sorted array.
+// Retry level par le jaata hai, Next agle briefing par, aur Campaign map par wapas.
 class ResultScreen : public Screen
 {
 public:
@@ -17,7 +17,7 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the static callbacks (public so they can reach them).
+    // Static callbacks se call hote hain, isliye public hain.
     void onRetry();
     void onNext();
     void onCampaign();

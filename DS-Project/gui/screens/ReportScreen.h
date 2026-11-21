@@ -5,6 +5,8 @@
 #include "../widgets/Button.h"
 #include "../../game/Leaderboard.h"
 
+//  report screen
+// Campaign ke stars ka bar chart, aur endless ke top scores ka chart.
 class ReportScreen : public Screen
 {
 public:

@@ -1,4 +1,3 @@
-// gui/screens/SandboxScreen.cpp
 #include "SandboxScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
@@ -12,15 +11,14 @@ namespace
     const float PanelW = 250.f;
     const float ClickSlop = 5.f;
 
-
+    // Sandbox ke apne operations, jo model ke SandboxOp se alag hain.
     namespace ScreenOp
     {
         inline const int Random = 100;
         inline const int Clear = 101;
     }
 
-
-    // different tabs have diff operations which are defined here
+    // Har tab ke operations alag hain, is liye har list yahan define hai.
     struct OpDef
     {
         int op;
@@ -29,42 +27,43 @@ namespace
 
     const OpDef kBinaryOps[] =
     {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Preorder, "Preorder" }, { SandboxOp::Inorder, "Inorder" },
-        { SandboxOp::Postorder, "Postorder" }, { SandboxOp::LevelOrder, "Level" },
-        { SandboxOp::Mirror, "Mirror" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
+        { SandboxOp::Insert, "Insert" },{ SandboxOp::Search, "Search" },
+        { SandboxOp::Preorder, "Preorder" },{ SandboxOp::Inorder, "Inorder" },
+        { SandboxOp::Postorder, "Postorder" },{ SandboxOp::LevelOrder, "Level" },
+        { SandboxOp::Mirror, "Mirror" },{ SandboxOp::Info, "Info" },
+        { ScreenOp::Random, "Random" },{ ScreenOp::Clear, "Clear" }
     };
     const OpDef kBstOps[] =
     {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Delete, "Delete" }, { SandboxOp::Range, "Range" },
-        { SandboxOp::Min, "Min" }, { SandboxOp::Max, "Max" },
-        { SandboxOp::Succ, "Succ" }, { SandboxOp::Pred, "Pred" },
-        { SandboxOp::Kth, "Kth" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
+        { SandboxOp::Insert, "Insert" },{ SandboxOp::Search, "Search" },
+        { SandboxOp::Delete, "Delete" },{ SandboxOp::Range, "Range" },
+        { SandboxOp::Min, "Min" },{ SandboxOp::Max, "Max" },
+        { SandboxOp::Succ, "Succ" },{ SandboxOp::Pred, "Pred" },
+        { SandboxOp::Kth, "Kth" },{ SandboxOp::Info, "Info" },
+        { ScreenOp::Random, "Random" },{ ScreenOp::Clear, "Clear" }
     };
     const OpDef kAvlOps[] =
     {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Delete, "Delete" }, { SandboxOp::Range, "Range" },
-        { SandboxOp::RotLL, "Rot LL" }, { SandboxOp::RotRR, "Rot RR" },
-        { SandboxOp::RotLR, "Rot LR" }, { SandboxOp::RotRL, "Rot RL" },
-        { SandboxOp::Kth, "Kth" }, { SandboxOp::Rank, "Rank" },
-        { SandboxOp::CountRange, "Count" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
+        { SandboxOp::Insert, "Insert" },{ SandboxOp::Search, "Search" },
+        { SandboxOp::Delete, "Delete" },{ SandboxOp::Range, "Range" },
+        { SandboxOp::RotLL, "Rot LL" },{ SandboxOp::RotRR, "Rot RR" },
+        { SandboxOp::RotLR, "Rot LR" },{ SandboxOp::RotRL, "Rot RL" },
+        { SandboxOp::Kth, "Kth" },{ SandboxOp::Rank, "Rank" },
+        { SandboxOp::CountRange, "Count" },{ SandboxOp::Info, "Info" },
+        { ScreenOp::Random, "Random" },{ ScreenOp::Clear, "Clear" }
     };
     const OpDef kHeapOps[] =
     {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Extract, "Extract" },
-        { SandboxOp::Build, "Build" }, { SandboxOp::Heapify, "Heapify" },
-        { SandboxOp::SiftUp, "SiftUp" }, { SandboxOp::Swap, "Swap" },
-        { SandboxOp::Sort, "Sort" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
+        { SandboxOp::Insert, "Insert" },{ SandboxOp::Extract, "Extract" },
+        { SandboxOp::Build, "Build" },{ SandboxOp::Heapify, "Heapify" },
+        { SandboxOp::SiftUp, "SiftUp" },{ SandboxOp::Swap, "Swap" },
+        { SandboxOp::Sort, "Sort" },{ SandboxOp::Info, "Info" },
+        { ScreenOp::Random, "Random" },{ ScreenOp::Clear, "Clear" }
     };
 
     const char* const TabNames[4] = { "Binary", "BST", "AVL", "MaxHeap" };
 
+    // Kaun se operation ko A field ki value chahiye.
     bool needsA(int op)
     {
         return op == SandboxOp::Insert || op == SandboxOp::Search || op == SandboxOp::Delete ||
@@ -73,6 +72,7 @@ namespace
             op == SandboxOp::Heapify || op == SandboxOp::SiftUp || op == SandboxOp::Swap;
     }
 
+    // Kaun se operation ko B field ki value chahiye.
     bool needsB(int op)
     {
         return op == SandboxOp::Range || op == SandboxOp::CountRange || op == SandboxOp::Swap;
@@ -83,18 +83,19 @@ namespace
         return op >= SandboxOp::RotLL && op <= SandboxOp::RotRL;
     }
 
-    
+    // Label wale events animate nahi hote, kyunke snapshots result dikha dete hain.
     bool animated(int type)
     {
         return type != EventType::UPDATE_HEIGHT && type != EventType::UPDATE_SIZE;
     }
 
+    // Structure badalne wale events, jinke liye snapshot zaroori hai.
     bool structural(int type)
     {
         return type == EventType::INSERT || type == EventType::UNLINK || type == EventType::ROTATE;
     }
 
-    
+    // Character count ke hisaab se word wrap.
     std::string wrapChars(const std::string& s, int width)
     {
         std::string out;
@@ -136,8 +137,7 @@ namespace
     }
 }
 
-// constructor
-
+//  construction
 SandboxScreen::SandboxScreen(AppContext& ctx)
     : m_ctx(ctx), m_renderer(ctx.assets->font()), m_anim(&m_renderer)
 {
@@ -158,9 +158,7 @@ SandboxScreen::SandboxScreen(AppContext& ctx)
     loadKind(TreeKind::BST, false);
 }
 
-// app bananay ke ham 5000 dollars lete hai aur
-// button idher udher karne ke ham 25000 dollar lete hai
-
+// Sab panels, tabs, canvas aur buttons ki positions yahan set hoti hain.
 void SandboxScreen::buildLayout()
 {
     const sf::Font& font = m_ctx.assets->font();
@@ -203,7 +201,7 @@ void SandboxScreen::buildLayout()
     m_renderer.setCanvasRect(cx, cy, cw, ch);
 
     styleText(m_hint, font, 12, sf::Color(170, 150, 150), cx + 10.f, cy + ch - 20.f);
-    m_hint.setString("Wheel: zoom  Drag: pan  Click: select (fills A)  Shift+click: fills B  Space: pause  Z: undo");
+    m_hint.setString("Wheel: zoom  Drag: pan  Click: select (A bhar jaata hai)  Shift+click: B bhar jaata hai  Space: pause  Z: undo");
     styleText(m_msg, font, 15, Theme::StarOn, cx + 10.f, cy + 8.f);
 
     float px = W - PanelW;
@@ -228,8 +226,8 @@ void SandboxScreen::buildLayout()
     m_tooltip.init(font);
 }
 
-// kind of tree / operations of that tree
-
+//  tab and state
+// Tree kind badalta hai, session shuru hota hai, aur us tree ke operations dikhte hain.
 void SandboxScreen::loadKind(int kind, bool empty)
 {
     m_kind = kind;
@@ -249,11 +247,12 @@ void SandboxScreen::loadKind(int kind, bool empty)
     rebuildOps();
     refreshTabs();
     refreshInfo();
-    m_log.addLine(std::string("Sandbox: ") + TabNames[kind] + (empty ? " (empty)" : (" (seed " + std::to_string(m_seed) + ")")));
-    setMessage(empty ? "Empty structure. Type a value in A and press Insert."
-        : "Ready. Type a value in A, then press an operation.");
+    m_log.addLine(std::string("Sandbox: ") + TabNames[kind] + (empty ? " (empty)" : (" seed " + std::to_string(m_seed))));
+    setMessage(empty ? "Khali structure. A mein value type karo aur Insert dabao."
+        : "Tayar. A mein value type karo, phir koi operation dabao.");
 }
 
+// Tree ke hisaab se operation buttons banata hai, do columns mein.
 void SandboxScreen::rebuildOps()
 {
     const OpDef* defs = kBstOps;
@@ -282,13 +281,13 @@ void SandboxScreen::rebuildOps()
     const float px = (float)Theme::WindowW - PanelW;
     const float y0 = TabH + 160.f;
     const float rowH = 38.f;
-    const float margin = 15.f;   // inner margin of the panel
-    const float gap = 10.f;      // space between the two columns
+    const float margin = 15.f;   // panel ke andar ka margin
+    const float gap = 10.f;      // do columns ke beech ka faasla
     const float btnH = 30.f;
 
     m_opCount = n;
 
-    // Pass 1: create the buttons with a small label and padding, and find each column's widest button.
+    // Pehle buttons banate hain aur har column ka sabse chauda button dhoondte hain.
     float colW[2] = { 0.f, 0.f };
     for (int i = 0; i < n; ++i)
     {
@@ -304,7 +303,7 @@ void SandboxScreen::rebuildOps()
         }
     }
 
-    // Pass 2: place each column's buttons centred in that column.
+    // Phir har column ke buttons us column ke center mein rakhte hain.
     const float colX[2] =
     {
         px + margin + colW[0] * 0.5f,
@@ -318,6 +317,7 @@ void SandboxScreen::rebuildOps()
     }
 }
 
+// Selected tab ko brackets aur underline se dikhate hain, sirf rang se nahi.
 void SandboxScreen::refreshTabs()
 {
     for (int i = 0; i < kTabs; ++i)
@@ -325,7 +325,7 @@ void SandboxScreen::refreshTabs()
         std::string label = TabNames[i];
         if (i == m_kind)
         {
-            label = "[ " + label + " ]";    // not colour alone: brackets + underline
+            label = "[ " + label + " ]";
         }
         m_tab[i].setLabel(label.c_str());
     }
@@ -348,6 +348,7 @@ void SandboxScreen::refreshInfo()
     setValid(text, ok);
 }
 
+// Validator ka result rang aur text dono mein dikhta hai.
 void SandboxScreen::setValid(const std::string& text, bool ok)
 {
     m_validText.setString(wrapChars(text, 30));
@@ -369,7 +370,6 @@ bool SandboxScreen::typing() const
 }
 
 //  callbacks
-
 void SandboxScreen::onTabClick(void* context)
 {
     TabCtx* c = static_cast<TabCtx*>(context);
@@ -418,9 +418,10 @@ void SandboxScreen::onOp(int op)
     doOp(op);
 }
 
+// Enter dabane par Insert chalta hai.
 void SandboxScreen::onFieldEnter()
 {
-    doOp(SandboxOp::Insert);     // Enter = insert
+    doOp(SandboxOp::Insert);
 }
 
 void SandboxScreen::onToolbar(int action)
@@ -438,7 +439,7 @@ void SandboxScreen::onToolbar(int action)
         }
         else
         {
-            setMessage("Nothing to replay yet.");
+            setMessage("Replay karne ke liye abhi kuch nahi hai.");
         }
     }
     else if (action == ToolbarAction::Reset)
@@ -447,17 +448,17 @@ void SandboxScreen::onToolbar(int action)
     }
     else if (action == ToolbarAction::Hint)
     {
-        setMessage("Hints are not available in the sandbox.");
+        setMessage("Sandbox mein hints available nahi hain.");
     }
 }
 
-// actions
-
+//  actions
+// Operation ke liye input check karta hai, phir session ko bhejta hai.
 void SandboxScreen::doOp(int op)
 {
     if (m_anim.busy())
     {
-        m_anim.skipAll();     // finish the running animation first
+        m_anim.skipAll();     // pehle chalti animation khatam karo
     }
 
     if (op == ScreenOp::Random)
@@ -478,7 +479,7 @@ void SandboxScreen::doOp(int op)
     {
         if (!m_fieldA.hasValue())
         {
-            setMessage("Type a value in A first.");
+            setMessage("Pehle A mein value type karo.");
             return;
         }
         a = m_fieldA.value();
@@ -487,7 +488,7 @@ void SandboxScreen::doOp(int op)
     {
         if (!m_fieldB.hasValue())
         {
-            setMessage("This operation needs a value in B as well.");
+            setMessage("Is operation ko B mein bhi value chahiye.");
             return;
         }
         b = m_fieldB.value();
@@ -502,7 +503,7 @@ void SandboxScreen::doOp(int op)
     {
         if (m_selected == kNull)
         {
-            setMessage("Click a room first: it is the pivot.");
+            setMessage("Pehle room click karo, woh pivot hai.");
             return;
         }
         a = m_selected;
@@ -516,7 +517,7 @@ void SandboxScreen::doOp(int op)
     play(r);
 }
 
-// Plays one batch like insert delete and so on
+// Ek batch chalata hai, jaise insert ya delete.
 void SandboxScreen::play(const SandboxResult& r)
 {
     m_pendingFocus = r.focusId;
@@ -559,16 +560,17 @@ void SandboxScreen::play(const SandboxResult& r)
     m_anim.endBatch(r.after);
 }
 
+// Undo ke baad view hard sync hota hai, taake positions fix ho jayen.
 void SandboxScreen::doUndo()
 {
     m_anim.clear();
     bool ok = m_session.undo();
-    m_renderer.snapTo(m_session.snapshot());     // hard snapping taakay position aik fixed ho final
+    m_renderer.snapTo(m_session.snapshot());
     m_renderer.setTarget(kNull);
     m_selected = kNull;
     m_renderer.setSelected(kNull);
     refreshInfo();
-    setMessage(ok ? "Undone." : "Nothing to undo.");
+    setMessage(ok ? "Undo ho gaya." : "Undo karne ke liye kuch nahi hai.");
 }
 
 void SandboxScreen::doReset()
@@ -582,11 +584,11 @@ void SandboxScreen::doReset()
     m_selected = kNull;
     m_log.clear();
     refreshInfo();
-    setMessage("Reset to the starting state.");
+    setMessage("Shuru wali halat par reset ho gaya.");
 }
 
-// input lena 
-
+//  hover and click
+// Mouse ke neeche node ya array cell ki info tooltip mein dikhati hai.
 void SandboxScreen::updateTooltip(int mx, int my)
 {
     float sx = (float)mx;
@@ -622,6 +624,7 @@ void SandboxScreen::updateTooltip(int mx, int my)
     m_tooltip.hide();
 }
 
+// Click se A field bharta hai, aur Shift ke saath click B field bharta hai.
 void SandboxScreen::onCanvasClick(int mx, int my)
 {
     float sx = (float)mx;
@@ -642,7 +645,7 @@ void SandboxScreen::onCanvasClick(int mx, int my)
     if (id != kNull && m_renderer.nodeInfo(id, key, h, s, b, d))
     {
         bool second = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-        int value = m_renderer.isHeap() ? id : key;     // tree: key, heap: array index
+        int value = m_renderer.isHeap() ? id : key;     // tree mein key, heap mein array index
         if (second)
         {
             m_fieldB.setValue(value);
@@ -655,9 +658,10 @@ void SandboxScreen::onCanvasClick(int mx, int my)
     refreshInfo();
 }
 
+//  input
+// Keyboard, toolbar, tabs, operation buttons, camera aur mouse sab yahan handle hote hain.
 void SandboxScreen::handleEvent(const sf::Event& e)
 {
-    // Esc is handled by UIManager.
     m_fieldA.handleEvent(e);
     m_fieldB.handleEvent(e);
 
@@ -687,7 +691,7 @@ void SandboxScreen::handleEvent(const sf::Event& e)
         }
         if (e.key.code == sf::Keyboard::H)
         {
-            setMessage("Hints are not available in the sandbox.");
+            setMessage("Sandbox mein hints available nahi hain.");
             return;
         }
     }
@@ -742,9 +746,8 @@ void SandboxScreen::handleEvent(const sf::Event& e)
     }
 }
 
-//update / draw
-// update changes laata hai in text fields and animations and so on
-
+//  update and draw
+// Update mein text fields, animation aur renderer aage badhte hain.
 void SandboxScreen::update(float dt)
 {
     m_toolbar.update(dt);
@@ -765,8 +768,7 @@ void SandboxScreen::update(float dt)
     m_anim.update(dt);
 }
 
-// draw draws those changed stuff
-
+// Sab cheezein draw karta hai, bina kisi state ko badle.
 void SandboxScreen::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);
@@ -800,5 +802,3 @@ void SandboxScreen::draw(sf::RenderWindow& window)
     m_toolbar.draw(window);
     m_tooltip.draw(window);
 }
-
-

@@ -1,4 +1,3 @@
-// gui/screens/CampaignMap.h
 #pragma once
 #include "Screen.h"
 #include "../AppContext.h"
@@ -6,6 +5,9 @@
 #include "../widgets/LevelBanner.h"
 #include "../../game/Campaign.h"
 
+//  campaign map
+// Char acts ka map. Har act mein paanch level banners hain, aur neeche selected level ki info.
+// Four acts shown as a map. Each act has five level banners and an info panel for the selected level.
 class CampaignMap : public Screen
 {
 public:
@@ -15,13 +17,15 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the static callbacks (public so they can reach them).
+    // Static callbacks se call hote hain, isliye public hain.
+    // Public because the static callbacks call them.
     void onBannerClicked(int slot);
     void onStart();
     void onBack();
     void onDebugUnlock();
 
-    // Re-reads stars and locks from the Campaign (e.g. after a result is saved).
+    // Stars aur locks ko Campaign se dobara parhta hai, jaise result save hone ke baad.
+    // Re-reads stars and locks from the Campaign, for example after a result is saved.
     void refreshFromData();
 
 private:
@@ -31,7 +35,7 @@ private:
     struct BannerCtx
     {
         CampaignMap* map;
-        int slot;     // 0..4 inside the current act
+        int slot;     // act ke andar 0 se 4 tak
     };
 
     static void onBannerClick(void* context);
@@ -56,31 +60,31 @@ private:
     Campaign* m_campaign;
     const sf::Font* m_font;
 
-    int m_act = 0;      // 0..3
-    int m_sel = 0;      // 0..4 (selected banner in this act)
+    int m_act = 0;      // 0 se 3 tak
+    int m_sel = 0;      // is act mein selected banner, 0 se 4 tak
 
-    // Backdrop and decoration
+    //  backdrop and decoration
     sf::Sprite         m_background;
     sf::RectangleShape m_dim;
     sf::Sprite         m_corners[4];   // TL, TR, BL, BR
-    sf::Sprite         m_divider;      // star ornament under the act name
+    sf::Sprite         m_divider;      // act ke naam ke neeche star ornament
 
-    // Top bar
+    //  top bar
     sf::Text           m_tab[ActCount];
-    sf::Sprite         m_tabHighlight;  // T-shaped marker under the selected act
+    sf::Sprite         m_tabHighlight;  // selected act ke neeche T-shaped marker
     sf::FloatRect      m_tabRect[ActCount];
     int                m_tabHover = -1;
-    sf::ConvexShape    m_arrow[2];      // 0 = left, 1 = right
+    sf::ConvexShape    m_arrow[2];      // 0 left, 1 right
     sf::FloatRect      m_arrowRect[2];
-    float              m_arrowAmt[2];   // eased hover 0..1
+    float              m_arrowAmt[2];   // hover ka smooth 0 se 1 value
     bool               m_arrowHover[2];
     sf::Text           m_actName;
 
-    // Banners
+    //  banners
     LevelBanner m_banner[PerAct];
     BannerCtx   m_bannerCtx[PerAct];
 
-    // Info panel
+    //  info panel
     sf::RectangleShape m_panel;
     sf::Text m_title, m_status, m_concept, m_objective;
     sf::Text m_bestLabel, m_lockedMsg;
@@ -89,5 +93,5 @@ private:
 
     Button m_start;
     Button m_back;
-    Button m_debug;     // DEBUG: toggles unlock-all
+    Button m_debug;     // DEBUG: sab levels unlock karne ka toggle
 };

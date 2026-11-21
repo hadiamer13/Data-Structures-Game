@@ -21,10 +21,11 @@ namespace NodeMark
     inline const int None = 0;
     inline const int Visit = 1;     // current visit (motay blue ring)
     inline const int Compare = 2;   // compare ho raha hai (blue ring)
-    inline const int Skipped = 3;   
+    inline const int Skipped = 3;
     inline const int Result = 4;    // target / result 
     inline const int Violation = 5; // motay laal ring
     inline const int Trail = 6;     // pehle visit hua 
+}
 
 namespace NodeFx
 {

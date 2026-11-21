@@ -29,6 +29,7 @@ namespace
     }
 }
 
+//  construction
 ReportScreen::ReportScreen(AppContext& ctx) : m_ctx(ctx)
 {
     const sf::Font& font = ctx.assets->font();
@@ -54,7 +55,7 @@ ReportScreen::ReportScreen(AppContext& ctx) : m_ctx(ctx)
     m_scoreHeading.setString("TOP ENDLESS SCORES");
     setText(m_campaignSummary, font, 17, Theme::TextColor, 88.f, 520.f);
     setText(m_emptyScores, font, 18, Theme::TextColor, 750.f, 330.f);
-    m_emptyScores.setString("No saved endless scores yet.");
+    m_emptyScores.setString("Abhi koi endless score save nahi hai.");
 
     for (int i = 0; i < 4; ++i)
     {
@@ -76,6 +77,7 @@ ReportScreen::ReportScreen(AppContext& ctx) : m_ctx(ctx)
     refreshCharts();
 }
 
+// Har act ke stars ka bar, aur endless scores ke bars, unki sahi height ke saath banate hain.
 void ReportScreen::refreshCharts()
 {
     int totalStars = 0;
@@ -143,6 +145,7 @@ void ReportScreen::update(float dt)
     m_home.update(dt);
 }
 
+// Baseline, divider aur bars draw karta hai.
 void ReportScreen::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);

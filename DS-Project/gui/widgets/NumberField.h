@@ -1,6 +1,6 @@
 // gui/widgets/NumberField.h
-// Digits-only text field (optional leading minus). Click to focus, Backspace deletes,
-// Enter fires the callback. Knows nothing about screens or the model.
+// Sirf digits wala text field (aik leading minus allowed). Click par focus, Backspace se delete,
+// Enter par callback chalta hai. Screen ya model ke bare mein kuch nahi janta.
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -12,14 +12,14 @@ class NumberField
 public:
     NumberField();
 
-    // x, y = top-left of the box. The label is drawn above it.
+    // x, y = box ka top-left. Label box ke upar draw hota hai.
     void init(const std::string& label, const sf::Font& font, float x, float y, float w, float h);
-    void setCallback(NumberFieldCallback cb, void* context);   // Enter pressed
+    void setCallback(NumberFieldCallback cb, void* context);   // Enter dabane par
 
     void setValue(int v);
     void clear();
-    bool hasValue() const;     // false when empty or just "-"
-    int value() const;         // 0 when !hasValue()
+    bool hasValue() const;     // khali ya sirf "-" ho to false
+    int value() const;         // hasValue() false ho to 0
     bool focused() const;
     void setFocused(bool f);
 
@@ -28,6 +28,7 @@ public:
     void draw(sf::RenderWindow& window) const;
 
 private:
+    // Text badalne par caret ki position aur sprite dobara set karta hai.
     void refreshText();
 
     static const int kMaxChars = 7;
@@ -38,7 +39,7 @@ private:
     float m_h;
     std::string m_text;
     bool m_focused;
-    float m_time;
+    float m_time;              // caret blink ke liye timer
 
     NumberFieldCallback m_cb;
     void* m_cbContext;

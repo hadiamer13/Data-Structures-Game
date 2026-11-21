@@ -8,6 +8,9 @@
 #include "../../game/Leaderboard.h"
 #include "../../game/SandboxSession.h"
 
+//  endless screen
+// Endless survival mode. Timer chalta hai, aur player ko sahi operation aur key dena hota hai.
+// Score aur bache hue waqt ke hisaab se leaderboard mein score save hota hai.
 class EndlessScreen : public Screen
 {
 public:

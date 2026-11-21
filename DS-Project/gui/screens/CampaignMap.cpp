@@ -1,4 +1,3 @@
-// gui/screens/CampaignMap.cpp
 #include "CampaignMap.h"
 #include "../UIManager.h"
 #include "../widgets/Ornament.h"
@@ -9,6 +8,8 @@
 
 namespace
 {
+    // Chhote math helpers, kyunke <algorithm> istemal nahi karna.
+    // Small math helpers, since <algorithm> is not allowed.
     float minF(float a, float b)
     {
         return a < b ? a : b;
@@ -19,30 +20,37 @@ namespace
         return a > b ? a : b;
     }
 
-    // Act names alone.
+    // Har act ka sirf naam.
+    // Only the name of each act.
     const char* const ActNames[4] =
     {
         "The Blueprint Wing", "The Sorted Wing",
         "The Architect's Wing", "The Heap Fortress"
     };
 
+    // Text ko apne bounding box ke center par origin deta hai.
+    // Puts the text origin at the centre of its bounding box.
     void centerOrigin(sf::Text& t)
     {
         sf::FloatRect b = t.getLocalBounds();
         t.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
     }
 
-    // "1.1  Guard Patrol" for the info panel title.
+    // Info panel ka title, jaise "1.1  Guard Patrol".
+    // Title for the info panel, for example "1.1  Guard Patrol".
     std::string levelTitle(int act, int slot, const std::string& name)
     {
         return std::to_string(act + 1) + "." + std::to_string(slot + 1) + "  " + name;
     }
 }
 
+//  text helper
+// Text ka common style set karta hai: font, size, rang aur halka outline.
+// Sets the common text style: font, size, colour and a light outline.
 void CampaignMap::styleText(sf::Text& t, const sf::Font& font, unsigned size,
     const sf::Color& col, float x, float y)
 {
-    t.setFont(font);                          // SFML 2.x API
+    t.setFont(font);                          // SFML 2.x ka API
     t.setCharacterSize(size);
     t.setFillColor(col);
     t.setOutlineColor(sf::Color(0, 0, 0, 200));
@@ -50,6 +58,8 @@ void CampaignMap::styleText(sf::Text& t, const sf::Font& font, unsigned size,
     t.setPosition(x, y);
 }
 
+// Left ya right arrow banata hai, jiska tip cx, cy par hota hai.
+// Builds a left or right arrow whose tip sits at cx, cy.
 void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy)
 {
     s.setPointCount(3);
@@ -61,6 +71,8 @@ void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy)
     s.setOutlineThickness(2.f);
 }
 
+// Teen stars ka shape banata hai.
+// Builds three star shapes.
 void CampaignMap::buildStars(float x, float y)
 {
     const float outer = 14.f;
@@ -79,6 +91,7 @@ void CampaignMap::buildStars(float x, float y)
     }
 }
 
+//  construction
 CampaignMap::CampaignMap(AppContext& ctx)
     : m_ctx(ctx), m_campaign(ctx.campaign), m_font(&ctx.assets->font())
 {
@@ -89,7 +102,7 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_arrowAmt[0] = m_arrowAmt[1] = 0.f;
     m_arrowHover[0] = m_arrowHover[1] = false;
 
-    // ---- Background -------------------------------------------------
+    //  background
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x),
@@ -97,8 +110,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_dim.setSize(sf::Vector2f(W, H));
     m_dim.setFillColor(sf::Color(0, 0, 0, 110));
 
-    // ---- Corner decoration (4 L shapes made of 2 bars each) ----------
-        // ---- Corner ornaments (one sprite, mirrored for each corner) ----
+    //  corner ornaments
+    // Aik hi sprite ko char kono par mirror karke lagaya jata hai.
+    // One sprite is mirrored to fill all four corners.
     {
         const sf::Texture& ct = ctx.assets->corner();
         const float inset = 12.f;
@@ -112,7 +126,7 @@ CampaignMap::CampaignMap(AppContext& ctx)
         }
     }
 
-    // ---- Top bar: tabs ------------------------------------------------
+    //  top bar tabs
     const float tabY = 30.f;
     for (int a = 0; a < ActCount; ++a)
     {
@@ -125,7 +139,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
         m_tab[a].setPosition(cx, tabY);
         m_tabRect[a] = sf::FloatRect(cx - 80.f, tabY - 20.f, 160.f, 40.f);
     }
-    // Act highlighter: the T-shaped sprite, scaled to a fixed width, origin at top centre.
+
+    // Act highlighter ek T-shaped sprite hai, jo fixed width par scale hota hai.
+    // The act highlighter is a T-shaped sprite scaled to a fixed width.
     const sf::Texture& hl = ctx.assets->highlight();
     const sf::Vector2u hs = hl.getSize();
     const float hlWidth = 120.f;
@@ -135,6 +151,7 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_tabHighlight.setScale(hlScale, hlScale);
     m_tabHighlight.setColor(Theme::NodeGlow);
 
+    // Arrows pehle aur aakhri tab ke bahar lagte hain.
     // Arrows sit just outside the first and last tab.
     float lx = W / 2.f - 1.5f * 190.f - 130.f;
     float rx = W / 2.f + 1.5f * 190.f + 130.f;
@@ -145,13 +162,15 @@ CampaignMap::CampaignMap(AppContext& ctx)
 
     styleText(m_actName, font, 18, Theme::NodeGlow, W / 2.f, 54.f);
 
-    // ---- Divider under the act name ----
+    // Act ke naam ke neeche divider.
+    // Divider under the act name.
     placeDivider(m_divider, ctx.assets->divider(), W / 2.f, 88.f, 400.f, 18.f);
     m_divider.setColor(Theme::NodeGlow);
 
-    // ---- Banners ----------------------------------------------------
-    // Positions, numbers, boss flags and states come from initBanners() and
-    // loadBannerStates(), called by setAct(). Only the callbacks are set here.
+    // Positions, numbers, boss flags aur states initBanners() aur loadBannerStates() se aate hain,
+    // jo setAct() call karta hai. Yahan sirf callbacks set hote hain.
+    // Positions, numbers, boss flags and states come from initBanners() and loadBannerStates(),
+    // which setAct() calls. Only the callbacks are set here.
     for (int i = 0; i < PerAct; ++i)
     {
         m_bannerCtx[i].map = this;
@@ -159,7 +178,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
         m_banner[i].setCallback(&CampaignMap::onBannerClick, &m_bannerCtx[i]);
     }
 
-    // ---- Info panel (under the banners) -------------------------------
+    
+    // Info panel banners ke neeche hai.
+    // The info panel sits under the banners.
     m_panelX = 100.f;  m_panelY = 448.f;
     m_panelW = W - 200.f;  m_panelH = 252.f;
     m_panel.setSize(sf::Vector2f(m_panelW, m_panelH));
@@ -180,7 +201,7 @@ CampaignMap::CampaignMap(AppContext& ctx)
     styleText(m_lockedMsg, font, 18, Theme::NodeLockedLine, rx2, m_panelY + 150.f);
     m_lockedMsg.setString("LOCKED\nFinish the previous level\nto unlock this one.");
 
-    // ---- Buttons ----------------------------------------------------------
+    //  buttons
     m_start.init("Start", font,
         sf::Vector2f(m_panelX + m_panelW - 150.f, m_panelY + m_panelH - 55.f),
         sf::Vector2f(240.f, Theme::ButtonH));
@@ -192,7 +213,8 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_back.setCallback(&CampaignMap::onBackClick, this);
     m_back.setFrame(&ctx.assets->buttonFrame());
 
-    // DEBUG button: bottom-left of the info panel, clear of the text and Start.
+    // Debug button info panel ke bottom-left mein hai, text aur Start se door.
+    // The debug button sits at the bottom left of the info panel, away from the text and Start.
     m_debug.init("DEBUG: UNLOCK ALL (OFF)", font,
         sf::Vector2f(m_panelX + 250.f, m_panelY + m_panelH - 55.f),
         sf::Vector2f(260.f, Theme::ButtonH));
@@ -200,7 +222,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
     m_debug.setFrame(&ctx.assets->buttonFrame());
     refreshDebugLabel();
 
-    // ---- Restore position when coming back from the Briefing -----------------
+    //  restore position
+    // Briefing se wapas aane par wahi level select rahe jo pehle tha.
+    // When coming back from the briefing, keep the same level selected.
     int act = 0;
     int sel = 0;
     if (ctx.selectedLevel >= 0 && ctx.selectedLevel < ActCount * PerAct)
@@ -214,7 +238,9 @@ CampaignMap::CampaignMap(AppContext& ctx)
     setSelected(sel);
 }
 
-// Banner number, boss flag and layout for the current act.
+//  banners setup
+// Current act ke liye banner number, boss flag aur layout set karta hai.
+// Sets the banner numbers, boss flags and layout for the current act.
 void CampaignMap::initBanners()
 {
     const float W = static_cast<float>(Theme::WindowW);
@@ -244,6 +270,8 @@ void CampaignMap::refreshFromData()
     refreshInfo();
 }
 
+// Act badalta hai, tabs ka rang badalta hai, aur pehla unplayed level select hota hai.
+// Changes the act, updates the tab colours, and selects the first unplayed level.
 void CampaignMap::setAct(int act)
 {
     if (act < 0)
@@ -260,7 +288,8 @@ void CampaignMap::setAct(int act)
     initBanners();
     loadBannerStates();
 
-    // Tab visuals
+    // Tab ke rang
+    // Tab colours
     for (int a = 0; a < ActCount; ++a)
     {
         m_tab[a].setFillColor(a == act ? Theme::NodeGlow : Theme::TextColor);
@@ -272,7 +301,8 @@ void CampaignMap::setAct(int act)
     centerOrigin(m_actName);
     m_actName.setPosition(W / 2.f, 54.f);
 
-    // Select the first level still to play (or the first one).
+    // Pehla level jo abhi khela nahi gaya, woh select hota hai, warna pehla.
+    // Select the first unlocked level with no stars yet, otherwise the first level.
     int pick = 0;
     for (int s = 0; s < PerAct; ++s)
     {
@@ -304,6 +334,8 @@ void CampaignMap::setSelected(int slot)
     refreshInfo();
 }
 
+// Start tabhi enable hota hai jab data load ho aur level unlock ho.
+// Start is enabled only when the data is loaded and the level is unlocked.
 bool CampaignMap::startEnabled() const
 {
     return m_campaign->loaded() && m_campaign->isUnlocked(levelIndex());
@@ -314,9 +346,10 @@ void CampaignMap::refreshDebugLabel()
     m_debug.setLabel(m_campaign->unlockAll() ? "DEBUG: UNLOCK ALL (ON)" : "DEBUG: UNLOCK ALL (OFF)");
 }
 
+// Info panel ke strings sirf tab badalte hain jab state badle, har frame mein nahi.
+// Info panel strings change only when the state changes, not every frame.
 void CampaignMap::refreshInfo()
 {
-    // Strings are only rewritten here (on change), never per frame.
     if (!m_campaign->loaded())
     {
         m_title.setString("CAMPAIGN DATA MISSING");
@@ -342,7 +375,8 @@ void CampaignMap::refreshInfo()
     m_concept.setString(def.conceptText);
     m_objective.setString(def.objective);
 
-    // Not colour alone: status is a word.
+    // Status ek word hai, sirf rang nahi.
+    // The status is a word, not only a colour.
     const char* word = "OPEN";
     if (!unlocked)
     {
@@ -367,6 +401,7 @@ void CampaignMap::refreshInfo()
     }
 }
 
+//  callbacks
 void CampaignMap::onBannerClick(void* context)
 {
     BannerCtx* c = static_cast<BannerCtx*>(context);
@@ -388,9 +423,10 @@ void CampaignMap::onDebugClick(void* context)
     static_cast<CampaignMap*>(context)->onDebugUnlock();
 }
 
+// Pehla click select karta hai, selected banner par dobara click Briefing kholta hai.
+// The first click selects. Clicking the selected banner again opens the briefing.
 void CampaignMap::onBannerClicked(int slot)
 {
-    // First click selects; clicking the selected banner opens the Briefing.
     if (slot == m_sel)
     {
         onStart();
@@ -405,7 +441,7 @@ void CampaignMap::onStart()
 {
     if (!startEnabled())
     {
-        return;      // locked or data missing: nothing happens
+        return;      // locked ya data missing ho to kuch nahi hota
     }
     m_ctx.selectedLevel = levelIndex();
     m_ctx.ui->requestScreen(ScreenId::Briefing);
@@ -428,9 +464,11 @@ void CampaignMap::onDebugUnlock()
     refreshInfo();
 }
 
+//  input
+// Esc UIManager handle karta hai. Yahan keys, mouse aur hover ko sambhalte hain.
+// Esc is handled by UIManager. Keys, mouse and hover are handled here.
 void CampaignMap::handleEvent(const sf::Event& e)
 {
-    // Esc is handled globally by UIManager.
     if (e.type == sf::Event::KeyPressed)
     {
         sf::Keyboard::Key k = e.key.code;
@@ -499,6 +537,9 @@ void CampaignMap::handleEvent(const sf::Event& e)
     }
 }
 
+//  update
+// Hover ke scale aur arrows ki animation har frame par chalti hai.
+// Hover scale and arrow animation run every frame.
 void CampaignMap::update(float dt)
 {
     for (int s = 0; s < PerAct; ++s)
@@ -509,7 +550,8 @@ void CampaignMap::update(float dt)
     m_debug.update(dt);
     m_start.update(dt);
 
-    // Tab hover: brighten (current act stays highlighted).
+    // Tab hover par roshan hota hai, selected act hamesha highlight rehta hai.
+    // A hovered tab brightens, and the selected act stays highlighted.
     for (int a = 0; a < ActCount; ++a)
     {
         if (a == m_act)
@@ -526,8 +568,10 @@ void CampaignMap::update(float dt)
         }
     }
 
-    // Arrows: ease the hover scale; dim at the ends (not colour alone:
-    // an arrow at the end is also drawn smaller and without outline).
+    // Arrows ka hover smooth hota hai. Aakhri act par arrow chhota aur bina outline ke dikhta hai,
+    // taake rang ke alawa bhi farq nazar aaye.
+    // Arrows ease their hover scale. At the ends the arrow is smaller and has no outline,
+    // so the difference shows without relying on colour.
     for (int s = 0; s < 2; ++s)
     {
         float t = m_arrowHover[s] ? 1.f : 0.f;
@@ -554,6 +598,9 @@ void CampaignMap::update(float dt)
     }
 }
 
+//  draw
+// Pehle backdrop, phir top bar, banners, aur aakhir mein info panel.
+// Backdrop first, then the top bar, the banners, and the info panel last.
 void CampaignMap::draw(sf::RenderWindow& window)
 {
     window.draw(m_background);
@@ -563,7 +610,6 @@ void CampaignMap::draw(sf::RenderWindow& window)
         window.draw(m_corners[c]);
     }
 
-    // Top bar
     m_back.draw(window);
     for (int a = 0; a < ActCount; ++a)
     {
@@ -574,9 +620,9 @@ void CampaignMap::draw(sf::RenderWindow& window)
     window.draw(m_arrow[1]);
     window.draw(m_actName);
     window.draw(m_divider);
-  
 
-    // Banners: selected one last so its glow and scale sit on top.
+    // Selected banner sab se upar draw hota hai, taake uska glow aur scale sab par nazar aaye.
+    // The selected banner is drawn last, so its glow and scale sit on top.
     for (int s = 0; s < PerAct; ++s)
     {
         if (s != m_sel)
@@ -586,7 +632,6 @@ void CampaignMap::draw(sf::RenderWindow& window)
     }
     m_banner[m_sel].draw(window);
 
-    // Info panel
     window.draw(m_panel);
     window.draw(m_title);
     window.draw(m_status);

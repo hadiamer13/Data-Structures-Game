@@ -3,7 +3,7 @@
 
 namespace
 {
-    // Keeps the border inside the texture and leaves at least one pixel of middle.
+    // Border ko texture ke andar rakhta hai aur beech mein kam az kam 1 pixel chhodta hai.
     int clampBorder(int border, unsigned texSize)
     {
         const int limit = (static_cast<int>(texSize) - 1) / 2;
@@ -30,6 +30,7 @@ NineSlice::NineSlice()
 {
 }
 
+// Texture set karta hai. Texture chhota ho to frame use nahi hota.
 void NineSlice::setTexture(const sf::Texture* tex, int border)
 {
     m_tex = nullptr;
@@ -47,6 +48,7 @@ void NineSlice::setRect(const sf::FloatRect& outer)
     rebuild();
 }
 
+// Rang sab 9 hisson par lagata hai.
 void NineSlice::setColor(const sf::Color& c)
 {
     m_color = c;
@@ -61,6 +63,7 @@ bool NineSlice::hasTexture() const
     return m_tex != nullptr;
 }
 
+// 9 hisson ka source rectangle aur screen par destination calculate karta hai.
 void NineSlice::rebuild()
 {
     if (m_tex == nullptr)
@@ -73,12 +76,12 @@ void NineSlice::rebuild()
     const int th = static_cast<int>(ts.y);
     const int bx = clampBorder(m_border, ts.x);
     const int by = clampBorder(m_border, ts.y);
-    const int b = (bx < by) ? bx : by;     // one square border size for all corners
+    const int b = (bx < by) ? bx : by;     // sab corners ke liye aik hi border size
     const float bf = static_cast<float>(b);
 
-    // Corners keep their texture size unless the frame is smaller than two corners.
+    // Frame chhota ho to kone bhi chhote ho jate hain, warna apna size rakhte hain.
     const float k = minF(1.f, minF(m_rect.width / (2.f * bf), m_rect.height / (2.f * bf)));
-    const float cw = bf * k;                // on-screen size of a corner or edge band
+    const float cw = bf * k;                // screen par kone ya kinare ka size
     const float midW = m_rect.width - 2.f * cw;
     const float midH = m_rect.height - 2.f * cw;
 
@@ -107,6 +110,7 @@ void NineSlice::rebuild()
     }
 }
 
+// Saare 9 hisse window par draw karta hai.
 void NineSlice::draw(sf::RenderWindow& window) const
 {
     if (m_tex == nullptr)

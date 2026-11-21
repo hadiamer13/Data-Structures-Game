@@ -1,6 +1,3 @@
-// gui/screens/SandboxScreen.h
-// Tabs on top, event log left, canvas middle, operation panel right, toolbar bottom.
-// Talks to SandboxSession (real model). Rejects nothing itself: the model decides.
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -15,6 +12,9 @@
 #include "../widgets/Tooltip.h"
 #include "../../game/SandboxSession.h"
 
+//  sandbox screen
+// Upar tabs hain, bayein event log, beech mein canvas, daayein operation panel aur neeche toolbar.
+// Sirf model se baat karta hai. Koi action khud reject nahi karta, model faisla karta hai.
 class SandboxScreen : public Screen
 {
 public:
@@ -24,7 +24,7 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the static callbacks (public so they can reach them).
+    // Static callbacks se call hote hain, isliye public hain.
     void onTab(int kind);
     void onOp(int op);
     void onToolbar(int action);
@@ -93,7 +93,7 @@ private:
     sf::Text m_validText;
 
     Renderer m_renderer;
-    AnimationController m_anim;   // must come after m_renderer
+    AnimationController m_anim;   
     Toolbar m_toolbar;
     EventLogPanel m_log;
     Tooltip m_tooltip;

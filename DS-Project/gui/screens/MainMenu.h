@@ -1,10 +1,12 @@
-// gui/screens/MainMenu.h
 #pragma once
 #include "Screen.h"
 #include "../AppContext.h"
 #include "../widgets/Button.h"
 
-class MainMenu : public Screen {
+// main menu
+// Game ka pehla screen. Campaign, Endless, Sandbox, Leaderboard, Settings aur Quit ke buttons.
+class MainMenu : public Screen 
+{
 public:
     explicit MainMenu(AppContext& ctx);
 
@@ -12,17 +14,16 @@ public:
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-    // Called by the button callback (public so the static function can reach it).
+    // Static callback se call hota hai, isliye public hai.
     void onPressed(int target);
 
 private:
     static const int ButtonCount = 6;
 
-    // One context object per button, so a single static callback can tell
-    // which button was clicked (no std::function, no lambdas needed).
+    // Har button ka alag context hota hai, taake aik hi static function sab ko handle kar sake.
     struct ButtonCtx {
         MainMenu* menu;
-        int       target;   // ScreenId value, or -2 meaning "quit"
+        int       target;   // ScreenId value, ya -2 jiska matlab quit hai
     };
     static void onButtonClick(void* context);
 

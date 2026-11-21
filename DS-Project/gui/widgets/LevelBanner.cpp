@@ -8,22 +8,26 @@ namespace {
     float minF(float a, float b) { return a < b ? a : b; }
     float maxF(float a, float b) { return a > b ? a : b; }
 
-    sf::Uint8 mixChannel(sf::Uint8 x, sf::Uint8 y, float t) {
+    sf::Uint8 mixChannel(sf::Uint8 x, sf::Uint8 y, float t) 
+    {
         return static_cast<sf::Uint8>(x + (y - x) * t);
     }
-    sf::Color lerpColor(const sf::Color& a, const sf::Color& b, float t) {
+    sf::Color lerpColor(const sf::Color& a, const sf::Color& b, float t) 
+    {
         return sf::Color(mixChannel(a.r, b.r, t), mixChannel(a.g, b.g, t),
             mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
     }
 
-    void centerOrigin(sf::Text& t) {
+    void centerOrigin(sf::Text& t) 
+    {
         sf::FloatRect b = t.getLocalBounds();
         t.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
     }
 
     void styleText(sf::Text& t, const sf::Font& font, unsigned size,
-        const sf::Color& col) {
-        t.setFont(font);                         // SFML 2.x API
+        const sf::Color& col) 
+    {
+        t.setFont(font);                        
         t.setCharacterSize(size);
         t.setFillColor(col);
         t.setOutlineColor(sf::Color(0, 0, 0, 200));
@@ -34,7 +38,8 @@ namespace {
 
 void LevelBanner::init(const char* number, const sf::Font& font,
     const sf::Texture& banner, const sf::Texture& skull,
-    sf::Vector2f center, float height, bool isBoss) {
+    sf::Vector2f center, float height, bool isBoss) 
+{
     m_center = center;
     m_height = height;
     m_boss = isBoss;
@@ -76,12 +81,15 @@ void LevelBanner::init(const char* number, const sf::Font& font,
     applyLayout(0.82f);
 }
 
-void LevelBanner::buildStars() {
+void LevelBanner::buildStars() 
+{
     const float outer = 11.f;
     const float inner = outer * 0.45f;
-    for (int s = 0; s < 3; ++s) {
+    for (int s = 0; s < 3; ++s) 
+    {
         m_star[s].setPointCount(10);
-        for (int p = 0; p < 10; ++p) {
+        for (int p = 0; p < 10; p++) 
+        {
             float r = (p % 2 == 0) ? outer : inner;
             float a = -Theme::Pi / 2.f + p * (Theme::Pi / 5.f);
             m_star[s].setPoint(p, sf::Vector2f(r * std::cos(a), r * std::sin(a)));
@@ -90,7 +98,8 @@ void LevelBanner::buildStars() {
     }
 }
 
-void LevelBanner::setState(int stars, bool unlocked) {
+void LevelBanner::setState(int stars, bool unlocked) 
+{
     m_unlocked = unlocked;
     m_stars = unlocked ? stars : 0;
     if (m_stars < 0) m_stars = 0;
@@ -113,7 +122,8 @@ void LevelBanner::setState(int stars, bool unlocked) {
     m_num.setFillColor(m_unlocked ? Theme::TitleColor : Theme::NodeLockedLine);
 }
 
-void LevelBanner::applyLayout(float s) {
+void LevelBanner::applyLayout(float s) 
+{
     const sf::Vector2u ts = m_banner.getTexture()->getSize();
     float base = (m_height / static_cast<float>(ts.y)) * s;
 
@@ -153,36 +163,39 @@ void LevelBanner::applyLayout(float s) {
     m_lockShackle.setPosition(cx, by - 8.f * s);
 }
 
-void LevelBanner::handleEvent(const sf::Event& e) {
-    // NOTE: raw window pixel coordinates (same as Button).
+void LevelBanner::handleEvent(const sf::Event& e) 
+{
     sf::FloatRect b = m_banner.getGlobalBounds();
 
-    if (e.type == sf::Event::MouseMoved) {
+    if (e.type == sf::Event::MouseMoved) 
+    {
         if (m_state != StatePressed)
             m_state = b.contains(static_cast<float>(e.mouseMove.x),
                 static_cast<float>(e.mouseMove.y))
             ? StateHover : StateIdle;
     }
-    else if (e.type == sf::Event::MouseButtonPressed) {
+    else if (e.type == sf::Event::MouseButtonPressed) 
+    {
         if (e.mouseButton.button == sf::Mouse::Left &&
             b.contains(static_cast<float>(e.mouseButton.x),
                 static_cast<float>(e.mouseButton.y)))
             m_state = StatePressed;
     }
-    else if (e.type == sf::Event::MouseButtonReleased) {
-        if (e.mouseButton.button == sf::Mouse::Left && m_state == StatePressed) {
+    else if (e.type == sf::Event::MouseButtonReleased) 
+    {
+        if (e.mouseButton.button == sf::Mouse::Left && m_state == StatePressed) 
+        {
             bool still = b.contains(static_cast<float>(e.mouseButton.x),
                 static_cast<float>(e.mouseButton.y));
             m_state = still ? StateHover : StateIdle;
-            // INTEGRATION: CampaignMap's callback decides: first click
-            // selects, clicking the selected banner opens the Briefing.
-            // Locked banners can be selected too (to read their info).
+            
             if (still && m_onClick) m_onClick(m_context);
         }
     }
 }
 
-void LevelBanner::update(float dt) {
+void LevelBanner::update(float dt) 
+{
     m_time += dt;
 
     float ht = (m_state == StateIdle) ? 0.f : 1.f;
@@ -206,7 +219,7 @@ void LevelBanner::update(float dt) {
     c = lerpColor(c, Theme::BannerHover, m_hoverAmt * 0.6f);
     m_banner.setColor(c);
 
-    // Pulsing glow behind the banner (selected or hovered). Locked = dim.
+    // Pulsing glow behind the banner . Locked = dim.
     float strength = maxF(m_selAmt, m_hoverAmt);
     float pulse = 0.75f + 0.25f * std::sin(m_time * 4.f);
     sf::Color g = m_unlocked ? Theme::NodeGlow : Theme::NodeLockedLine;
@@ -214,7 +227,8 @@ void LevelBanner::update(float dt) {
     m_glow.setColor(g);
 }
 
-void LevelBanner::draw(sf::RenderWindow& window) const {
+void LevelBanner::draw(sf::RenderWindow& window) const 
+{
     if (m_hoverAmt > 0.01f || m_selAmt > 0.01f) window.draw(m_glow);
     window.draw(m_banner);
 
@@ -223,11 +237,13 @@ void LevelBanner::draw(sf::RenderWindow& window) const {
     window.draw(m_num);
     window.draw(m_status);
 
-    if (!m_unlocked) {
+    if (!m_unlocked)
+    {
         window.draw(m_lockShackle);
         window.draw(m_lockBody);
     }
-    else {
+    else 
+    {
         for (int s = 0; s < 3; ++s) window.draw(m_star[s]);   // empty = outline
     }
 }
