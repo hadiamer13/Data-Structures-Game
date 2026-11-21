@@ -1,7 +1,7 @@
 #include "TestSupport.h"
 #include "../model/NodePool.h"
 #include "../model/TreeNode.h"
-#include "../model\EventLog.h"
+#include "../model/EventLog.h"
 
 void runNodePoolTests()
 {
