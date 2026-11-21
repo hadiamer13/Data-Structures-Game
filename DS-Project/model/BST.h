@@ -4,11 +4,10 @@
 #include "NodePool.h"
 #include "EventLog.h"
 
-// Strict integer BST. Duplicate keys are rejected; removed nodes remain in the
-// pool as dead slots so node ids stay dense and stable for recorded events.
+
 class BST
 {
-public:
+  public:
     BST();
     ~BST();
 
@@ -32,7 +31,7 @@ public:
     int kthSmallest(int k) const;
     void clear();
 
-private:
+  private:
     void emitSkipped(BSTNode* subtreeRoot, EventLog* log) const;
     friend class Serializer;
     bool owns(const BSTNode* node) const;

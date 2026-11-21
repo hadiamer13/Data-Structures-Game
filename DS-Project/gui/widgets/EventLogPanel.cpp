@@ -12,7 +12,7 @@ namespace
 
 EventLogPanel::EventLogPanel()
     : m_x(0.f), m_y(0.f), m_w(320.f), m_h(500.f),
-    m_start(0), m_count(0), m_scroll(0), m_dirty(true)
+      m_start(0), m_count(0), m_scroll(0), m_dirty(true)
 {
 }
 
@@ -115,7 +115,7 @@ void EventLogPanel::pushWrapped(const std::string& line)
             {
                 pushRaw(cur);
                 first = false;
-                cur = "  " + word;       // continuation lines are indented
+                cur = "  " + word; // continuation lines are indented
             }
             else
             {
@@ -171,7 +171,7 @@ void EventLogPanel::rebuild()
         m_scroll = 0;
     }
 
-    int endIdx = m_count - m_scroll;   // exclusive
+    int endIdx = m_count - m_scroll; // exclusive
     int startIdx = endIdx - r;
     for (int i = 0; i < kMaxRows; ++i)
     {
@@ -227,7 +227,7 @@ void EventLogPanel::draw(sf::RenderWindow& window) const
     window.draw(m_header);
     if (m_scroll > 0)
     {
-        window.draw(m_scrollHint);   // text label hai, not colour alone
+        window.draw(m_scrollHint); // text label, not colour alone
     }
     int r = rows();
     for (int i = 0; i < r; ++i)

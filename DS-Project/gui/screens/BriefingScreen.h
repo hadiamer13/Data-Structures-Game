@@ -17,34 +17,34 @@ public:
     void onStart();
     void onBack();
 
-private:
+  private:
     static void onStartClick(void* context);
     static void onBackClick(void* context);
 
     void makeLabel(sf::Text& t, const sf::Font& font, const char* str,
-        unsigned size, const sf::Color& col, float x, float y);
+                   unsigned size, const sf::Color& col, float x, float y);
     void buildStars(float x, float y);
 
     AppContext& m_ctx;
-    int         m_index = 0;       // level index 0..19
-    int         m_stars = 0;       // best stars for this level
+    int m_index = 0; // level index 0..19
+    int m_stars = 0; // best stars for this level
 
-    sf::Sprite         m_background;
+    sf::Sprite m_background;
     sf::RectangleShape m_dim;
     sf::RectangleShape m_panel;
-    sf::Sprite         m_divider;
+    sf::Sprite m_divider;
 
     sf::Text m_act, m_title, m_boss;
     sf::Text m_objHead, m_objective;
     sf::Text m_conceptHead, m_concept;
     sf::Text m_ruleHead, m_rule;
     sf::Text m_bestLabel;
-    sf::Sprite m_bossIcon;         // skull shown next to the BOSS LEVEL tag
+    sf::Sprite m_bossIcon; // skull shown next to the BOSS LEVEL tag
 
     sf::ConvexShape m_star[3];
 
     Button m_start;
     Button m_backBtn;
 
-    float m_fade = 0.f;            // 0..1 fade-in of the dim layer
+    float m_fade = 0.f; // 0..1 fade-in of the dim layer
 };

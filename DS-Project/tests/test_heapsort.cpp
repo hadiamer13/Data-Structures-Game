@@ -30,14 +30,14 @@ static void checkHeapSort(const int* values, int count, const char* message)
 void runHeapSortTests()
 {
     checkHeapSort(nullptr, 0, "heap sort handles empty input");
-    const int singleton[] = { -4 };
+    const int singleton[] = {-4};
     checkHeapSort(singleton, 1, "heap sort handles a singleton");
-    const int duplicates[] = { 5, 2, 5, -1, 2, 0, -1 };
+    const int duplicates[] = {5, 2, 5, -1, 2, 0, -1};
     checkHeapSort(duplicates, 7, "heap sort handles duplicates and negatives");
-    const int sorted[] = { -3, -1, 0, 2, 8, 11 };
+    const int sorted[] = {-3, -1, 0, 2, 8, 11};
     checkHeapSort(sorted, 6, "heap sort handles sorted input");
-    const int reversed[] = { 11, 8, 2, 0, -1, -3 };
+    const int reversed[] = {11, 8, 2, 0, -1, -3};
     checkHeapSort(reversed, 6, "heap sort handles reverse-sorted input");
-    const int randomLike[] = { 6, -5, 19, 0, 2, 11, -2, 8, 3 };
+    const int randomLike[] = {6, -5, 19, 0, 2, 11, -2, 8, 3};
     checkHeapSort(randomLike, 9, "heap sort handles mixed input");
 }

@@ -6,18 +6,19 @@
 
 class SettingsScreen : public Screen
 {
-public:
+  public:
     explicit SettingsScreen(AppContext& ctx);
     void handleEvent(const sf::Event& event) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     struct ButtonContext
     {
         SettingsScreen* owner;
         int action;
     };
+
     static void onButton(void* context);
     void change(int setting, int direction);
     AppContext& m_ctx;

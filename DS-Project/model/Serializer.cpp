@@ -9,6 +9,7 @@ void Serializer::writeBinary(const TreeNode* node, std::ostringstream& out)
         out << "# ";
         return;
     }
+    
     out << node->value << ' ';
     writeBinary(node->left, out);
     writeBinary(node->right, out);
@@ -199,7 +200,10 @@ AVLNode* Serializer::readAVL(std::istream& in, AVLTree& tree, AVLNode* parent, i
         ok = false;
         return nullptr;
     }
-    if (token == "#") return nullptr;
+    if (token == "#")
+    {
+        return nullptr;
+    }
     std::istringstream valueStream(token);
     int key = 0;
     char extra = 0;
@@ -217,13 +221,25 @@ AVLNode* Serializer::readAVL(std::istream& in, AVLTree& tree, AVLNode* parent, i
     else
     {
         node->parent = parent;
-        if (side == Side::Left) parent->left = node;
-        else parent->right = node;
+        if (side == Side::Left)
+        {
+            parent->left = node;
+        }
+        else
+        {
+            parent->right = node;
+        }
     }
     node->left = readAVL(in, tree, node, Side::Left, hasLower, lower, true, key, ok);
-    if (!ok) return nullptr;
+    if (!ok)
+    {
+        return nullptr;
+    }
     node->right = readAVL(in, tree, node, Side::Right, true, key, hasUpper, upper, ok);
-    if (!ok) return nullptr;
+    if (!ok)
+    {
+        return nullptr;
+    }
     const int leftHeight = node->left == nullptr ? 0 : static_cast<AVLNode*>(node->left)->height;
     const int rightHeight = node->right == nullptr ? 0 : static_cast<AVLNode*>(node->right)->height;
     const int leftSize = node->left == nullptr ? 0 : static_cast<AVLNode*>(node->left)->size;
@@ -240,8 +256,14 @@ bool Serializer::deserializeAVL(const std::string& text, AVLTree& tree)
     bool ok = true;
     readAVL(in, tree, nullptr, Side::None, false, 0, false, 0, ok);
     std::string extra;
-    if (in >> extra) ok = false;
-    if (!ok) tree.clear();
+    if (in >> extra)
+    {
+        ok = false;
+    }
+    if (!ok)
+    {
+        tree.clear();
+    }
     return ok;
 }
 

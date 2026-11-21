@@ -1,17 +1,13 @@
 // contracts/Types.h
-// Shared basic types and int-constant "enums". No SFML, no STL containers.
+
 #ifndef VH_TYPES_H
 #define VH_TYPES_H
 
-// Sentinel for "no node / no index / not applicable".
 inline const int kNull = -1;
 
-// Height convention (frozen decision 4): height counts NODES.
-// Empty tree = 0, leaf = 1.
 inline const int kEmptyHeight = 0;
 inline const int kLeafHeight = 1;
 
-// Plain 2D point (layout math lives in model-independent code; no sf::Vector2f here).
 struct Point
 {
     float x;
@@ -26,7 +22,6 @@ struct Point
     }
 };
 
-// Small replacement for std::pair<int,int>.
 struct IntPair
 {
     int a;

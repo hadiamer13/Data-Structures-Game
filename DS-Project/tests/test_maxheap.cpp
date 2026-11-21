@@ -19,15 +19,15 @@ static void checkHeapBuild(const int* values, int count, const char* message)
 void runMaxHeapTests()
 {
     checkHeapBuild(nullptr, 0, "empty input builds an empty heap");
-    const int one[] = { 7 };
+    const int one[] = {7};
     checkHeapBuild(one, 1, "one-element input builds a one-element heap");
-    const int duplicates[] = { 4, 4, 9, 4, 9, 1, 1 };
+    const int duplicates[] = {4, 4, 9, 4, 9, 1, 1};
     checkHeapBuild(duplicates, 7, "duplicate-heavy input builds a heap");
-    const int alreadyHeap[] = { 20, 12, 18, 4, 9, 11, 17 };
+    const int alreadyHeap[] = {20, 12, 18, 4, 9, 11, 17};
     checkHeapBuild(alreadyHeap, 7, "already-heap input remains a heap");
-    const int reversed[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    const int reversed[] = {1, 2, 3, 4, 5, 6, 7, 8};
     checkHeapBuild(reversed, 8, "reverse-heap input builds correctly");
-    const int mixed[] = { 3, -8, 22, 5, 22, 0, -2, 14, 7 };
+    const int mixed[] = {3, -8, 22, 5, 22, 0, -2, 14, 7};
     checkHeapBuild(mixed, 9, "mixed and negative input builds correctly");
 
     IntArray input;

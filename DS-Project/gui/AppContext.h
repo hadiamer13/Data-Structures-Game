@@ -31,13 +31,13 @@ struct LevelResult
     int penalties;
     int score;
     bool won;
-    int levelIndex;        // act * 5 + level (0..19)
-    IntArray sortedArray;  // Act 4 ka final sorted array (warna khali)
+    int levelIndex;       // act * 5 + level (0..19)
+    IntArray sortedArray; // Act 4: final array (empty otherwise)
     bool heapAct;
 
     LevelResult()
         : stars(0), alarm(0), optimal(0), penalties(0), score(0), won(false),
-        levelIndex(0), heapAct(false)
+          levelIndex(0), heapAct(false)
     {
     }
 };

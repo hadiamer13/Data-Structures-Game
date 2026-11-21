@@ -6,7 +6,7 @@
 
 class NineSlice
 {
-public:
+  public:
     NineSlice();
 
     // border = kone/kinare ka woh hissa jo nahi badalta, texture pixels mein.
@@ -27,7 +27,7 @@ private:
 
     sf::Sprite         m_part[9];   // row-major: 0..2 upar, 3..5 beech, 6..8 neeche
     const sf::Texture* m_tex;
-    int                m_border;
-    sf::FloatRect      m_rect;
-    sf::Color          m_color;
+    int m_border;
+    sf::FloatRect m_rect;
+    sf::Color m_color;
 };

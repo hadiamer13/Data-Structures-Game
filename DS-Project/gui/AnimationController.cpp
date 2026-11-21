@@ -18,11 +18,11 @@ namespace
 
 AnimationController::AnimationController(IEventVisualizer* visualizer)
     : m_vis(visualizer), m_items(nullptr), m_count(0), m_cap(0),
-    m_hasStart(false), m_hasEnd(false),
-    m_index(0), m_t(0.f), m_speed(1.f),
-    m_busy(false), m_paused(false), m_active(false), m_stepping(false),
-    m_stepReq(false), m_skipping(false),
-    m_onEvent(nullptr), m_onDone(nullptr), m_cbContext(nullptr)
+      m_hasStart(false), m_hasEnd(false),
+      m_index(0), m_t(0.f), m_speed(1.f),
+      m_busy(false), m_paused(false), m_active(false), m_stepping(false),
+      m_stepReq(false), m_skipping(false),
+      m_onEvent(nullptr), m_onDone(nullptr), m_cbContext(nullptr)
 {
 }
 

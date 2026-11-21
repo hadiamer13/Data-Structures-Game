@@ -8,6 +8,7 @@ namespace
         {
             return 0;
         }
+
         const int leftHeight = fillNode(node->left, view, avl);
         const int rightHeight = fillNode(node->right, view, avl);
         const int height = (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
@@ -16,10 +17,12 @@ namespace
         ViewNode& out = view.nodes[node->id];
         out.id = node->id;
         out.key = node->value;
+
         if (dynamic_cast<const BSTNode*>(node) != nullptr)
         {
             out.key = static_cast<const BSTNode*>(node)->key;
         }
+
         out.left = node->left == nullptr ? kNull : node->left->id;
         out.right = node->right == nullptr ? kNull : node->right->id;
         out.parent = node->parent == nullptr ? kNull : node->parent->id;
@@ -27,6 +30,7 @@ namespace
         out.size = avl ? static_cast<const AVLNode*>(node)->size : leftSize + rightSize + 1;
         out.balance = leftHeight - rightHeight;
         out.alive = true;
+
         return height;
     }
 
@@ -35,6 +39,7 @@ namespace
         view.kind = kind;
         view.rootId = kNull;
         view.nodes.resize(pool.size());
+
         for (int i = 0; i < pool.size(); i++)
         {
             view.nodes[i] = ViewNode();
@@ -49,6 +54,7 @@ ViewSnapshot SnapshotBuilder::fromBinaryTree(const BinaryTree& tree)
     initialize(view, tree.pool(), TreeKind::Binary);
     view.rootId = tree.root() == nullptr ? kNull : tree.root()->id;
     fillNode(tree.root(), view, false);
+
     for (int i = 0; i < tree.pool().size(); i++)
     {
         if (!tree.isAlive(i))
@@ -56,6 +62,7 @@ ViewSnapshot SnapshotBuilder::fromBinaryTree(const BinaryTree& tree)
             view.nodes[i].alive = false;
         }
     }
+
     return view;
 }
 
@@ -65,6 +72,7 @@ ViewSnapshot SnapshotBuilder::fromBST(const BST& tree)
     initialize(view, tree.pool(), TreeKind::BST);
     view.rootId = tree.root() == nullptr ? kNull : tree.root()->id;
     fillNode(tree.root(), view, false);
+
     for (int i = 0; i < tree.pool().size(); i++)
     {
         if (!tree.isAlive(i))
@@ -72,6 +80,7 @@ ViewSnapshot SnapshotBuilder::fromBST(const BST& tree)
             view.nodes[i].alive = false;
         }
     }
+
     return view;
 }
 
@@ -81,6 +90,7 @@ ViewSnapshot SnapshotBuilder::fromAVL(const AVLTree& tree)
     initialize(view, tree.pool(), TreeKind::AVL);
     view.rootId = tree.root() == nullptr ? kNull : tree.root()->id;
     fillNode(tree.root(), view, true);
+
     for (int i = 0; i < tree.pool().size(); i++)
     {
         if (!tree.isAlive(i))
@@ -88,6 +98,7 @@ ViewSnapshot SnapshotBuilder::fromAVL(const AVLTree& tree)
             view.nodes[i].alive = false;
         }
     }
+    
     return view;
 }
 

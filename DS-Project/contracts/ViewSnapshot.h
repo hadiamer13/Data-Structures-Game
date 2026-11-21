@@ -1,7 +1,5 @@
 // contracts/ViewSnapshot.h
-// Read-only picture of the model for the GUI. Built by game/SnapshotBuilder.
-// nodes is indexed by node id (dense), so nodes[id] is O(1). alive == false means
-// the node was removed (slot kept so ids never shift).
+
 #ifndef VH_VIEWSNAPSHOT_H
 #define VH_VIEWSNAPSHOT_H
 
@@ -12,12 +10,12 @@ struct ViewNode
 {
     int id;
     int key;
-    int left;       // child id or kNull
+    int left;
     int right;
     int parent;
-    int height;     // leaf = 1
-    int size;       // subtree size (AVL), else computed or 1
-    int balance;    // height(left) - height(right)
+    int height;
+    int size;
+    int balance;
     bool alive;
 
     ViewNode() : id(kNull), key(0), left(kNull), right(kNull), parent(kNull), height(0), size(0), balance(0), alive(false)
@@ -27,7 +25,7 @@ struct ViewNode
 
 class ViewNodeArray
 {
-public:
+  public:
     ViewNodeArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -43,6 +41,7 @@ public:
         {
             copyFrom(other);
         }
+
         return *this;
     }
 
@@ -102,6 +101,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -125,11 +125,14 @@ public:
         {
             return;
         }
+
         ViewNode* nd = new ViewNode[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -138,25 +141,30 @@ public:
     void resize(int n)
     {
         reserve(n);
+
         for (int i = m_size; i < n; i++)
         {
             m_data[i] = ViewNode();
         }
+
         m_size = n;
     }
 
-private:
+  private:
     void copyFrom(const ViewNodeArray& other)
     {
         ViewNode* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new ViewNode[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -170,8 +178,8 @@ private:
 
 struct ViewHeap
 {
-    IntArray array;       // the full underlying array
-    int activeSize;       // array[0..activeSize-1] = active heap, rest = sorted region
+    IntArray array;
+    int activeSize;
 
     ViewHeap() : activeSize(0)
     {
@@ -180,10 +188,10 @@ struct ViewHeap
 
 struct ViewSnapshot
 {
-    int kind;                 // TreeKind::*
-    int rootId;               // kNull for empty tree (unused for MaxHeap)
-    ViewNodeArray nodes;      // used for Binary/BST/AVL
-    ViewHeap heap;            // used for MaxHeap
+    int kind;
+    int rootId;
+    ViewNodeArray nodes;
+    ViewHeap heap;
 
     ViewSnapshot() : kind(TreeKind::BST), rootId(kNull)
     {

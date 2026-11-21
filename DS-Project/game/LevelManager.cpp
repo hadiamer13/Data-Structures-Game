@@ -47,25 +47,30 @@ int LevelManager::alarmCapacity(int optimalSteps)
 }
 
 int LevelManager::starsFor(bool won, int stepsTaken, int optimalSteps,
-    int penalties, int penaltyCount, bool hintUsed)
+                           int penalties, int penaltyCount, bool hintUsed)
 {
     if (!won)
     {
         return 0;
     }
+
     int result = 1;
+
     if (stepsTaken <= optimalSteps && penalties == 0)
     {
         result = 3;
     }
+
     else if (4 * stepsTaken <= 5 * optimalSteps && penaltyCount <= 1)
     {
         result = 2;
     }
+
     if (hintUsed && result > 2)
     {
         result = 2;
     }
+
     return result;
 }
 
@@ -89,6 +94,7 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
     if (isBinaryMission(mission))
     {
         BinaryTree tree;
+
         if (!level.preorder.empty())
         {
             if (!Serializer::deserializeBinaryTree(level.preorder, tree))
@@ -96,11 +102,14 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
                 return false;
             }
         }
+
         else if (!LevelGenerator::generateBinaryTree(level, tree))
         {
             return false;
         }
+
         const int n = tree.nodeCount();
+
         if (n < 1)
         {
             return false;
@@ -110,10 +119,12 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
         {
             out = n;
         }
+
         else if (mission == MissionKind::HeightDiameter)
         {
             out = n + 1;
         }
+
         else if (mission == MissionKind::LcaPath)
         {
             const int a = n - 1;
@@ -124,6 +135,7 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
             const int pathRooms = (pathA.size() - shared) + (pathB.size() - shared) + 1;
             out = 3 + pathRooms;
         }
+
         else
         {
             int swaps = 0;
@@ -143,11 +155,14 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
     if (GameSession::supportsMission(mission))
     {
         GameSession session;
+
         if (!session.startLevel(level))
         {
             return false;
         }
+
         out = session.hud().optimalSteps;
+
         return true;
     }
     return false;
@@ -158,6 +173,7 @@ bool LevelManager::optimalSteps(const LevelDef& level, int& out)
 bool LevelManager::traversalMatches(const BinaryTree& tree, int traversalType, const IntArray& answer)
 {
     IntArray expected;
+
     if (traversalType == 0)
     {
         expected = tree.preorder();
@@ -178,6 +194,7 @@ bool LevelManager::traversalMatches(const BinaryTree& tree, int traversalType, c
     {
         return false;
     }
+
     return sameSequence(expected, answer);
 }
 
@@ -189,11 +206,14 @@ bool LevelManager::reconstructMatches(const BinaryTree& hidden, const BinaryTree
 bool LevelManager::mirrorMatches(const BinaryTree& original, const BinaryTree& current)
 {
     BinaryTree expected;
+
     if (!Serializer::deserializeBinaryTree(Serializer::serializeBinaryTree(original), expected))
     {
         return false;
     }
+
     expected.mirror();
+
     return expected.isSameTree(current);
 }
 
@@ -203,11 +223,13 @@ bool LevelManager::heapWon(int mission, const MaxHeap& heap)
     {
         return heap.activeSize() == heap.totalSize() && heap.isMaxHeap();
     }
+
     if (mission == MissionKind::HeapExtract || mission == MissionKind::HeapRace ||
         mission == MissionKind::HeapBoss)
     {
         return heap.activeSize() == 0 && heap.isSortedAscending();
     }
+
     return false;
 }
 
@@ -219,10 +241,12 @@ bool LevelManager::isUnlocked(const IntArray& stars, int index, bool unlockAll)
     {
         return false;
     }
+
     if (unlockAll || index == 0)
     {
         return true;
     }
+
     return stars.size() > index && stars[index - 1] >= 1;
 }
 
@@ -232,12 +256,14 @@ int LevelManager::nextLevel(int index)
     {
         return kNull;
     }
+
     return index + 1;
 }
 
 int LevelManager::firstOpenLevel(const IntArray& stars)
 {
     int lastUnlocked = 0;
+
     for (int i = 0; i < LevelCount; i++)
     {
         if (!isUnlocked(stars, i, false))
@@ -250,16 +276,19 @@ int LevelManager::firstOpenLevel(const IntArray& stars)
             return i;
         }
     }
+
     return lastUnlocked;
 }
 
 int LevelManager::totalStars(const IntArray& stars)
 {
     int total = 0;
+
     for (int i = 0; i < stars.size() && i < LevelCount; i++)
     {
         total += stars[i];
     }
+
     return total;
 }
 
@@ -269,7 +298,9 @@ bool LevelManager::actCleared(const IntArray& stars, int act)
     {
         return false;
     }
+
     const int first = (act - 1) * 5;
+
     for (int i = first; i < first + 5; i++)
     {
         if (stars[i] < 1)
@@ -277,5 +308,6 @@ bool LevelManager::actCleared(const IntArray& stars, int act)
             return false;
         }
     }
+    
     return true;
 }

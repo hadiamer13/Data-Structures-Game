@@ -5,7 +5,10 @@
 void runContainerTests()
 {
     IntArray ints;
-    for (int i = 0; i < 20; i++) ints.push(i);
+    for (int i = 0; i < 20; i++)
+    {
+        ints.push(i);
+    }
     IntArray intsCopy = ints;
     intsCopy[0] = 99;
     testCheck(ints.size() == 20 && ints[19] == 19, "IntArray grows and deep-copies");
@@ -67,9 +70,18 @@ void runContainerTests()
     testCheck(nodeStack.top() == first, "NodeStack pop exposes the previous node");
 
     IntQueue intsQueue;
-    for (int i = 0; i < 12; i++) intsQueue.push(i);
-    for (int i = 0; i < 7; i++) intsQueue.pop();
-    for (int i = 12; i < 21; i++) intsQueue.push(i);
+    for (int i = 0; i < 12; i++)
+    {
+        intsQueue.push(i);
+    }
+    for (int i = 0; i < 7; i++)
+    {
+        intsQueue.pop();
+    }
+    for (int i = 12; i < 21; i++)
+    {
+        intsQueue.push(i);
+    }
     testCheck(intsQueue.size() == 14 && intsQueue.front() == 7, "IntQueue preserves FIFO order across wrap and growth");
     IntQueue queueCopy = intsQueue;
     queueCopy.pop();

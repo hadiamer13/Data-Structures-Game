@@ -17,10 +17,9 @@ struct SaveData
     SaveData();
 };
 
-// JSON save/load for campaign stars and the local endless-mode state.
 class SaveManager
 {
-public:
+  public:
     static bool save(const std::string& path, const SaveData& data, std::string* error = nullptr);
     static bool load(const std::string& path, SaveData& out, std::string* error = nullptr);
     static bool validate(const SaveData& data, std::string* error = nullptr);

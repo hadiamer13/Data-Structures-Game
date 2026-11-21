@@ -29,7 +29,7 @@ struct AnimItem
 
 class AnimationController
 {
-public:
+  public:
     explicit AnimationController(IEventVisualizer* visualizer);
     ~AnimationController();
 
@@ -64,7 +64,7 @@ public:
 
     static float eventDuration(int eventType);   // speed 1 par seconds mein
 
-private:
+  private:
     AnimationController(const AnimationController&);
     AnimationController& operator=(const AnimationController&);
 

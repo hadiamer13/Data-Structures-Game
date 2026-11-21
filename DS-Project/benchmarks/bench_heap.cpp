@@ -7,9 +7,10 @@ void runHeapBench()
 {
     std::printf("\n[Max Heap build and Heap Sort]\n");
     std::printf("n,shape,build_ms,build_comparisons,build_swaps,heapsort_ms,heapsort_comparisons,heapsort_swaps\n");
-    const int sizes[] = { 100, 1000, 10000 };
-    const int shapes[] = { BenchShape::Random, BenchShape::Sorted, BenchShape::Reverse, BenchShape::Duplicates };
-    const char* names[] = { "random", "sorted", "reverse", "duplicates" };
+    const int sizes[] = {100, 1000, 10000};
+    const int shapes[] = {BenchShape::Random, BenchShape::Sorted, BenchShape::Reverse, BenchShape::Duplicates};
+    const char* names[] = {"random", "sorted", "reverse", "duplicates"};
+    
     for (int s = 0; s < 3; s++)
     {
         for (int sh = 0; sh < 4; sh++)

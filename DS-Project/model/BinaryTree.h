@@ -7,11 +7,10 @@
 #include "EventLog.h"
 #include "NodePool.h"
 
-// General binary tree with no ordering requirement. Node IDs are pool indices.
-// height() counts nodes; diameter() counts edges on the longest path.
+
 class BinaryTree
 {
-public:
+  public:
     BinaryTree();
     ~BinaryTree();
 
@@ -58,7 +57,7 @@ public:
     bool isSymmetric() const;
     void clear();
 
-private:
+  private:
     bool owns(const TreeNode* node) const;
     bool isReachable(const TreeNode* target) const;
     bool attachChild(TreeNode* parent, TreeNode* child, int side, EventLog* log);

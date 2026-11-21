@@ -40,7 +40,10 @@ struct BenchRng
 inline void makePermutation(int count, std::uint32_t seed, IntArray& values)
 {
     values.clear();
-    for (int i = 0; i < count; i++) values.push(i + 1);
+    for (int i = 0; i < count; i++)
+    {
+        values.push(i + 1);
+    }
     BenchRng rng(seed);
     for (int i = count - 1; i > 0; i--)
     {
@@ -58,9 +61,18 @@ inline void makeData(int count, int shape, std::uint32_t seed, IntArray& values)
     for (int i = 0; i < count; i++)
     {
         int value = i;
-        if (shape == BenchShape::Reverse || shape == BenchShape::Heap) value = count - i;
-        else if (shape == BenchShape::Random) value = rng.below(count * 8 + 1);
-        else if (shape == BenchShape::Duplicates) value = rng.below(7);
+        if (shape == BenchShape::Reverse || shape == BenchShape::Heap)
+        {
+            value = count - i;
+        }
+        else if (shape == BenchShape::Random)
+        {
+            value = rng.below(count * 8 + 1);
+        }
+        else if (shape == BenchShape::Duplicates)
+        {
+            value = rng.below(7);
+        }
         values.push(value);
     }
 }
@@ -73,7 +85,13 @@ inline double elapsedMilliseconds(std::clock_t start, std::clock_t end)
 inline int countEvents(const EventLog& log, int type)
 {
     int count = 0;
-    for (int i = 0; i < log.size(); i++) if (log.at(i).type == type) count++;
+    for (int i = 0; i < log.size(); i++)
+    {
+        if (log.at(i).type == type)
+        {
+            count++;
+        }
+    }
     return count;
 }
 

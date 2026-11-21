@@ -10,8 +10,10 @@
 
 class IEventVisualizer
 {
-public:
-    virtual ~IEventVisualizer() {}
+  public:
+    virtual ~IEventVisualizer()
+    {
+    }
 
     virtual void beginEvent(const Event& e) = 0;
     virtual void progress(const Event& e, float t) = 0;

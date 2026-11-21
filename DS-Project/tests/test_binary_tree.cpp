@@ -58,9 +58,9 @@ void runBinaryTreeTests()
     IntArray emptyValues;
     testCheck(empty.build(emptyValues, emptyValues), "empty traversal pair reconstructs an empty tree");
 
-    const int preorderValues[] = { 1, 2, 4, 5, 3, 6, 7 };
-    const int inorderValues[] = { 4, 2, 5, 1, 6, 3, 7 };
-    const int postorderValues[] = { 4, 5, 2, 6, 7, 3, 1 };
+    const int preorderValues[] = {1, 2, 4, 5, 3, 6, 7};
+    const int inorderValues[] = {4, 2, 5, 1, 6, 3, 7};
+    const int postorderValues[] = {4, 5, 2, 6, 7, 3, 1};
     IntArray preorderInput;
     IntArray inorderInput;
     IntArray postorderInput;
@@ -95,8 +95,8 @@ void runBinaryTreeTests()
     testCheck(postInTree.buildFromPostIn(postorderInput, inorderInput), "tree reconstructs from postorder and inorder");
     testCheck(preInTree.isSameTree(postInTree), "preorder/inorder and postorder/inorder round trip structurally");
 
-    const int skewPre[] = { 1, 2, 3 };
-    const int skewIn[] = { 1, 2, 3 };
+    const int skewPre[] = {1, 2, 3};
+    const int skewIn[] = {1, 2, 3};
     IntArray skewPreInput;
     IntArray skewInInput;
     for (int i = 0; i < 3; i++)

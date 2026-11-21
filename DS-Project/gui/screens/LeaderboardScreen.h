@@ -9,13 +9,13 @@
 // Endless mode ke local top scores dikhata hai.
 class LeaderboardScreen : public Screen
 {
-public:
+  public:
     explicit LeaderboardScreen(AppContext& ctx);
     void handleEvent(const sf::Event& event) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     static void onHome(void* context);
     static void onReports(void* context);
     AppContext& m_ctx;

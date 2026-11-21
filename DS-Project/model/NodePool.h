@@ -1,8 +1,5 @@
 // model/NodePool.h
-// Owns every node of one tree. Raw pointers, unique dense ids (id == pool index).
-// Ids are never reused and never change on rotation or value swap (frozen decision 3).
-// Removed nodes stay in the pool (marked dead) so undo can relink them and ids never shift.
-// The destructor deletes every node.
+
 #pragma once
 
 #include "../contracts/Types.h"
@@ -11,7 +8,7 @@
 
 class NodePool
 {
-public:
+  public:
     NodePool()
     {
     }
@@ -21,7 +18,6 @@ public:
         clear();
     }
 
-    // One creator per node type (no templates). Each uses the next id.
     TreeNode* createTree(int value)
     {
         TreeNode* n = new TreeNode(m_nodes.size(), value);
@@ -43,7 +39,6 @@ public:
         return n;
     }
 
-    // Node by id, or nullptr for kNull / out of range.
     TreeNode* get(int id) const
     {
         if (id < 0 || id >= m_nodes.size())
@@ -53,7 +48,6 @@ public:
         return m_nodes[id];
     }
 
-    // Total slots ever created (dead ones included). Equals the next id to be handed out.
     int size() const
     {
         return m_nodes.size();
@@ -81,7 +75,6 @@ public:
         return m_alive[id];
     }
 
-    // Marks a node removed from the tree (it is NOT deleted; undo may revive it).
     void markDead(int id)
     {
         if (id >= 0 && id < m_alive.size())
@@ -98,13 +91,11 @@ public:
         }
     }
 
-    // Read access for the validator / snapshot builder (frozen decision 3: pool() lookup).
     const NodePtrArray& pool() const
     {
         return m_nodes;
     }
 
-    // Deletes every node and restarts ids at 0.
     void clear()
     {
         for (int i = 0; i < m_nodes.size(); i++)
@@ -115,8 +106,7 @@ public:
         m_alive.clear();
     }
 
-private:
-    // Owning raw pointers: copying would double-delete.
+  private:
     NodePool(const NodePool&) = delete;
     NodePool& operator=(const NodePool&) = delete;
 

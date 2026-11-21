@@ -30,12 +30,12 @@ static bool sortedByAllSorts(const int* input, int count)
 void runSortTests()
 {
     testCheck(sortedByAllSorts(nullptr, 0), "custom sorts handle empty input");
-    const int one[] = { -4 };
+    const int one[] = {-4};
     testCheck(sortedByAllSorts(one, 1), "custom sorts handle singleton input");
-    const int duplicates[] = { 5, 2, 5, -1, 2, 0, -1, 5, 5 };
+    const int duplicates[] = {5, 2, 5, -1, 2, 0, -1, 5, 5};
     testCheck(sortedByAllSorts(duplicates, 9), "custom sorts handle duplicates and negative values");
-    const int sorted[] = { -3, -1, 0, 2, 8, 11, 15 };
+    const int sorted[] = {-3, -1, 0, 2, 8, 11, 15};
     testCheck(sortedByAllSorts(sorted, 7), "custom sorts handle already sorted input");
-    const int reversed[] = { 11, 8, 2, 0, -1, -3 };
+    const int reversed[] = {11, 8, 2, 0, -1, -3};
     testCheck(sortedByAllSorts(reversed, 6), "custom sorts handle reversed input");
 }

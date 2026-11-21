@@ -15,12 +15,12 @@ namespace
     {
         const sf::FloatRect bounds = text.getLocalBounds();
         text.setOrigin(bounds.left + bounds.width * 0.5f,
-            bounds.top + bounds.height * 0.5f);
+                       bounds.top + bounds.height * 0.5f);
         text.setPosition(x, y);
     }
 
     void setText(sf::Text& text, const sf::Font& font, unsigned size,
-        const sf::Color& color, float x, float y)
+                 const sf::Color& color, float x, float y)
     {
         text.setFont(font);
         text.setCharacterSize(size);
@@ -87,7 +87,10 @@ void ReportScreen::refreshCharts()
         int actStars = 0;
         for (int level = 0; level < 5; ++level)
         {
-            if (m_ctx.campaign != nullptr) actStars += m_ctx.campaign->stars(act * 5 + level);
+            if (m_ctx.campaign != nullptr)
+            {
+                actStars += m_ctx.campaign->stars(act * 5 + level);
+            }
         }
         totalStars += actStars;
         const float barHeight = 210.f * static_cast<float>(actStars) / 15.f;
@@ -173,7 +176,10 @@ void ReportScreen::draw(sf::RenderWindow& window)
         window.draw(m_actLabels[i]);
     }
     window.draw(m_campaignSummary);
-    if (m_scores.size() == 0) window.draw(m_emptyScores);
+    if (m_scores.size() == 0)
+    {
+        window.draw(m_emptyScores);
+    }
     for (int i = 0; i < m_scores.size(); ++i)
     {
         window.draw(m_scoreBars[i]);

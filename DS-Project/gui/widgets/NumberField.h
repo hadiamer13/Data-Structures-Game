@@ -9,17 +9,17 @@ typedef void (*NumberFieldCallback)(void* context);
 
 class NumberField
 {
-public:
+  public:
     NumberField();
 
     // x, y = box ka top-left. Label box ke upar draw hota hai.
     void init(const std::string& label, const sf::Font& font, float x, float y, float w, float h);
-    void setCallback(NumberFieldCallback cb, void* context);   // Enter dabane par
+    void setCallback(NumberFieldCallback cb, void* context); // Enter pressed
 
     void setValue(int v);
     void clear();
-    bool hasValue() const;     // khali ya sirf "-" ho to false
-    int value() const;         // hasValue() false ho to 0
+    bool hasValue() const; // false when empty or just "-"
+    int value() const;     // 0 when !hasValue()
     bool focused() const;
     void setFocused(bool f);
 

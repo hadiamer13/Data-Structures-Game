@@ -10,7 +10,7 @@
 // Four acts shown as a map. Each act has five level banners and an info panel for the selected level.
 class CampaignMap : public Screen
 {
-public:
+  public:
     explicit CampaignMap(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
@@ -28,7 +28,7 @@ public:
     // Re-reads stars and locks from the Campaign, for example after a result is saved.
     void refreshFromData();
 
-private:
+  private:
     static const int ActCount = 4;
     static const int PerAct = 5;
 
@@ -43,7 +43,11 @@ private:
     static void onBackClick(void* context);
     static void onDebugClick(void* context);
 
-    int levelIndex() const { return m_act * PerAct + m_sel; }
+    int levelIndex() const
+    {
+        return m_act * PerAct + m_sel;
+    }
+
     bool startEnabled() const;
     void setAct(int act);
     void setSelected(int slot);
@@ -54,7 +58,7 @@ private:
     void buildArrow(sf::ConvexShape& s, bool left, float cx, float cy);
     void buildStars(float x, float y);
     void styleText(sf::Text& t, const sf::Font& font, unsigned size,
-        const sf::Color& col, float x, float y);
+                   const sf::Color& col, float x, float y);
 
     AppContext& m_ctx;
     Campaign* m_campaign;
@@ -82,7 +86,7 @@ private:
 
     //  banners
     LevelBanner m_banner[PerAct];
-    BannerCtx   m_bannerCtx[PerAct];
+    BannerCtx m_bannerCtx[PerAct];
 
     //  info panel
     sf::RectangleShape m_panel;

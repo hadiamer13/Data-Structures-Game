@@ -61,15 +61,15 @@ namespace
         { ScreenOp::Random, "Random" },{ ScreenOp::Clear, "Clear" }
     };
 
-    const char* const TabNames[4] = { "Binary", "BST", "AVL", "MaxHeap" };
+    const char* const TabNames[4] = {"Binary", "BST", "AVL", "MaxHeap"};
 
     // Kaun se operation ko A field ki value chahiye.
     bool needsA(int op)
     {
         return op == SandboxOp::Insert || op == SandboxOp::Search || op == SandboxOp::Delete ||
-            op == SandboxOp::Range || op == SandboxOp::Kth || op == SandboxOp::Rank ||
-            op == SandboxOp::CountRange || op == SandboxOp::Succ || op == SandboxOp::Pred ||
-            op == SandboxOp::Heapify || op == SandboxOp::SiftUp || op == SandboxOp::Swap;
+               op == SandboxOp::Range || op == SandboxOp::Kth || op == SandboxOp::Rank ||
+               op == SandboxOp::CountRange || op == SandboxOp::Succ || op == SandboxOp::Pred ||
+               op == SandboxOp::Heapify || op == SandboxOp::SiftUp || op == SandboxOp::Swap;
     }
 
     // Kaun se operation ko B field ki value chahiye.
@@ -247,9 +247,9 @@ void SandboxScreen::loadKind(int kind, bool empty)
     rebuildOps();
     refreshTabs();
     refreshInfo();
-    m_log.addLine(std::string("Sandbox: ") + TabNames[kind] + (empty ? " (empty)" : (" seed " + std::to_string(m_seed))));
-    setMessage(empty ? "Khali structure. A mein value type karo aur Insert dabao."
-        : "Tayar. A mein value type karo, phir koi operation dabao.");
+    m_log.addLine(std::string("Sandbox: ") + TabNames[kind] + (empty ? " (empty)" : (" (seed " + std::to_string(m_seed) + ")")));
+    setMessage(empty ? "Empty structure. Type a value in A and press Insert."
+                     : "Ready. Type a value in A, then press an operation.");
 }
 
 // Tree ke hisaab se operation buttons banata hai, do columns mein.
@@ -281,8 +281,8 @@ void SandboxScreen::rebuildOps()
     const float px = (float)Theme::WindowW - PanelW;
     const float y0 = TabH + 160.f;
     const float rowH = 38.f;
-    const float margin = 15.f;   // panel ke andar ka margin
-    const float gap = 10.f;      // do columns ke beech ka faasla
+    const float margin = 15.f; // inner margin of the panel
+    const float gap = 10.f;    // space between the two columns
     const float btnH = 30.f;
 
     m_opCount = n;
@@ -305,10 +305,9 @@ void SandboxScreen::rebuildOps()
 
     // Phir har column ke buttons us column ke center mein rakhte hain.
     const float colX[2] =
-    {
-        px + margin + colW[0] * 0.5f,
-        px + margin + colW[0] + gap + colW[1] * 0.5f
-    };
+        {
+            px + margin + colW[0] * 0.5f,
+            px + margin + colW[0] + gap + colW[1] * 0.5f};
     for (int i = 0; i < n; ++i)
     {
         const int col = i % 2;
@@ -458,7 +457,7 @@ void SandboxScreen::doOp(int op)
 {
     if (m_anim.busy())
     {
-        m_anim.skipAll();     // pehle chalti animation khatam karo
+        m_anim.skipAll(); // finish the running animation first
     }
 
     if (op == ScreenOp::Random)
@@ -570,7 +569,7 @@ void SandboxScreen::doUndo()
     m_selected = kNull;
     m_renderer.setSelected(kNull);
     refreshInfo();
-    setMessage(ok ? "Undo ho gaya." : "Undo karne ke liye kuch nahi hai.");
+    setMessage(ok ? "Undo is done." : "Nothing to Undo");
 }
 
 void SandboxScreen::doReset()
@@ -604,13 +603,12 @@ void SandboxScreen::updateTooltip(int mx, int my)
         if (m_renderer.isHeap())
         {
             m_tooltip.showText(sx + 16.f, sy + 16.f,
-                "value: " + std::to_string(key) + "\nindex: " + std::to_string(id)
-                + "\ndepth: " + std::to_string(depth));
+                               "value: " + std::to_string(key) + "\nindex: " + std::to_string(id) + "\ndepth: " + std::to_string(depth));
         }
         else
         {
             m_tooltip.showNode(sx + 16.f, sy + 16.f, key, height, bal, size, depth,
-                m_renderer.kind() == TreeKind::AVL);
+                               m_renderer.kind() == TreeKind::AVL);
         }
         return;
     }
@@ -618,7 +616,7 @@ void SandboxScreen::updateTooltip(int mx, int my)
     if (cell != kNull && m_renderer.nodeInfo(cell, key, height, size, bal, depth))
     {
         m_tooltip.showText(sx + 16.f, sy + 16.f,
-            "array cell\nindex: " + std::to_string(cell) + "\nvalue: " + std::to_string(key));
+                           "array cell\nindex: " + std::to_string(cell) + "\nvalue: " + std::to_string(key));
         return;
     }
     m_tooltip.hide();
@@ -645,7 +643,7 @@ void SandboxScreen::onCanvasClick(int mx, int my)
     if (id != kNull && m_renderer.nodeInfo(id, key, h, s, b, d))
     {
         bool second = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-        int value = m_renderer.isHeap() ? id : key;     // tree mein key, heap mein array index
+        int value = m_renderer.isHeap() ? id : key; // tree: key, heap: array index
         if (second)
         {
             m_fieldB.setValue(value);

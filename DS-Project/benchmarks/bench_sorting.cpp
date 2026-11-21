@@ -57,7 +57,10 @@ static double timeHeap(const IntArray& source, int repetitions, std::uint64_t& c
         MaxHeap heap;
         EventLog log;
         heap.buildMaxHeap(source, g_recordBenchEvents ? &log : nullptr);
-        while (heap.activeSize() > 0) heap.extractMax(g_recordBenchEvents ? &log : nullptr);
+        while (heap.activeSize() > 0)
+        {
+            heap.extractMax(g_recordBenchEvents ? &log : nullptr);
+        }
         comparisons += heap.comparisonCount();
         swaps += heap.swapCount();
     }
@@ -68,9 +71,9 @@ void runSortingBench()
 {
     std::printf("\n[Heap Sort vs insertion, merge and quick sort]\n");
     std::printf("n,shape,algorithm,avg_ms,avg_comparisons,avg_swaps,auxiliary_space\n");
-    const int sizes[] = { 100, 1000, 10000 };
-    const int shapes[] = { BenchShape::Random, BenchShape::Sorted, BenchShape::Reverse, BenchShape::Duplicates };
-    const char* names[] = { "random", "sorted", "reverse", "duplicates" };
+    const int sizes[] = {100, 1000, 10000};
+    const int shapes[] = {BenchShape::Random, BenchShape::Sorted, BenchShape::Reverse, BenchShape::Duplicates};
+    const char* names[] = {"random", "sorted", "reverse", "duplicates"};
     for (int s = 0; s < 3; s++)
     {
         const int repetitions = sizes[s] == 100 ? 5 : (sizes[s] == 1000 ? 2 : 1);

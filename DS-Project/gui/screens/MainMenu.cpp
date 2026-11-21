@@ -3,20 +3,20 @@
 #include "../UIManager.h"
 #include "../Theme.h"
 
-namespace {
-    const int QuitTarget = -2;   // not a screen: tells UIManager to quit
+namespace
+{
+    const int QuitTarget = -2; // not a screen: tells UIManager to quit
 
     // Label + destination for each button, top to bottom.
     const char* const Labels[6] = {
-        "Campaign", "Endless", "Sandbox", "Leaderboard", "Settings", "Quit"
-    };
+        "Campaign", "Endless", "Sandbox", "Leaderboard", "Settings", "Quit"};
     const int Targets[6] = {
         ScreenId::Campaign, ScreenId::Endless, ScreenId::Sandbox,
-        ScreenId::Leaderboard, ScreenId::Settings, QuitTarget
-    };
-}  // namespace
+        ScreenId::Leaderboard, ScreenId::Settings, QuitTarget};
+} // namespace
 
-MainMenu::MainMenu(AppContext& ctx) : m_ctx(ctx) {
+MainMenu::MainMenu(AppContext& ctx) : m_ctx(ctx)
+{
     const sf::Font& font = ctx.assets->font();
 
     // ---- Background -------------------------------------------------
@@ -58,42 +58,63 @@ MainMenu::MainMenu(AppContext& ctx) : m_ctx(ctx) {
     const float firstY = 240.f;
     const float stepY = Theme::ButtonH + Theme::ButtonGap;
 
-    for (int i = 0; i < ButtonCount; ++i) {
+    for (int i = 0; i < ButtonCount; ++i)
+    {
         m_btnCtx[i].menu = this;
         m_btnCtx[i].target = Targets[i];
 
         m_buttons[i].init(Labels[i], font,
-            sf::Vector2f(cx, firstY + stepY * i),
-            sf::Vector2f(Theme::ButtonW, Theme::ButtonH));
+                          sf::Vector2f(cx, firstY + stepY * i),
+                          sf::Vector2f(Theme::ButtonW, Theme::ButtonH));
         m_buttons[i].setCallback(&MainMenu::onButtonClick, &m_btnCtx[i]);
         m_buttons[i].setFrame(&ctx.assets->buttonFrame());
     }
 }
 
-void MainMenu::onButtonClick(void* context) {
+void MainMenu::onButtonClick(void* context)
+{
     ButtonCtx* c = static_cast<ButtonCtx*>(context);
     c->menu->onPressed(c->target);
 }
 
-void MainMenu::onPressed(int target) {
+void MainMenu::onPressed(int target)
+{
     // INTEGRATION POINT: this is the only place the menu decides where to go.
     // Later, e.g. Campaign can first load progress via SaveManager before
     // switching. For now it just asks UIManager (deferred switch).
-    if (target == QuitTarget) m_ctx.ui->requestQuit();
-    else                      m_ctx.ui->requestScreen(target);
+    if (target == QuitTarget)
+    {
+        m_ctx.ui->requestQuit();
+    }
+    else
+    {
+        m_ctx.ui->requestScreen(target);
+    }
 }
 
-void MainMenu::handleEvent(const sf::Event& e) {
-    for (int i = 0; i < ButtonCount; ++i) m_buttons[i].handleEvent(e);
+void MainMenu::handleEvent(const sf::Event& e)
+{
+    for (int i = 0; i < ButtonCount; ++i)
+    {
+        m_buttons[i].handleEvent(e);
+    }
 }
 
-void MainMenu::update(float dt) {
-    for (int i = 0; i < ButtonCount; ++i) m_buttons[i].update(dt);
+void MainMenu::update(float dt)
+{
+    for (int i = 0; i < ButtonCount; ++i)
+    {
+        m_buttons[i].update(dt);
+    }
 }
 
-void MainMenu::draw(sf::RenderWindow& window) {
+void MainMenu::draw(sf::RenderWindow& window)
+{
     window.draw(m_background);
     window.draw(m_title);
     window.draw(m_subtitle);
-    for (int i = 0; i < ButtonCount; ++i) m_buttons[i].draw(window);
+    for (int i = 0; i < ButtonCount; ++i)
+    {
+        m_buttons[i].draw(window);
+    }
 }

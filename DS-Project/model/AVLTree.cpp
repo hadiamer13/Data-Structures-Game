@@ -70,8 +70,8 @@ AVLNode* AVLTree::findWithoutEvents(int key) const
             return current;
         }
         current = key < current->key
-            ? static_cast<AVLNode*>(current->left)
-            : static_cast<AVLNode*>(current->right);
+                      ? static_cast<AVLNode*>(current->left)
+                      : static_cast<AVLNode*>(current->right);
     }
     return nullptr;
 }
@@ -277,7 +277,8 @@ void AVLTree::rebalanceFrom(AVLNode* node, EventLog* log)
         if (factor > 1)
         {
             const int rotation = balanceFactor(static_cast<AVLNode*>(current->left)) >= 0
-                ? RotationType::LL : RotationType::LR;
+                                     ? RotationType::LL
+                                     : RotationType::LR;
             Event event(EventType::ROTATE);
             event.id = current->id;
             event.result = rotation;
@@ -294,7 +295,8 @@ void AVLTree::rebalanceFrom(AVLNode* node, EventLog* log)
         else if (factor < -1)
         {
             const int rotation = balanceFactor(static_cast<AVLNode*>(current->right)) <= 0
-                ? RotationType::RR : RotationType::RL;
+                                     ? RotationType::RR
+                                     : RotationType::RL;
             Event event(EventType::ROTATE);
             event.id = current->id;
             event.result = rotation;
@@ -506,7 +508,8 @@ int AVLTree::rank(int key) const
             const int leftSize = current->left == nullptr ? 0 : static_cast<AVLNode*>(current->left)->size;
             count = count + leftSize + 1;
             current = key == current->key
-                ? nullptr : static_cast<AVLNode*>(current->right);
+                          ? nullptr
+                          : static_cast<AVLNode*>(current->right);
         }
     }
     return count;

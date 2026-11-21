@@ -1,9 +1,5 @@
-// contracts/Containers.h
-// Own NON-template containers. One concrete class per element type, all built from the
-// same pattern: raw new[]/delete[], doubling growth, deep copy (rule of three).
-// operator[] / back() / top() / front() are UNCHECKED: test size()/empty() first.
-// ViewNodeArray lives in ViewSnapshot.h (it needs ViewNode). /game adds JsonPtrArray and
-// LevelDefArray the same way.
+
+
 #ifndef VH_CONTAINERS_H
 #define VH_CONTAINERS_H
 
@@ -12,12 +8,11 @@
 #include "Event.h"
 #include "NodeDefs.h"
 
-// Typedef so "const TreeNodePtr&" means a const reference to a pointer (not pointer-to-const).
 typedef TreeNode* TreeNodePtr;
 
 class IntArray
 {
-public:
+  public:
     IntArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -92,6 +87,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -115,11 +111,14 @@ public:
         {
             return;
         }
+
         int* nd = new int[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -128,10 +127,12 @@ public:
     void resize(int n)
     {
         reserve(n);
+
         for (int i = m_size; i < n; i++)
         {
             m_data[i] = 0;
         }
+
         m_size = n;
     }
 
@@ -144,20 +145,25 @@ public:
                 return i;
             }
         }
+
         return -1;
     }
-private:
+
+  private:
     void copyFrom(const IntArray& other)
     {
         int* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new int[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -171,7 +177,7 @@ private:
 
 class BoolArray
 {
-public:
+  public:
     BoolArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -187,6 +193,7 @@ public:
         {
             copyFrom(other);
         }
+
         return *this;
     }
 
@@ -246,6 +253,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -269,11 +277,14 @@ public:
         {
             return;
         }
+
         bool* nd = new bool[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -286,21 +297,25 @@ public:
         {
             m_data[i] = false;
         }
+
         m_size = n;
     }
 
-private:
+  private:
     void copyFrom(const BoolArray& other)
     {
         bool* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new bool[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -314,7 +329,7 @@ private:
 
 class NodePtrArray
 {
-public:
+  public:
     NodePtrArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -389,6 +404,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -412,11 +428,14 @@ public:
         {
             return;
         }
+
         TreeNodePtr* nd = new TreeNodePtr[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -425,10 +444,12 @@ public:
     void resize(int n)
     {
         reserve(n);
+
         for (int i = m_size; i < n; i++)
         {
             m_data[i] = nullptr;
         }
+
         m_size = n;
     }
 
@@ -441,12 +462,15 @@ public:
                 return i;
             }
         }
+
         return -1;
     }
-private:
+
+  private:
     void copyFrom(const NodePtrArray& other)
     {
         TreeNodePtr* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new TreeNodePtr[other.m_size];
@@ -455,6 +479,7 @@ private:
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -468,7 +493,7 @@ private:
 
 class EventArray
 {
-public:
+  public:
     EventArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -484,6 +509,7 @@ public:
         {
             copyFrom(other);
         }
+
         return *this;
     }
 
@@ -543,6 +569,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -566,11 +593,14 @@ public:
         {
             return;
         }
+
         Event* nd = new Event[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -579,6 +609,7 @@ public:
     void resize(int n)
     {
         reserve(n);
+
         for (int i = m_size; i < n; i++)
         {
             m_data[i] = Event();
@@ -586,18 +617,21 @@ public:
         m_size = n;
     }
 
-private:
+  private:
     void copyFrom(const EventArray& other)
     {
         Event* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new Event[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -611,7 +645,7 @@ private:
 
 class StringArray
 {
-public:
+  public:
     StringArray() : m_data(nullptr), m_size(0), m_cap(0)
     {
     }
@@ -686,6 +720,7 @@ public:
         {
             reserve(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[m_size] = v;
         m_size = m_size + 1;
     }
@@ -709,11 +744,14 @@ public:
         {
             return;
         }
+
         std::string* nd = new std::string[n];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[i];
         }
+
         delete[] m_data;
         m_data = nd;
         m_cap = n;
@@ -722,25 +760,30 @@ public:
     void resize(int n)
     {
         reserve(n);
+
         for (int i = m_size; i < n; i++)
         {
             m_data[i] = std::string();
         }
+
         m_size = n;
     }
 
-private:
+  private:
     void copyFrom(const StringArray& other)
     {
         std::string* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new std::string[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[i];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_size = other.m_size;
@@ -754,7 +797,7 @@ private:
 
 class IntStack
 {
-public:
+  public:
     bool empty() const
     {
         return m_items.empty();
@@ -790,13 +833,13 @@ public:
         m_items.clear();
     }
 
-private:
+  private:
     IntArray m_items;
 };
 
 class NodeStack
 {
-public:
+  public:
     bool empty() const
     {
         return m_items.empty();
@@ -832,13 +875,13 @@ public:
         m_items.clear();
     }
 
-private:
+  private:
     NodePtrArray m_items;
 };
 
 class IntQueue
 {
-public:
+  public:
     IntQueue() : m_data(nullptr), m_head(0), m_size(0), m_cap(0)
     {
     }
@@ -878,6 +921,7 @@ public:
         {
             grow(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[(m_head + m_size) % m_cap] = v;
         m_size = m_size + 1;
     }
@@ -907,14 +951,16 @@ public:
         m_size = 0;
     }
 
-private:
+  private:
     void grow(int newCap)
     {
         int* nd = new int[newCap];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[(m_head + i) % m_cap];
         }
+
         delete[] m_data;
         m_data = nd;
         m_head = 0;
@@ -924,14 +970,17 @@ private:
     void copyFrom(const IntQueue& other)
     {
         int* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new int[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[(other.m_head + i) % other.m_cap];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_head = 0;
@@ -947,7 +996,7 @@ private:
 
 class NodeQueue
 {
-public:
+  public:
     NodeQueue() : m_data(nullptr), m_head(0), m_size(0), m_cap(0)
     {
     }
@@ -963,6 +1012,7 @@ public:
         {
             copyFrom(other);
         }
+
         return *this;
     }
 
@@ -987,6 +1037,7 @@ public:
         {
             grow(m_cap == 0 ? 4 : m_cap * 2);
         }
+
         m_data[(m_head + m_size) % m_cap] = v;
         m_size = m_size + 1;
     }
@@ -1016,14 +1067,16 @@ public:
         m_size = 0;
     }
 
-private:
+  private:
     void grow(int newCap)
     {
         TreeNodePtr* nd = new TreeNodePtr[newCap];
+
         for (int i = 0; i < m_size; i++)
         {
             nd[i] = m_data[(m_head + i) % m_cap];
         }
+
         delete[] m_data;
         m_data = nd;
         m_head = 0;
@@ -1033,14 +1086,17 @@ private:
     void copyFrom(const NodeQueue& other)
     {
         TreeNodePtr* nd = nullptr;
+
         if (other.m_size > 0)
         {
             nd = new TreeNodePtr[other.m_size];
+
             for (int i = 0; i < other.m_size; i++)
             {
                 nd[i] = other.m_data[(other.m_head + i) % other.m_cap];
             }
         }
+
         delete[] m_data;
         m_data = nd;
         m_head = 0;
