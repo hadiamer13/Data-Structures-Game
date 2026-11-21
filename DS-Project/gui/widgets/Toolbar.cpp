@@ -20,6 +20,7 @@ Toolbar::Toolbar()
     }
 }
 
+// Bar ka background, chaaron buttons aur speed slider banata hai.
 void Toolbar::init(const sf::Font& font, float x, float y, float w, float h)
 {
     m_bg.setPosition(x, y);
@@ -42,7 +43,7 @@ void Toolbar::init(const sf::Font& font, float x, float y, float w, float h)
         bx += bw + 14.f;
     }
 
-    // speed slider on the right
+    // Speed slider right side par.
     m_trackX1 = x + w - 100.f;
     m_trackX0 = m_trackX1 - 200.f;
     m_trackY = cy;
@@ -85,6 +86,7 @@ float Toolbar::speed() const
     return m_speed;
 }
 
+// Button ka static callback: apne owner ka fire() call karta hai.
 void Toolbar::onButton(void* context)
 {
     ToolbarButtonCtx* c = static_cast<ToolbarButtonCtx*>(context);
@@ -99,12 +101,14 @@ void Toolbar::fire(int action)
     }
 }
 
+// Knob ko current speed ke hisaab se track par rakhta hai.
 void Toolbar::layoutKnob()
 {
     float t = (m_speed - MinSpeed) / (MaxSpeed - MinSpeed);
     m_knob.setPosition(m_trackX0 + t * (m_trackX1 - m_trackX0), m_trackY);
 }
 
+// Speed ka text (jaise 1.00x) update karta hai.
 void Toolbar::refreshSpeedLabel()
 {
     char buf[16];
@@ -112,6 +116,7 @@ void Toolbar::refreshSpeedLabel()
     m_speedValue.setString(buf);
 }
 
+// Mouse x ko 0..1 range mein badal kar speed set karta hai.
 void Toolbar::setSpeedFromX(float x)
 {
     float t = (x - m_trackX0) / (m_trackX1 - m_trackX0);
@@ -128,6 +133,7 @@ void Toolbar::setSpeedFromX(float x)
     refreshSpeedLabel();
 }
 
+// Buttons ko events bhejta hai aur slider par drag ko handle karta hai.
 void Toolbar::handleEvent(const sf::Event& e)
 {
     for (int i = 0; i < kButtons; ++i)
@@ -159,13 +165,14 @@ void Toolbar::handleEvent(const sf::Event& e)
     }
 }
 
+// Buttons ki animation aur drag ke waqt knob ki outline update karta hai.
 void Toolbar::update(float dt)
 {
     for (int i = 0; i < kButtons; ++i)
     {
         m_btn[i].update(dt);
     }
-    // not colour alone: the knob grows while dragged
+    // Rang akela signal nahi: drag ke waqt knob ki outline motі ho jati hai.
     m_knob.setOutlineThickness(m_dragging ? 4.f : 2.f);
 }
 

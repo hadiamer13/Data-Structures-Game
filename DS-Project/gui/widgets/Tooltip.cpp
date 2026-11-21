@@ -22,14 +22,15 @@ void Tooltip::init(const sf::Font& font)
     m_box.setOutlineThickness(2.f);
 }
 
+// Text set karke box ka size aur position tay karta hai (window ke andar rehne ke liye clamp).
 void Tooltip::showText(float sx, float sy, const std::string& text)
 {
-    m_text.setString(text);    // SFML skips the rebuild when the string is unchanged
+    m_text.setString(text);    // SFML string same ho to dobara rebuild nahi karta
     sf::FloatRect b = m_text.getLocalBounds();
     float w = b.left + b.width + 2.f * Pad;
     float h = b.top + b.height + 2.f * Pad;
 
-    // keep the whole box inside the window
+    // Poora box window ke andar rahe.
     float maxX = (float)Theme::WindowW - w - 4.f;
     float maxY = (float)Theme::WindowH - h - 4.f;
     if (sx > maxX)
@@ -55,6 +56,7 @@ void Tooltip::showText(float sx, float sy, const std::string& text)
     m_visible = true;
 }
 
+// Node ki maloomat ko formatted text mein badal kar dikhata hai.
 void Tooltip::showNode(float sx, float sy, int key, int height, int balance, int size, int depth,
     bool showBalance)
 {
@@ -69,7 +71,7 @@ void Tooltip::showNode(float sx, float sy, int key, int height, int balance, int
             s += "+";
         }
         s += std::to_string(balance);
-        s += (ab <= 1) ? "  (OK)" : "  (VIOLATION)";   // word, not colour alone
+        s += (ab <= 1) ? "  (OK)" : "  (VIOLATION)";   // word, sirf rang nahi
     }
     s += "\nsize: " + std::to_string(size)
         + "\ndepth: " + std::to_string(depth);

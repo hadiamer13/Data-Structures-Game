@@ -1,11 +1,11 @@
 // gui/widgets/Ornament.h
-// Placement helpers for ornament sprites. Header-only, no state.
-// Empty textures are skipped, so a missing file never causes a divide by zero.
+// Ornament sprites ko jagah dene ke helpers. Header-only, koi state nahi.
+// Khali textures skip hoti hain, is liye missing file se divide by zero nahi hota.
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// Places a corner ornament so its top-left point sits at (x, y).
-// flipX / flipY mirror it, so one texture serves all four corners.
+// Corner ornament ko iske top-left point (x, y) par rakhta hai.
+// flipX / flipY se aik hi texture chaaron konon ke kaam aati hai.
 inline void placeCorner(sf::Sprite& s, const sf::Texture& t,
     float x, float y, float size, bool flipX, bool flipY) {
     const sf::Vector2u ts = t.getSize();
@@ -20,10 +20,10 @@ inline void placeCorner(sf::Sprite& s, const sf::Texture& t,
     s.setPosition(x, y);
 }
 
-// Places a horizontal divider centred at (cx, cy).
-// The art keeps its proportions. It is scaled to the requested width,
-// but never taller than maxHeight, so tall ornament peaks can't reach
-// the text above or below. maxHeight <= 0 means no height limit.
+// Horizontal divider ko (cx, cy) par center karta hai.
+// Art ka aspect ratio qaim rehta hai, width ke hisaab se scale hota hai,
+// lekin maxHeight se zyada lamba nahi hota taake upar neeche ka text na chhoye.
+// maxHeight <= 0 ka matlab koi height limit nahi.
 inline void placeDivider(sf::Sprite& s, const sf::Texture& t,
     float cx, float cy, float width, float maxHeight = 0.f) {
     const sf::Vector2u ts = t.getSize();

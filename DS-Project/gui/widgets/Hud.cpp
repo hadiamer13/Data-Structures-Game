@@ -56,7 +56,7 @@ void Hud::init(const sf::Font& font, float x, float y, float w, float h)
     m_objective.setFillColor(Theme::TextColor);
     m_objective.setPosition(x + Pad, y + 38.f);
 
-    // alarm meter (middle)
+    // alarm meter 
     float mx = x + w * 0.47f;
     float mw = 300.f;
     m_alarmLabel.setFont(font);
@@ -120,7 +120,6 @@ void Hud::setObjective(const std::string& objective)
 
 void Hud::layoutObjective()
 {
-    // '\n' -> space, greedy word wrap to ObjectiveWrapW using the real font metrics.
     std::string flat;
     for (size_t i = 0; i < m_objectiveRaw.size(); ++i)
     {

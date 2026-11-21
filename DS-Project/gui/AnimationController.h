@@ -1,16 +1,16 @@
 // gui/AnimationController.h
-// Plays one batch of events (one player action) through an IEventVisualizer.
-// Timing, queue, pause, single-step, skip, replay and speed live here.
+// Aik player action ka batch (events ki list) IEventVisualizer ke zariye chalata hai.
+// Timing, queue, pause, single step, skip, replay aur speed sab yahin hain.
 //
-// Usage per player action (the batch must be built in this order):
+// Istemal ka tareeqa (har player action ke liye, isi tarteeb se):
 //   ctrl.beginBatch(snapshotBefore);
-//   ctrl.enqueue(event, snapshotAfterThisEvent or nullptr);   // per event
-//   ctrl.endBatch(snapshotAfterWholeAction);                  // starts playing
+//   ctrl.enqueue(event, snapshotAfterThisEvent ya nullptr);   /har event ke liye
+//   ctrl.endBatch(snapshotAfterWholeAction);                   playback shuru
 //
-// Snapshot timing per event (so structure and effects never fight):
-//   INSERT, ROTATE : animateTo(after) BEFORE beginEvent (new node must exist)
-//   UNLINK         : animateTo(after) right AFTER beginEvent (node fades while playing)
-//   everything else: animateTo(after) AFTER endEvent (swaps finish their own travel first)
+// Har event ke liye snapshot ka waqt (taake structure aur effects aapas mein na ladein):
+//   INSERT, ROTATE: animateTo(after) BEFORE beginEvent (naya node pehle maujood hona chahiye)
+//   UNLINK: animateTo(after) beginEvent ke FORAN BAAD (node chalte hue fade hota hai)
+//   baaqi sab: animateTo(after) endEvent KE BAAD (swap apna safar khatam kare)
 #pragma once
 #include "IEventVisualizer.h"
 
@@ -20,7 +20,7 @@ typedef void (*AnimDoneCallback)(void* context);
 struct AnimItem
 {
     Event ev;
-    ViewSnapshot* after;   // owned by the controller, may be nullptr
+    ViewSnapshot* after;   // controller ki ownership mein, nullptr ho sakta hai
 
     AnimItem() : after(nullptr)
     {
@@ -33,36 +33,36 @@ public:
     explicit AnimationController(IEventVisualizer* visualizer);
     ~AnimationController();
 
-    // Called when an event starts playing (log line, alarm update) and when the batch ends.
+    // Jab koi event chalna shuru ho (log line, alarm update) aur jab batch khatam ho, tab yeh callbacks chalte hain.
     void setCallbacks(AnimEventCallback onEvent, AnimDoneCallback onDone, void* context);
 
-    // Batch building
+    // Batch banana
     void beginBatch(const ViewSnapshot& before);
     void enqueue(const Event& e, const ViewSnapshot* afterEvent);
-    void endBatch(const ViewSnapshot& afterAll);   // starts playback
+    void endBatch(const ViewSnapshot& afterAll);   // playback shuru karta hai
 
-    // Frame
+    
     void update(float dt);
 
     // Controls
     void play();
     void pause();
     void togglePause();
-    void stepOne();          // plays exactly one event, then stays paused
-    void skipAll();          // finish instantly, hard-sync to the end snapshot
-    void startReplay();      // snap to the start snapshot and play again
-    void setSpeed(float s);  // 0.1 .. 5 (fed from Toolbar::speed())
-    void clear();            // drop the batch and stop
+    void stepOne();          // exactly aik event chalata hai, phir pause par rehta hai
+    void skipAll();          // sab fauran khatam, end snapshot par hard sync
+    void startReplay();      // start snapshot par wapas jaake dobara chalata hai
+    void setSpeed(float s);  // 0.1 .. 5   Toolbar::speed() se aata hai
+    void clear();            // batch khatam karke rok deta hai
 
     // State
-    bool busy() const;       // true while events remain (LevelScreen locks input)
+    bool busy() const;       // jab tak events baaki hain, true (LevelScreen input lock karti hai)
     bool paused() const;
     float speed() const;
     int playedCount() const;
     int totalCount() const;
-    float scrubProgress() const;   // 0..1, for a future scrubber bar
+    float scrubProgress() const;   // 0..1, future scrubber bar ke liye
 
-    static float eventDuration(int eventType);   // seconds at speed 1
+    static float eventDuration(int eventType);   // speed 1 par seconds mein
 
 private:
     AnimationController(const AnimationController&);
@@ -90,8 +90,8 @@ private:
     float m_speed;
     bool m_busy;
     bool m_paused;
-    bool m_active;     // an event is animating
-    bool m_stepping;   // single step in progress
+    bool m_active;     // koi event chal raha hai
+    bool m_stepping;   // single step chal raha hai
     bool m_stepReq;
     bool m_skipping;
 

@@ -1,44 +1,45 @@
 // gui/widgets/Button.h
+// Reusable button. Isay screen ya game logic ke bare mein kuch pata nahi hota.
+// Owner ek plain function pointer aur context register karta hai,
+// button click par woh function call karta hai.
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "NineSlice.h"
 
-// Reusable button. Knows NOTHING about screens or game logic.
-// The owner registers a plain function pointer + context; the button
-// calls it on click.
 typedef void (*ButtonCallback)(void* context);
 
+//  button class
 class Button {
 public:
-    // center = middle of the button in window pixels.
-    // size.x is the MINIMUM width: the button widens to fit its label.
+    // center button ka darmiyani nuqta hai, window pixels mein.
+    // size.x kam se kam chaurai hai, button label ke hisaab se barh sakta hai.
     void init(const char* label, const sf::Font& font,
         sf::Vector2f center, sf::Vector2f size);
 
+    // Click par chalne wala function aur uska context set karta hai.
     void setCallback(ButtonCallback cb, void* context) {
         m_onClick = cb;
         m_context = context;
     }
     void setLabel(const char* label);
 
-    // Optional frame texture, drawn as a nine-slice so it never distorts.
-    // The frame always covers exactly the button's own rectangle.
+    // Optional frame texture, nine slice ke taur par draw hoti hai taake distort na ho.
     void setFrame(const sf::Texture* frame);
 
-    // Horizontal space between the label and each side of the button.
+    // Label aur button ke har side ke beech horizontal jagah.
     void setPadding(float padX);
 
-    // Hard limit on the width. A label that does not fit shrinks first.
-    // 0 = no limit. Use this where a button sits in a fixed-width row.
+    // Chaurai ki hard limit. Agar label fit na ho to pehle chhota hota hai.
+    // 0 ka matlab koi limit nahi. Fixed-width row mein istemal karo.
     void setMaxWidth(float maxW);
 
-    // Current width. This is the real width on screen (frame included).
+    // Screen par asal chaurai, frame samet.
     float width() const { return m_size.x; }
 
-    // Moves the button's centre and re-lays it out.
+    // Centre ko move karta hai aur dobara layout karta hai.
     void setCenter(sf::Vector2f c);
 
-    // Base label size. Long labels may shrink below this when maxWidth is set.
+    // Base label size. Lamba label maxWidth set hone par chhota ho sakta hai.
     void setTextSize(unsigned size);
 
     void handleEvent(const sf::Event& e);
@@ -50,7 +51,8 @@ private:
     static const int StateHover = 1;
     static const int StatePressed = 2;
 
-    void applyLayout();   // measures the label, sets width, positions box/text/frame
+    // Label ka size naap kar, chaurai, box aur frame sab set karta hai.
+    void applyLayout();
 
     sf::RectangleShape m_box;
     sf::Text           m_text;
@@ -59,9 +61,9 @@ private:
     sf::Vector2f       m_center;
     sf::Vector2f       m_minSize;
     sf::Vector2f       m_size;
-    unsigned           m_textSize = 0;     // base label size, set in init()
+    unsigned           m_textSize = 0;     // base label size, init() mein set hota hai
     float              m_padX = 36.f;
-    float              m_maxW = 0.f;       // 0 = no limit
+    float              m_maxW = 0.f;       // 0 ka matlab koi limit nahi
     int                m_state = StateIdle;
     float              m_hoverAmt = 0.f;
     ButtonCallback     m_onClick = nullptr;

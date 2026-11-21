@@ -8,6 +8,7 @@ NumberField::NumberField()
 {
 }
 
+// Box, label aur text ko set karta hai.
 void NumberField::init(const std::string& label, const sf::Font& font, float x, float y, float w, float h)
 {
     m_x = x;
@@ -44,6 +45,7 @@ void NumberField::setCallback(NumberFieldCallback cb, void* context)
     m_cbContext = context;
 }
 
+// Integer value ko text mein badalta hai.
 void NumberField::setValue(int v)
 {
     m_text = std::to_string(v);
@@ -61,6 +63,7 @@ bool NumberField::hasValue() const
     return !m_text.empty() && m_text != "-";
 }
 
+// Text ko integer mein badalta hai (manual parsing, bina stoi ke).
 int NumberField::value() const
 {
     if (!hasValue())
@@ -94,6 +97,7 @@ void NumberField::setFocused(bool f)
     m_focused = f;
 }
 
+// Text sprite update karta hai aur caret ko text ke end par rakhta hai.
 void NumberField::refreshText()
 {
     m_shown.setString(m_text);
@@ -101,6 +105,7 @@ void NumberField::refreshText()
     m_caret.setPosition(m_x + 8.f + b.left + b.width + 3.f, m_y + 6.f);
 }
 
+// Mouse focus, keyboard input (digits, minus, backspace) aur Enter ko handle karta hai.
 void NumberField::handleEvent(const sf::Event& e)
 {
     if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left)
@@ -120,6 +125,7 @@ void NumberField::handleEvent(const sf::Event& e)
         }
         else if (u == 45)
         {
+            // Minus sirf shuru mein allowed hai.
             if (m_text.empty())
             {
                 m_text = "-";
@@ -143,14 +149,16 @@ void NumberField::handleEvent(const sf::Event& e)
     }
 }
 
+// Focus ke hisaab se outline, rang aur caret blink update karta hai.
 void NumberField::update(float dt)
 {
     m_time += dt;
-    // Not colour alone: focus = thick outline + blinking caret.
+    // Rang akela signal nahi: focus = moti outline + blinking caret.
     m_box.setOutlineThickness(m_focused ? 4.f : 2.f);
     m_box.setFillColor(m_focused ? Theme::BtnHover : Theme::BtnIdle);
 }
 
+// Box, label, text aur (focus mein) blinking caret draw karta hai.
 void NumberField::draw(sf::RenderWindow& window) const
 {
     window.draw(m_box);

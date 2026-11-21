@@ -1,23 +1,23 @@
 // gui/Theme.h
-// Header-only constants. Change look & feel here only.
+// Sirf constants. Look aur feel badalna ho to bas yahin badlo.
 #pragma once
 #include <SFML/Graphics.hpp>
 
 namespace Theme {
 
-    // ---- Window ----
-    // TODO(YOU): set this to your background image size (e.g. 1280x720)
+    // Window
+    
     inline const unsigned WindowW = 1280;
     inline const unsigned WindowH = 720;
     inline const unsigned FrameLimit = 60;
 
-    // ---- Asset paths (relative to project root; run the exe from there) ----
+    // Asset paths (project root se relative; exe ko project root se chalao)
     inline const char* const FontPath = "assets/fonts/vault.ttf";
     inline const char* const MenuBgPath = "assets/images/menu_bg.png";
     inline const char* const CampaignBgPath = "assets/images/campaign_bg.png";
     inline const char* const BannerPath = "assets/images/ui/banner.png";
 
-    // UI sheet pieces (sliced from the generated sheets, see sprite_cutter.py)
+    // UI sheet ke hisse (sprite_cutter.py se kaatay gaye)
     inline const char* const SkullPath = "assets/images/ui/ui_skull_01.png";
     inline const char* const NodeRingPath = "assets/images/ui/ui_ring_01.png";
     inline const char* const ButtonFramePath = "assets/images/ui/ui_title_06.png";
@@ -27,22 +27,22 @@ namespace Theme {
     inline const char* const CornerPath = "assets/images/ui/ui_corner_03.png";
     inline const char* const CornerSmallPath = "assets/images/ui/ui_small_08.png";
 
-    // ---- Fonts ----
+    // Font sizes
     inline const unsigned TitleSize = 48;
     inline const unsigned ButtonTextSize = 20;
     inline const unsigned NodeTextSize = 22;
     inline const unsigned TooltipTextSize = 18;
 
-    // ---- Buttons ----
+    // Buttons
     inline const float ButtonW = 320.f;
     inline const float ButtonH = 56.f;
     inline const float ButtonGap = 18.f;
 
-    // ---- Misc numbers ----
+    // Misc numbers
     inline const float Pi = 3.14159265f;
-    inline const float BannerH = 340.f;       // selected banner height
+    inline const float BannerH = 340.f;       // selected banner ki height
 
-    // ---- Colours (dark red theme) ----
+    // Rang (dark red theme)
     inline const sf::Color BtnIdle(28, 12, 16, 220);
     inline const sf::Color BtnHover(110, 20, 30, 235);
     inline const sf::Color BtnPressed(60, 10, 16, 245);
@@ -65,16 +65,17 @@ namespace Theme {
     inline const sf::Color BannerLocked(105, 100, 108, 190);
     inline const sf::Color BannerHover(255, 120, 105);
 
-    // One colour per act (Briefing panel border uses these)
-    inline const sf::Color ActColors[4] = {
+    // Har act ka aik rang (Briefing panel ke border mein istemal hota hai)
+    inline const sf::Color ActColors[4] = 
+    {
         sf::Color(170, 40, 50, 200),
         sf::Color(150, 35, 60, 200),
         sf::Color(130, 30, 70, 200),
         sf::Color(190, 50, 40, 200)
     };
 
-    // Width of the untouched corner/edge band of a framed texture, in texture pixels.
-// Tune this if the frame corners look too thick or too thin.
+    // Framed texture ki woh chaurai jo bina scale hue rehti hai (texture pixels mein).
+    // Agar frame ke kone zyada motay ya patle lagen to yeh value badlo.
     inline const int FrameBorderPx = 12;
 
-}  // namespace Theme
+}  

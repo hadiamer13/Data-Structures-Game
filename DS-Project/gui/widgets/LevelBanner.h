@@ -1,18 +1,17 @@
 // gui/widgets/LevelBanner.h
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Button.h"   // reuses the ButtonCallback typedef (function pointer + void*)
+#include "Button.h"   
 
 // One tall banner card on the level select screen. Knows nothing about
 // levels or saves: the owner sets number, stars, locked and selected state.
-class LevelBanner {
+class LevelBanner 
+{
 public:
-    // number e.g. "3" (the level inside the act). height = selected height.
     void init(const char* number, const sf::Font& font,
         const sf::Texture& banner, const sf::Texture& skull,
         sf::Vector2f center, float height, bool isBoss);
 
-    // INTEGRATION (later): CampaignMap passes data from SaveManager here.
     void setState(int stars, bool unlocked);
     void setSelected(bool s) { m_selected = s; }
 
@@ -32,7 +31,7 @@ private:
     static const int StateHover = 1;
     static const int StatePressed = 2;
 
-    void applyLayout(float s);   // s = current visual scale (about 0.8..1.05)
+    void applyLayout(float s);   
     void buildStars();
 
     sf::Vector2f m_center;

@@ -1,12 +1,3 @@
-
-// gui/screens/HeapLevel.h
-// Act 4 "Heap Fortress" screen (missions 4.1 to 4.5).
-// The heap tree view and the array view are both drawn by Renderer from one ViewSnapshot,
-// so they stay synchronised by construction.
-// Input: click a node or array cell to select it. While one is selected, clicking an
-// adjacent (parent or child) cell sends a SwapHeap. Buttons: Build heap, Heapify selected,
-// Extract max, Clear selection. The model decides whether every action is valid.
-// Flow: input -> PlayerAction -> GameSession::apply -> events -> animation -> Result screen.
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -21,6 +12,7 @@
 #include "../widgets/Tooltip.h"
 #include "../../game/GameSession.h"
 
+//  heap operations
 namespace HeapOp
 {
     inline const int Build = 0;
@@ -29,6 +21,13 @@ namespace HeapOp
     inline const int Clear = 3;
 }
 
+
+// Act 4 "Heap Fortress" screen, missions 4.1 se 4.5 tak.
+// Heap ka tree view aur array view dono Renderer ek hi ViewSnapshot se banate hain,
+// is liye woh hamesha synchronised rehte hain.
+// Input: node ya array cell click karo. Aik select ho to uske adjacent (parent ya child) cell
+// par click SwapHeap bhejta hai. Buttons: Build heap, Heapify selected, Extract max, Clear selection.
+// Model decide karta hai ke har action valid hai ya nahi.
 class HeapLevel : public Screen
 {
 public:
@@ -96,7 +95,7 @@ private:
     int m_pressY;
     bool m_pressing;
     int m_opCount;
-    float m_opNextX = 170.f;   // x where the next op button starts
+    float m_opNextX = 170.f;   // agle op button ka x, "Selected:" label ke baad
 
     sf::Sprite m_background;
     sf::RectangleShape m_dim;
@@ -108,7 +107,7 @@ private:
     sf::Text m_selText;
     sf::Text m_notice;
 
-    Renderer m_renderer;          // must be constructed before m_anim
+    Renderer m_renderer;          // m_anim se pehle banna zaroori hai
     AnimationController m_anim;
     Hud m_hud;
     Toolbar m_toolbar;

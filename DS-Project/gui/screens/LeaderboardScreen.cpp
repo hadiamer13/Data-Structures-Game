@@ -15,6 +15,8 @@ namespace
     }
 }
 
+//  construction
+// Leaderboard file load karta hai. File na mile to khali list dikhti hai, error nahi aata.
 LeaderboardScreen::LeaderboardScreen(AppContext& ctx) : m_ctx(ctx), m_loaded(false)
 {
     const sf::Font& font = ctx.assets->font();
@@ -34,7 +36,7 @@ LeaderboardScreen::LeaderboardScreen(AppContext& ctx) : m_ctx(ctx), m_loaded(fal
     setText(m_title, font, 40, Theme::TitleColor, 430.f, 88.f);
     m_title.setString("LOCAL LEADERBOARD");
     setText(m_empty, font, 21, Theme::TextColor, 390.f, 330.f);
-    m_empty.setString("No endless scores yet. Survive a round to set a record.");
+    m_empty.setString("Abhi endless scores nahi hain. Ek round survive karo, record banao.");
     setText(m_error, font, 14, Theme::NodeGlow, 260.f, 570.f);
     for (int i = 0; i < Leaderboard::Capacity; ++i)
     {
@@ -71,6 +73,7 @@ void LeaderboardScreen::handleEvent(const sf::Event& event)
     m_reports.handleEvent(event);
 }
 
+// Har frame rows ka text update karta hai. Lamba naam chhota karke ".." lagta hai.
 void LeaderboardScreen::update(float dt)
 {
     m_home.update(dt);
@@ -104,6 +107,7 @@ void LeaderboardScreen::draw(sf::RenderWindow& window)
     headerRule.setPosition(230.f, 145.f);
     headerRule.setFillColor(Theme::NodeLine);
     window.draw(headerRule);
+    // Har row ki halki background patti, aur pehli row par sunehri border.
     for (int i = 0; i < Leaderboard::Capacity; ++i)
     {
         sf::RectangleShape row(sf::Vector2f(820.f, 32.f));

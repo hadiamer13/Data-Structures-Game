@@ -1,6 +1,6 @@
 // gui/widgets/Tooltip.h
-// Small hover box. The owner decides WHEN to show it and WHAT it says;
-// the box only positions itself (clamped inside the window) and draws.
+// Chota hover box. Owner decide karta hai KAB dikhana hai aur KYA likhna hai;
+// box sirf khud ko position karta (window ke andar clamp karke) aur draw karta hai.
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -12,7 +12,7 @@ public:
 
     void init(const sf::Font& font);
 
-    // Key, height, balance factor, size, depth. showBalance = AVL (adds bf + status word).
+    // Key, height, balance factor, size, depth. showBalance = AVL (bf aur status word bhi add hota hai).
     void showNode(float sx, float sy, int key, int height, int balance, int size, int depth,
         bool showBalance);
     void showText(float sx, float sy, const std::string& text);

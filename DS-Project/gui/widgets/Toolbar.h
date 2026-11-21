@@ -1,6 +1,6 @@
 // gui/widgets/Toolbar.h
-// Bottom bar: Undo, Replay, Reset, Hint buttons + animation speed slider.
-// Reports clicks through one function pointer: callback(context, action).
+// Neeche wali bar: Undo, Replay, Reset, Hint buttons + animation speed slider.
+// Clicks aik hi function pointer se report hote hain: callback(context, action).
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Button.h"
@@ -17,7 +17,7 @@ typedef void (*ToolbarCallback)(void* context, int action);
 
 class Toolbar;
 
-// One small context per button so a single static function serves all four.
+// Har button ka aik chhota context, taake aik hi static function chaaron ko handle kare.
 struct ToolbarButtonCtx
 {
     Toolbar* owner;
@@ -38,12 +38,13 @@ public:
     void update(float dt);
     void draw(sf::RenderWindow& window) const;
 
-    // Called by the static button callback (public so it can reach it).
+    // Static button callback se call hota hai (isliye public hai).
     void fire(int action);
 
 private:
     static void onButton(void* context);
 
+    // Slider par mouse x se speed set karta hai.
     void setSpeedFromX(float x);
     void refreshSpeedLabel();
     void layoutKnob();
@@ -54,7 +55,7 @@ private:
     Button m_btn[kButtons];
     ToolbarButtonCtx m_btnCtx[kButtons];
 
-    // slider
+    // Slider
     sf::Text m_speedTitle;
     sf::Text m_speedValue;
     sf::RectangleShape m_track;

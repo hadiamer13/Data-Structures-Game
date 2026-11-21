@@ -1,7 +1,6 @@
 // gui/widgets/NineSlice.h
-// Draws a texture as a frame: corners and edges keep their native size and only
-// the middle stretches. Use it for every framed decoration so the art never
-// distorts when a button or bar is wide.
+// Texture ko frame ke taur par draw karta hai: kone aur kinare apna asli size rakhte hain
+// aur sirf beech ka hissa stretch hota hai. Isse wide button ya bar par art distort nahi hota.
 #pragma once
 #include <SFML/Graphics.hpp>
 
@@ -10,11 +9,11 @@ class NineSlice
 public:
     NineSlice();
 
-    // border = width of the untouched corner/edge band, in texture pixels.
-    // Passing nullptr clears the frame.
+    // border = kone/kinare ka woh hissa jo nahi badalta, texture pixels mein.
+    // nullptr dene par frame clear ho jata hai.
     void setTexture(const sf::Texture* tex, int border);
 
-    // The on-screen rectangle the whole frame fills.
+    // Poore frame ka screen par rectangle.
     void setRect(const sf::FloatRect& outer);
 
     void setColor(const sf::Color& c);
@@ -23,9 +22,10 @@ public:
     void draw(sf::RenderWindow& window) const;
 
 private:
+    // Sprites ko dobara calculate karta hai (texture ya rect badalne par).
     void rebuild();
 
-    sf::Sprite         m_part[9];   // row-major: 0..2 top, 3..5 middle, 6..8 bottom
+    sf::Sprite         m_part[9];   // row-major: 0..2 upar, 3..5 beech, 6..8 neeche
     const sf::Texture* m_tex;
     int                m_border;
     sf::FloatRect      m_rect;

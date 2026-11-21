@@ -1,5 +1,6 @@
 // gui/AppContext.h
-// Passed to every screen so they can reach shared things without globals.
+// Yeh struct har screen ko milta hai taake woh shared cheezon tak pohonch sake
+// (global variables ke bajaye).
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Assets.h"
@@ -9,6 +10,7 @@ class UIManager;
 class GameSession;
 class Campaign;
 
+// Game ki display aur animation settings. Settings screen inhe change karti hai.
 struct GameSettings
 {
     unsigned int antialiasingLevel;
@@ -20,7 +22,7 @@ struct GameSettings
     }
 };
 
-// Filled by the Level screen when a level ends, read by the Result screen.
+// Level khatam hone par Level screen yeh data bharti hai, aur Result screen ise parhti hai.
 struct LevelResult
 {
     int stars;
@@ -30,7 +32,7 @@ struct LevelResult
     int score;
     bool won;
     int levelIndex;        // act * 5 + level (0..19)
-    IntArray sortedArray;  // Act 4: final array (empty otherwise)
+    IntArray sortedArray;  // Act 4 ka final sorted array (warna khali)
     bool heapAct;
 
     LevelResult()
@@ -44,11 +46,11 @@ struct AppContext
 {
     sf::RenderWindow* window = nullptr;
     const Assets* assets = nullptr;
-    UIManager* ui = nullptr;           // main_gui.cpp sets this to &uiManager
-    GameSession* session = nullptr;    // main_gui.cpp sets this (stub or real)
-    Campaign* campaign = nullptr;      // main_gui.cpp sets this; levels + star progress
-    GameSettings* settings = nullptr;  // shared display and animation settings
+    UIManager* ui = nullptr;           // main_gui.cpp isay &uiManager par set karta hai
+    GameSession* session = nullptr;    // main_gui.cpp isay set karta hai (stub ya asli session)
+    Campaign* campaign = nullptr;      // main_gui.cpp isay set karta hai; levels aur star progress
+    GameSettings* settings = nullptr;  // display aur animation ki shared settings
 
-    int selectedLevel = -1;            // index = act * 5 + level (0..19), -1 = none
+    int selectedLevel = -1;            // index = act * 5 + level (0..19), -1 ka matlab koi nahi
     LevelResult result;
 };

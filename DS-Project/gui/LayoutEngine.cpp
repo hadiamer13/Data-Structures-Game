@@ -95,8 +95,7 @@ bool LayoutEngine::validId(const ViewSnapshot& snap, int id) const
     return snap.nodes[id].alive;
 }
 
-// ---------------------------------------------------------------- compute
-
+// Har snapshot ke liye layout dobara nikalta hai. Sirf tab call karo jab snapshot badla ho.
 void LayoutEngine::compute(const ViewSnapshot& snap)
 {
     clear();
@@ -112,12 +111,10 @@ void LayoutEngine::compute(const ViewSnapshot& snap)
     finish();
 }
 
-// ------------------------------------------------------------- tidy tree
-//
-// layoutSub fills lo[d]/hi[d] = leftmost/rightmost x at depth d of the subtree
-// (relative to the subtree root at x = 0) and stores each child's offset to
-// its parent in m_rel. Two child subtrees are pushed apart just enough that
-// their contours keep m_hGap distance on every shared level.
+// Tidy tree layout:
+// layoutSub har subtree ke liye lo[d]/hi[d] (depth d par bayein/daayen x) nikalta hai,
+// subtree root ko x = 0 maan kar. Do bachon ke subtrees itne door dhakele jaate hain
+// ke har shared level par contours m_hGap ka faasla rakhein.
 
 int LayoutEngine::layoutSub(const ViewSnapshot& snap, int id, float* lo, float* hi, int cap)
 {
@@ -129,7 +126,7 @@ int LayoutEngine::layoutSub(const ViewSnapshot& snap, int id, float* lo, float* 
     m_guard++;
     if (m_guard > m_cap + 8)
     {
-        return 0; // cycle protection
+        return 0; // cycle se bachao
     }
 
     lo[0] = 0.f;
@@ -254,7 +251,7 @@ void LayoutEngine::layoutTree(const ViewSnapshot& snap)
 
     if (!validId(snap, snap.rootId))
     {
-        return; // empty tree
+        return; // khali tree
     }
 
     int cap = alive + 1;
@@ -268,8 +265,9 @@ void LayoutEngine::layoutTree(const ViewSnapshot& snap)
     assignSub(snap, snap.rootId, 0.f, 0);
 }
 
-// ------------------------------------------------------------------ heap
-
+// Heap layout: complete binary tree ke slots. Node id == array index.
+// Slot ki position poore array ki length par depend karti hai, is liye jab active heap chhota hota hai
+// (Heap Sort ke dauran) nodes apni jagah se nahi hilte. Sirf index < activeSize ko tree position milti hai.
 void LayoutEngine::layoutHeap(const ViewSnapshot& snap)
 {
     int total = snap.heap.array.size();
@@ -285,7 +283,7 @@ void LayoutEngine::layoutHeap(const ViewSnapshot& snap)
 
     allocNodes(total);
 
-    // levels of the FULL array so positions stay stable while the heap shrinks
+    // Levels poore array ke hisaab se, taake positions stable rahen.
     int levels = 0;
     int count = 0;
     int levelSize = 1;
@@ -321,7 +319,7 @@ void LayoutEngine::layoutHeap(const ViewSnapshot& snap)
         m_has[i] = true;
     }
 
-    // array row, centred under the full-width tree
+    // Array line, tree ke neeche center mein.
     if (total > 0)
     {
         float treeBottom = (levels > 0) ? (float)(levels - 1) * m_vGap : 0.f;
@@ -342,8 +340,7 @@ void LayoutEngine::layoutArrayRow(int count, float centreX, float topY)
     }
 }
 
-// ---------------------------------------------------- normalise to (0,0)
-
+// Sab positions ko (0,0) ke hisaab se shift karta hai aur bounding box nikalta hai.
 void LayoutEngine::finish()
 {
     bool any = false;
@@ -418,8 +415,7 @@ void LayoutEngine::finish()
     m_height = maxY - minY;
 }
 
-// --------------------------------------------------------------- queries
-
+// Doosre engine se data copy karta hai (jo bhi tween ho uske ke liye "from" layout rakhne ke liye).
 void LayoutEngine::copyFrom(const LayoutEngine& o)
 {
     if (this == &o)

@@ -1,4 +1,3 @@
-// gui/screens/HeapLevel.cpp
 #include "HeapLevel.h"
 #include "../UIManager.h"
 #include "../Theme.h"
@@ -12,7 +11,7 @@ namespace
     const float LogW = 320.f;
     const float BarH = 64.f;
     const float ClickSlop = 5.f;
-    const int FirstHeapIndex = 15;   // campaign index of level 4.1 (act 4 starts at 15)
+    const int FirstHeapIndex = 15;   // level 4.1 ka campaign index, act 4 15 se shuru hota hai
 
     void styleText(sf::Text& t, const sf::Font& font, unsigned size, const sf::Color& col, float x, float y)
     {
@@ -22,6 +21,7 @@ namespace
         t.setPosition(x, y);
     }
 
+    // Greedy word wrap, character count ke hisaab se.
     // Greedy word wrap by character count.
     std::string wrapChars(const std::string& s, int width)
     {
@@ -55,6 +55,8 @@ namespace
         return out;
     }
 
+    // Pointer press aur release ke beech itna move hua ho to drag maana jaata hai.
+    // True when the pointer moved far enough between press and release to be a drag.
     bool movedBeyondSlop(int x0, int y0, int x1, int y1)
     {
         int dx = x1 - x0;
@@ -70,7 +72,8 @@ namespace
         return (float)dx >= ClickSlop || (float)dy >= ClickSlop;
     }
 
-    // True when a and b are a parent and one of its children (heap indices).
+    // Do index aapas mein parent aur child hain ya nahi.
+    // Checks whether two heap indices are a parent and one of its children.
     bool isAdjacent(int a, int b)
     {
         if (a < 0 || b < 0 || a == b)
@@ -82,13 +85,14 @@ namespace
         return aParentOfB || bParentOfA;
     }
 
-    // One instruction per mission. Text only, so nothing depends on colour.
+    // Har mission ki aik instruction. Sirf text hai, is liye rang par depend nahi karta.
+    // One instruction per mission. It is text only, so nothing depends on colour.
     const char* missionText(int mission)
     {
         if (mission == MissionKind::HeapBuild)
         {
             return "Activate the vault: swap a parent with a larger child, or select a node and press "
-                "Heapify. Work bottom-up from the last parent.";
+                "Heapify. Work bottom up from the last parent.";
         }
         if (mission == MissionKind::HeapRepair)
         {
@@ -106,8 +110,9 @@ namespace
     }
 }
 
-// ------------------------------------------------------------ construction
-
+//  construction
+// Layout banata hai, level load karta hai, aur ready hone par buttons aur HUD set karta hai.
+// Builds the layout, loads the level, and sets the buttons and HUD once it is ready.
 HeapLevel::HeapLevel(AppContext& ctx)
     : m_ctx(ctx), m_index(FirstHeapIndex), m_ok(false), m_selected(kNull), m_endTimer(0.f),
     m_pressX(0), m_pressY(0), m_pressing(false), m_opCount(0),
@@ -147,6 +152,8 @@ HeapLevel::HeapLevel(AppContext& ctx)
     }
 }
 
+// Canvas, bar, toolbar, log aur HUD ki positions set karta hai.
+// Sets the positions of the canvas, bar, toolbar, log and HUD.
 void HeapLevel::buildLayout()
 {
     const sf::Font& font = m_ctx.assets->font();
@@ -190,7 +197,8 @@ void HeapLevel::buildLayout()
     m_tooltip.init(font);
 }
 
-// Level comes from levels/act4.json. Index 15..19 maps to slots 0..4.
+// Level levels/act4.json se aata hai. Index 15 se 19 tak slot 0 se 4 tak map hota hai.
+// The level comes from levels/act4.json. Index 15 to 19 maps to slots 0 to 4.
 bool HeapLevel::loadLevel()
 {
     const int slot = m_index - FirstHeapIndex;
@@ -223,8 +231,7 @@ bool HeapLevel::loadLevel()
     return true;
 }
 
-// ----------------------------------------------------------- mission rules
-
+//  mission rules
 bool HeapLevel::allowsBuild() const
 {
     return m_def.mission == MissionKind::HeapRace || m_def.mission == MissionKind::HeapBoss;
@@ -246,10 +253,12 @@ bool HeapLevel::allowsSwap() const
     return m_def.mission != MissionKind::HeapExtract;
 }
 
+// Mission ke hisaab se sirf wahi buttons banate hain jo allowed hain.
+// Builds only the buttons that the mission allows.
 void HeapLevel::buildOpButtons()
 {
     m_opCount = 0;
-    m_opNextX = 170.f;   // clear of the "Selected:" label
+    m_opNextX = 170.f;   // "Selected:" label se door rakhne ke liye
     if (allowsBuild())
     {
         addOp(HeapOp::Build, "Build heap");
@@ -287,8 +296,7 @@ void HeapLevel::addOp(int op, const char* label)
     m_opCount++;
 }
 
-// ---------------------------------------------------------------- callbacks
-
+//  callbacks
 void HeapLevel::onToolbarClick(void* context, int action)
 {
     static_cast<HeapLevel*>(context)->onToolbar(action);
@@ -344,8 +352,7 @@ void HeapLevel::onToolbar(int action)
     }
 }
 
-// ------------------------------------------------------------------- HUD
-
+//  HUD
 void HeapLevel::setMessage(const std::string& msg)
 {
     m_msg.setString(wrapChars(msg, 100));
@@ -362,7 +369,8 @@ void HeapLevel::setSelection(int id)
     refreshPrompt();
 }
 
-// Every number comes from the session's HudState, never from GUI maths.
+// Har number session ki HudState se aata hai, GUI maths se nahi.
+// Every number comes from the session HudState, never from GUI maths.
 void HeapLevel::refreshHud(const HudState& h)
 {
     m_lastHud = h;
@@ -406,6 +414,8 @@ void HeapLevel::refreshPrompt()
         : ("Selected: index " + std::to_string(m_selected)));
 }
 
+// Tooltip mein node ki value, index aur depth dikhti hai.
+// The tooltip shows the value, index and depth of a node.
 void HeapLevel::updateTooltip(int mx, int my)
 {
     const float sx = (float)mx;
@@ -435,9 +445,10 @@ void HeapLevel::updateTooltip(int mx, int my)
     m_tooltip.hide();
 }
 
-// ------------------------------------------------------------------ actions
-
-// Click selects an index. Clicking an adjacent index while a swap is allowed sends a SwapHeap.
+//  actions
+// Click pehle index select karta hai. Select ho aur adjacent index par click ho to SwapHeap bhejta hai.
+// Model direction aur heap rule check karta hai, is liye galat swap par alarm aur penalty lagti hai.
+// The first click selects an index. A click on an adjacent index sends a SwapHeap.
 // The model checks the direction and the heap rule, so a wrong swap costs alarm and a penalty.
 void HeapLevel::onCanvasClick(int mx, int my)
 {
@@ -513,12 +524,16 @@ void HeapLevel::submit(const PlayerAction& act)
     play(before, r);
 }
 
-// One batch per action. Every event is queued without a snapshot. The final snapshot tweens
-// nodes and array cells to their new slots when the batch ends. DONE carries no animation.
+// Har action aik batch hai. Events bina snapshot ke queue hote hain, aur aakhir mein
+// final snapshot nodes aur array cells ko naye slots tak tween karta hai.
+// DONE par koi animation nahi hoti.
+// Each action is one batch. Events are queued without snapshots. The final snapshot
+// tweens the nodes and array cells to their new slots at the end.
+// DONE carries no animation.
 void HeapLevel::play(const ViewSnapshot& before, const ActionResult& r)
 {
     m_lastHud = r.hud;
-    if (r.events.size() <= 1)        // only DONE (or nothing): the action changed nothing
+    if (r.events.size() <= 1)        // sirf DONE (ya kuch nahi), matlab action ne kuch nahi badla
     {
         refreshHud(r.hud);
         refreshPrompt();
@@ -547,18 +562,22 @@ void HeapLevel::animEvent(const Event& e)
     refreshStatus();
 }
 
+// Animation ke baad session ke authoritative numbers dikhte hain, aur level khatam ho to result ka timer chalta hai.
+// After the animation, the authoritative session numbers are shown. If the level is over, the result timer starts.
 void HeapLevel::animDone()
 {
     m_renderer.setTarget(kNull);
-    refreshHud(m_lastHud);            // authoritative numbers from the session
+    refreshHud(m_lastHud);
     refreshPrompt();
     if (m_lastHud.status != HudStatus::Playing)
     {
         m_log.addLine(m_lastHud.status == HudStatus::Won ? "LEVEL CLEARED" : "LEVEL FAILED");
-        m_endTimer = 1.0f;            // Result screen only after the animation ends
+        m_endTimer = 1.0f;            // Result screen animation ke baad hi aata hai
     }
 }
 
+// Undo ke baad hard sync hota hai, taake koi purani position na rahe.
+// After undo the view is hard synced, so no old position is left behind.
 void HeapLevel::doUndo()
 {
     if (m_endTimer > 0.f || m_anim.busy())
@@ -569,7 +588,7 @@ void HeapLevel::doUndo()
     act.kind = ActionKind::Undo;
     const ActionResult r = m_session.apply(act);
     m_anim.clear();
-    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.snapTo(m_session.snapshot());
     m_renderer.setTarget(kNull);
     setSelection(kNull);
     refreshHud(r.hud);
@@ -604,11 +623,13 @@ void HeapLevel::doHint()
     PlayerAction act;
     act.kind = ActionKind::Hint;
     const ActionResult r = m_session.apply(act);
-    m_renderer.setTarget(m_session.targetNodeId());   // gold ring on the index to fix
+    m_renderer.setTarget(m_session.targetNodeId());   // jis index ko theek karna hai, uspar gold ring
     refreshHud(r.hud);
     setMessage(r.message);
 }
 
+// Result ko context mein bharta hai. Sorted array sirf tab dikhta hai jab sab extract ho chuke hon.
+// Fills the shared result. The sorted array is shown only when every treasure is extracted in order.
 void HeapLevel::goToResult()
 {
     LevelResult& res = m_ctx.result;
@@ -621,7 +642,6 @@ void HeapLevel::goToResult()
     res.levelIndex = m_index;
     res.heapAct = true;
 
-    // Sorted array is shown only when every treasure has been extracted in ascending order.
     res.sortedArray.clear();
     const MaxHeap& heap = m_session.heap();
     if (res.won && heap.activeSize() == 0 && heap.isSortedAscending())
@@ -631,11 +651,11 @@ void HeapLevel::goToResult()
     m_ctx.ui->requestScreen(ScreenId::Result);
 }
 
-// -------------------------------------------------------------------- input
-
+//  input
+// Keyboard shortcuts, toolbar, op buttons, camera aur mouse click sab yahin handle hote hain.
+// Keyboard shortcuts, toolbar, op buttons, camera and mouse clicks are all handled here.
 void HeapLevel::handleEvent(const sf::Event& e)
 {
-    // Esc is handled by UIManager.
     if (!m_ok)
     {
         return;
@@ -707,8 +727,7 @@ void HeapLevel::handleEvent(const sf::Event& e)
     }
 }
 
-// ------------------------------------------------------------ update / draw
-
+//  update and draw
 void HeapLevel::update(float dt)
 {
     m_hud.update(dt);

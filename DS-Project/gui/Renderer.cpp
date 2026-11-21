@@ -23,6 +23,7 @@ namespace
         return a + (b - a) * t;
     }
 
+    // Smooth step: shuru aur aakhir mein dheere, beech mein tez.
     inline float smooth(float t)
     {
         return t * t * (3.f - 2.f * t);
@@ -48,7 +49,7 @@ namespace
     const float BadgeMinZoom = 0.5f;
     const float PiF = 3.14159265f;
 
-    // Colour code (never the only signal: ring thickness, double ring, slash, text badges)
+    // Rang ka code (rang akela signal nahi hai: ring ki motai, double ring, slash aur text badges bhi hain)
     const sf::Color ColNeutral(55, 45, 60);
     const sf::Color ColGreen(40, 120, 65);
     const sf::Color ColYellow(165, 140, 30);
@@ -67,7 +68,7 @@ namespace
     const sf::Color ColInsert(90, 220, 120);
 }
 
-// ----------------------------------------------------------- construction
+// Construction: fonts, arrows aur swap labels pehle se bana kar rakhte hain.
 
 Renderer::Renderer(const sf::Font& font)
     : m_font(&font),
@@ -181,6 +182,7 @@ void Renderer::resetNode(RenderNode& r) const
     r.fxKind = NodeFx::None;
 }
 
+// Arrays ko zaroorat ke mutabiq bada karta hai (doubling se).
 void Renderer::ensureCapacity(int n)
 {
     if (n <= m_cap)
@@ -237,7 +239,7 @@ bool Renderer::validIdx(int i) const
     return i >= 0 && i < m_count && m_nodes[i].present;
 }
 
-// ---------------------------------------------------------------- labels
+// Labels: key, AVL badge aur heap ka MAX tag.
 
 void Renderer::refreshLabel(int i)
 {
@@ -290,7 +292,7 @@ void Renderer::updateRegionLabels()
     m_regionB->setFillColor(ColSorted);
 }
 
-// -------------------------------------------------------------- snapshots
+// Snapshots: model ki picture ko renderer ke nodes mein daalna.
 
 void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
 {
@@ -362,7 +364,7 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
         {
             if (animate && (was || wasDying))
             {
-                // removed node: stays drawn, fades out, edge retracts to its old parent
+                // Hataya hua node dikhta rehta hai, fade hota hai, aur edge purane parent ki taraf sikudta hai.
                 r.present = true;
                 r.visible = true;
                 r.dying = true;
@@ -394,7 +396,7 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
         }
         else
         {
-            // heap node outside the active heap: keep its last position
+            // Heap ka node jo active heap se bahar hai, apni last position par rahega.
             r.toX = (was ? curX : 0.f);
             r.toY = (was ? curY : 0.f);
         }
@@ -406,7 +408,7 @@ void Renderer::setSnapshot(const ViewSnapshot& s, bool animate)
         }
         else if (animate)
         {
-            // new node grows out of its parent's slot
+            // Naya node apne parent ki jagah se nikalta hai.
             r.fromX = r.toX;
             r.fromY = r.toY;
             if (r.parent != kNull && m_layout.hasNode(r.parent))
@@ -461,7 +463,7 @@ void Renderer::snapTo(const ViewSnapshot& snap)
     clearHighlights();
 }
 
-// ----------------------------------------------------------- highlights
+// Highlights: marks, pulses, arrows aur selection.
 
 void Renderer::clearHighlights()
 {
@@ -533,7 +535,7 @@ void Renderer::setActiveSize(int n)
     m_edgesDirty = true;
 }
 
-// ------------------------------------------------------------------ swaps
+// Swaps: do values travel karke aapas mein badalti hain.
 
 void Renderer::startSwap(int a, int b)
 {
@@ -572,7 +574,7 @@ void Renderer::finishSwap()
     m_nodes[b].pulse = 1.f;
 }
 
-// ----------------------------------------------------------------- events
+// Events: har event type ka visual effect shuru karta hai.
 
 void Renderer::beginEvent(const Event& e)
 {
@@ -596,7 +598,7 @@ void Renderer::beginEvent(const Event& e)
     }
     else if (t == EventType::HEAP_BUILD)
     {
-        // idx = first index to sift (n/2 - 1). Show the whole active region as the work area.
+        // idx = sift karne ka pehla index (n/2 - 1). Poora active region kaam ka area dikhta hai.
         if (validIdx(e.idx))
         {
             m_nodes[e.idx].mark = NodeMark::Visit;
@@ -658,7 +660,7 @@ void Renderer::beginEvent(const Event& e)
             m_rotTxt->setString(nm);
             centreText(*m_rotTxt);
         }
-        // the controller already called animateTo(), so the tween spans the event
+        // Controller ne pehle hi animateTo() call kar diya hai, is liye tween event ke poore waqt chalega.
         m_tweenDur = 0.9f;
     }
     else if (t == EventType::SWAP_VALUE)
@@ -671,7 +673,7 @@ void Renderer::beginEvent(const Event& e)
         {
             if (t == EventType::UPDATE_HEIGHT)
             {
-                m_nodes[e.id].height = e.newV;   // bf arrives with the next snapshot
+                m_nodes[e.id].height = e.newV;   // bf agle snapshot ke saath aata hai
             }
             else
             {
@@ -692,7 +694,7 @@ void Renderer::beginEvent(const Event& e)
     }
     else if (t == EventType::HIGHLIGHT_SUBTREE)
     {
-        // mode is carried in e.result using HighlightMode constants.
+        // Mode e.result mein HighlightMode constants ke taur par hota hai.
         int mark = NodeMark::Visit;
         if (e.result == HighlightMode::Skipped)
         {
@@ -720,7 +722,7 @@ void Renderer::beginEvent(const Event& e)
     }
     else if (t == EventType::EXTRACT_MAX)
     {
-        // After HEAP_SWAP(root, last), the old maximum sits at idx2 (the last active index).
+        // HEAP_SWAP(root, last) ke baad purana maximum idx2 (last active index) par hota hai.
         int maxCell = e.idx2;
         if (validIdx(maxCell))
         {
@@ -810,7 +812,7 @@ void Renderer::endEvent(const Event& e)
             {
                 r.mark = NodeMark::None;
             }
-            // Gold marks belong only to the sorted region; drop them from the active heap.
+            // Sone ka mark sirf sorted region ke liye hai, active heap se hata do.
             if (r.mark == NodeMark::Result && i < m_activeSize)
             {
                 r.mark = NodeMark::None;
@@ -820,7 +822,7 @@ void Renderer::endEvent(const Event& e)
     }
 }
 
-// ----------------------------------------------------------------- update
+// Update: tween, fade, pulse aur camera ko har frame aage badhata hai.
 
 void Renderer::update(float dt)
 {
@@ -877,7 +879,7 @@ void Renderer::update(float dt)
     m_cy += (m_tCy - m_cy) * k;
 }
 
-// ----------------------------------------------------------------- camera
+// Camera: zoom, pan aur fit.
 
 void Renderer::setCanvasRect(float x, float y, float w, float h)
 {
@@ -994,7 +996,7 @@ bool Renderer::handleCameraEvent(const sf::Event& ev)
     return false;
 }
 
-// ---------------------------------------------------------------- picking
+// Picking: screen point par kaunsa node ya cell hai.
 
 int Renderer::pick(float sx, float sy) const
 {
@@ -1091,7 +1093,7 @@ bool Renderer::isHeap() const
     return m_kind == TreeKind::MaxHeap;
 }
 
-// ---------------------------------------------------------------- drawing
+// Drawing: edges, nodes, effects aur array.
 
 void Renderer::rebuildEdges()
 {
@@ -1130,7 +1132,7 @@ void Renderer::rebuildEdges()
         }
     }
 
-    // edges of removed nodes retract toward their old parent
+    // Hatai jaane wale nodes ki edges parent ki taraf sikud kar ghaib hoti hain.
     for (int i = 0; i < m_count; i++)
     {
         const RenderNode& d = m_nodes[i];
@@ -1206,8 +1208,8 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
 
     if (m_ringTex != nullptr)
     {
-        // The ring takes the same outline colour as before, so marks still read
-        // (blue visit, gold result, red violation), and it extends past the node edge.
+        // Ring ka rang wohi outline wala hai, taake marks nazar aayen (blue visit, gold result, red violation).
+        // Ring node ke edges se thora bahar nikalta hai.
         const float d = 2.f * R * 1.4f;
         const float s = d / static_cast<float>(m_ringTex->getSize().x);
         m_ringSprite.setScale(s, s);
@@ -1321,7 +1323,7 @@ void Renderer::drawNode(sf::RenderWindow& w, int i)
 
 void Renderer::drawEffects(sf::RenderWindow& w)
 {
-    // COMPARE: arrow toward the chosen child, with a text label (not colour alone)
+    // COMPARE: us bache ki taraf teer jo chuna gaya, text label ke saath (rang akela signal nahi)
     if (validIdx(m_arrowNode))
     {
         const RenderNode& n = m_nodes[m_arrowNode];
@@ -1379,7 +1381,7 @@ void Renderer::drawEffects(sf::RenderWindow& w)
         }
     }
 
-    // ROTATE: floating label above the pivot
+    // ROTATE: pivot ke upar ek floating label
     if (validIdx(m_rotNode) && m_zoom >= LabelMinZoom)
     {
         const RenderNode& n = m_nodes[m_rotNode];
@@ -1391,8 +1393,8 @@ void Renderer::drawEffects(sf::RenderWindow& w)
 
 void Renderer::drawTravelLabel(sf::RenderWindow& w, const Point& a, const Point& b)
 {
-    // value of A travels to B's slot, value of B travels to A's slot;
-    // a small vertical lift makes the two values pass each other
+    // A ki value B ki jagah jaati hai, aur B ki value A ki jagah.
+    // Thora sa upar uthana dono values ko aik doosre ko cross karne deta hai.
     float lift = 18.f * std::sin(PiF * m_swapT);
     m_swapTxt[0]->setPosition(a.x + (b.x - a.x) * m_swapT, a.y + (b.y - a.y) * m_swapT - lift);
     m_swapTxt[1]->setPosition(b.x + (a.x - b.x) * m_swapT, b.y + (a.y - b.y) * m_swapT + lift);
@@ -1458,7 +1460,7 @@ void Renderer::drawArray(sf::RenderWindow& w, float left, float right)
         drawTravelLabel(w, m_layout.cellPos(m_swapA), m_layout.cellPos(m_swapB));
     }
 
-    // region frames + text labels (colour is not the only signal)
+    // Region ke frames aur text labels (rang akela signal nahi hai)
     if (n > 0)
     {
         float top = m_layout.cellPos(0).y - ch * 0.5f - 6.f;
@@ -1515,6 +1517,7 @@ void Renderer::draw(sf::RenderWindow& window)
         m_rw / (float)ws.x, m_rh / (float)ws.y));
     window.setView(view);
 
+    // Sirf screen par dikhne wale nodes draw karte hain (culling).
     float halfW = m_rw / (2.f * m_zoom) + 60.f;
     float halfH = m_rh / (2.f * m_zoom) + 60.f;
     float left = m_cx - halfW;

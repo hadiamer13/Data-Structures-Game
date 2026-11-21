@@ -1,20 +1,19 @@
 #pragma once
-// Pure math: ViewSnapshot -> (x, y) per node id + array cell row.
-// No SFML. Uses only Point and ViewSnapshot from contracts/.
+// Pure math:ViewSnapshot se har node id ka (x, y) aur array cell ki qatar nikalta hai.
+// SFML nahi hai. Sirf Point aur ViewSnapshot istemal hote hain.
 //
-// Coordinates are "layout space": origin (0,0) = top-left of the whole
-// drawing (tree + array row). The Renderer applies camera zoom/pan.
+// Coordinates "layout space" mein hain: (0,0) poori drawing (tree + array row) ka top-left hai.
+// Zoom aur pan Renderer apply karta hai.
 //
-// Trees (Binary/BST/AVL): compact tidy-tree, parent centred over its
-//   children, subtrees never overlap (contour based), y = depth * vGap.
-// MaxHeap: complete-binary-tree slots. Node id == array index. Slot
-//   positions depend on the full array length, so nodes do NOT jump when
-//   the active heap shrinks during Heap Sort. Only indices < activeSize get
-//   a tree position (extracted values live only in the array row).
-// Array row: one cell per array element, centred below the tree.
+// Trees (Binary/BST/AVL): compact tidy-tree, parent apne bachon ke beech center mein,
+//   subtrees kabhi overlap nahi karte (contour based), y = depth * vGap.
+// maxheap:complete binary tree ke slots. Node id == array index. Slot positions poore array
+//   ki length par depend karti hain, is liye Heap Sort ke dauran nodes jump nahi karte.
+//   Sirf indices < activeSize ko tree position milti hai (nikale hue values sirf array row mein hote hain).
+// Array row: array ke har element ke liye aik cell, tree ke neeche center mein.
 
-#include "contracts/Types.h"
-#include "contracts/ViewSnapshot.h"
+#include "../contracts/Types.h"
+#include "../contracts/ViewSnapshot.h"
 
 class LayoutEngine
 {
@@ -25,28 +24,28 @@ public:
     void setSpacing(float hGap, float vGap);
     void setArrayStyle(float cellW, float cellH, float cellGap, float gapBelowTree);
 
-    // Recompute everything. Call only when the snapshot changed.
+    // Sab kuch dobara compute karta hai. Sirf snapshot badalne par call karo.
     void compute(const ViewSnapshot& snap);
 
-    // Copy positions from another engine (keep the "from" layout for tweening).
+    // Doosre engine se positions copy karta hai (tween ke liye "from" layout rakhne ke liye).
     void copyFrom(const LayoutEngine& other);
 
-    // Tree node lookup by id. nodePos is (0,0) if !hasNode.
+    // Tree node ko id se dhoondna. Agar !hasNode ho to nodePos (0,0) deta hai.
     bool  hasNode(int id) const;
     Point nodePos(int id) const;
     int   nodeCapacity() const;
 
-    // Array row (heap only). cellPos = cell CENTRE.
+    // Array row sirf heap. cellPos cell ka CENTRE deta hai.
     int   cellCount() const;
     Point cellPos(int index) const;
     float cellWidth() const;
     float cellHeight() const;
 
-    // Bounding box of nodes + cells (node centres / cell edges), min is (0,0).
+    // Nodes aur cells ka bounding box node centres/cell edges, min (0,0) hota hai.
     float width() const;
     float height() const;
 
-    // Linear interpolation helper for from->to tweens.
+    // from -> to tween ke liye linear interpolation.
     static Point mix(const Point& a, const Point& b, float t);
 
 private:
@@ -83,4 +82,3 @@ private:
     float m_width;
     float m_height;
 };
-

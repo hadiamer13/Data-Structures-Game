@@ -1,9 +1,7 @@
 // gui/widgets/Hud.h
 // Top bar: level title + objective (left), alarm meter (middle),
-// score / steps / status (right).
-// Knows nothing about the model. The owner feeds it numbers
-// (INTEGRATION: from ActionResult.hud, never from GUI maths).
-// Colour is never the only signal: the meter always has a numeric label and
+// score /steps/status (right).
+// Colour is never the only signal: the meter always has a numeric label for nerds and
 // a DANGER word near the limit; the status is a word.
 #pragma once
 #include <string>
@@ -48,7 +46,7 @@ private:
     int m_maxSteps;
     float m_shown;     // eased meter fill 0..1
 
-    NineSlice m_frame;  // ornate frame behind the alarm bar
+    NineSlice m_frame;  
 
     sf::RectangleShape m_bg;
     sf::RectangleShape m_barBack;

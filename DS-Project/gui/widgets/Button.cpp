@@ -4,15 +4,17 @@
 
 namespace {
 
-    const unsigned kMinTextSize = 12;   // labels never shrink below this
+    const unsigned kMinTextSize = 12;   // label is size se chhota nahi hoga
 
     float minF(float a, float b) { return a < b ? a : b; }
     float maxF(float a, float b) { return a > b ? a : b; }
 
+    // Aik color channel ko t (0..1) ke hisaab se x se y tak mix karta hai.
     sf::Uint8 mixChannel(sf::Uint8 x, sf::Uint8 y, float t) {
         return static_cast<sf::Uint8>(x + (y - x) * t);
     }
 
+    // Do colors ke darmiyan smooth transition ke liye.
     sf::Color lerpColor(const sf::Color& a, const sf::Color& b, float t) {
         return sf::Color(mixChannel(a.r, b.r, t), mixChannel(a.g, b.g, t),
             mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
@@ -20,6 +22,7 @@ namespace {
 
 }  // namespace
 
+// Button ko shuru karta hai: position, size, font aur label set karta hai.
 void Button::init(const char* label, const sf::Font& font,
     sf::Vector2f center, sf::Vector2f size) {
     m_center = center;
@@ -36,6 +39,7 @@ void Button::init(const char* label, const sf::Font& font,
     setLabel(label);
 }
 
+// Label badalta hai aur layout dobara banata hai.
 void Button::setLabel(const char* label) {
     m_text.setString(label);
     applyLayout();
@@ -61,20 +65,21 @@ void Button::setCenter(sf::Vector2f c) {
     applyLayout();
 }
 
+// Frame texture set karta hai. Texture na ho to frame band kar deta hai.
 void Button::setFrame(const sf::Texture* frame) {
     m_hasFrame = (frame != nullptr && frame->getSize().x > 0 && frame->getSize().y > 0);
     if (m_hasFrame) {
         m_frame.setTexture(frame, Theme::FrameBorderPx);
     }
     else {
-        m_frame.setTexture(nullptr, 0);   // texture missing: keep the plain button
+        m_frame.setTexture(nullptr, 0);   // texture missing: saada button rakho
     }
     applyLayout();
 }
 
-// Sizes the label, then the box, then the frame. All three use the same rectangle.
+// Label, box aur frame teeno ka size aur position aik hi rectangle se tay karta hai.
 void Button::applyLayout() {
-    // 1. Start from the base label size and shrink it only if a max width is set.
+    // 1. Label ka base size lo, aur sirf max width set ho to chhota karo.
     m_text.setCharacterSize(m_textSize);
     if (m_maxW > 0.f) {
         while (m_text.getCharacterSize() > kMinTextSize &&
@@ -83,28 +88,29 @@ void Button::applyLayout() {
         }
     }
 
-    // 2. Width = label + padding, not below the minimum, not above the max.
+    // 2. Chaurai = label + padding, minimum se kam nahi, max se zyada nahi.
     float w = maxF(m_minSize.x, m_text.getLocalBounds().width + 2.f * m_padX);
     if (m_maxW > 0.f) {
         w = minF(w, m_maxW);
     }
     m_size = sf::Vector2f(w, m_minSize.y);
 
-    // 3. Box, centred on m_center.
+    // 3. Box ko m_center par set karo.
     m_box.setSize(m_size);
     m_box.setOrigin(w / 2.f, m_size.y / 2.f);
     m_box.setPosition(m_center);
 
-    // 4. Label, centred.
+    // 4. Label ko bilkul center mein rakho.
     sf::FloatRect b = m_text.getLocalBounds();
     m_text.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
     m_text.setPosition(m_center);
 
-    // 5. Frame covers exactly the box, so it never spills into neighbours.
+    // 5. Frame bilkul box ke barabar ho taake padosi buttons par na chala jaye.
     m_frame.setRect(sf::FloatRect(m_center.x - w / 2.f, m_center.y - m_size.y / 2.f,
         w, m_size.y));
 }
 
+// Mouse events ko samajhta hai: hover, press aur click.
 void Button::handleEvent(const sf::Event& e) {
     sf::FloatRect bounds = m_box.getGlobalBounds();
 
@@ -123,6 +129,7 @@ void Button::handleEvent(const sf::Event& e) {
         }
     }
     else if (e.type == sf::Event::MouseButtonReleased) {
+        // Click tabhi maana jayega jab press aur release dono button ke andar hon.
         if (e.mouseButton.button == sf::Mouse::Left &&
             m_state == StatePressed) {
             bool still = bounds.contains(static_cast<float>(e.mouseButton.x),
@@ -133,6 +140,7 @@ void Button::handleEvent(const sf::Event& e) {
     }
 }
 
+// Hover ka smooth animation aur rang/outline ko har frame update karta hai.
 void Button::update(float dt) {
     float target = (m_state == StateIdle) ? 0.f : 1.f;
     float step = 8.f * dt;
@@ -140,7 +148,7 @@ void Button::update(float dt) {
     else                     m_hoverAmt = maxF(target, m_hoverAmt - step);
 
     if (m_hasFrame) {
-        // Framed: the fill stays dark. Hover only brightens the frame.
+        // Frame ke saath fill dark rehti hai. Hover sirf frame ko roshan karta hai.
         m_box.setFillColor(sf::Color::Transparent);
         m_box.setOutlineThickness(0.f);
         m_frame.setColor(lerpColor(Theme::BtnOutline, Theme::NodeGlow, m_hoverAmt));
@@ -153,6 +161,7 @@ void Button::update(float dt) {
     }
 }
 
+// Box, frame (agar ho) aur label ko window par draw karta hai.
 void Button::draw(sf::RenderWindow& window) const {
     window.draw(m_box);
     if (m_hasFrame) {

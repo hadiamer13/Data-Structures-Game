@@ -1,4 +1,3 @@
-// gui/screens/BriefingScreen.cpp
 #include "BriefingScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
@@ -12,6 +11,7 @@ void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
     const sf::Color& col, float x, float y)
 
 {
+    // check  if boss level
     if (m_ctx.campaign->isBoss(m_index))
     {
         const sf::Texture& skullTex = m_ctx.assets->skull();
@@ -24,7 +24,7 @@ void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
         m_bossIcon.setColor(Theme::StarOn);
         m_bossIcon.setPosition(panelPos.x + panelSize.x - 226.f, panelPos.y + 20.f);
     }
-    t.setFont(font);                       // SFML 2.x API
+    t.setFont(font);                       
     t.setString(str);
     t.setCharacterSize(size);
     t.setFillColor(col);
@@ -72,18 +72,15 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     const int act = m_index / 5;
     const int lvl = m_index % 5;
 
-    // ---- Background ----------------------------------------------------
-    // TODO(YOU): reuses the campaign background. For a dedicated briefing
-    // image, add BriefingBgPath to Theme.h and a texture to Assets, then
-    // swap the texture here.
+    // background
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x),
         H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
-    m_dim.setFillColor(sf::Color(0, 0, 0, 0));   // fades in via update()
+    m_dim.setFillColor(sf::Color(0, 0, 0, 0));   // fades in inside update()
 
-    // ---- Panel -----------------------------------------------------------
+   // main panel that has all contents
     const float pw = 860.f;
     const float ph = 540.f;
     const float px = (W - pw) / 2.f;

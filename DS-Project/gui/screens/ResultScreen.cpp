@@ -1,4 +1,3 @@
-// gui/screens/ResultScreen.cpp
 #include "ResultScreen.h"
 #include "../UIManager.h"
 #include "../Theme.h"
@@ -24,6 +23,8 @@ namespace
     }
 }
 
+//  construction
+// Result ko campaign progress mein save karta hai, phir panel, stars, stats aur buttons banata hai.
 ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
 {
     const sf::Font& font = ctx.assets->font();
@@ -41,8 +42,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_lastLevel = (idx >= 19);
     m_showBadge = (r.won && r.heapAct && idx == 19);
 
-    // Save this result into campaign progress. setStars keeps the best value,
-    // so showing the same result again is harmless.
+    // setStars sirf behtar value rakhta hai, is liye same result dobara dikhane se kuch nahi bigadta.
     if (ctx.campaign != nullptr)
     {
         ctx.campaign->setStars(idx, r.stars);
@@ -52,7 +52,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x), H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
-    m_dim.setFillColor(sf::Color(0, 0, 0, 0));    // fades in via update()
+    m_dim.setFillColor(sf::Color(0, 0, 0, 0));    // update() mein fade-in hota hai
 
     const float pw = 760.f;
     const float ph = 540.f;
@@ -62,9 +62,9 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_panel.setPosition(px, py);
     m_panel.setFillColor(Theme::TooltipBg);
     m_panel.setOutlineColor(r.won ? Theme::StarOn : Theme::NodeLine);
-    m_panel.setOutlineThickness(r.won ? 6.f : 3.f);     // not colour alone
+    m_panel.setOutlineThickness(r.won ? 6.f : 3.f);     // rang ke saath border bhi badalta hai
 
-    // Status is a word, not only a colour.
+    // Status sirf rang se nahi, text se bhi dikhta hai.
     styleText(m_title, font, 44, r.won ? Theme::StarOn : Theme::TitleColor);
     m_title.setString(r.won ? "LEVEL CLEARED" : "ALARM FULL - LEVEL FAILED");
     centreAt(m_title, cx, py + 42.f);
@@ -75,7 +75,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_sub.setString("ACT " + std::to_string(act) + "  -  LEVEL " + std::to_string(act) + "." + std::to_string(lvl));
     centreAt(m_sub, cx, py + 92.f);
 
-    // stars
+    //  stars
     const float outer = 28.f;
     const float inner = outer * 0.45f;
     for (int s = 0; s < 3; ++s)
@@ -102,7 +102,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_stats.setLineSpacing(1.15f);
     centreAt(m_stats, cx, py + 270.f);
 
-    // Act 4: final array, 12 values per line
+    // Act 4 ka final array, har line par 12 values.
     styleText(m_sorted, font, 18, Theme::TextColor);
     if (r.heapAct && r.sortedArray.size() > 0)
     {
@@ -119,7 +119,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
         centreAt(m_sorted, cx, py + 390.f);
     }
 
-    // Completion badge (text + gold frame)
+    // Completion badge, text aur sunehri frame ke saath.
     styleText(m_badge, font, 26, Theme::StarOn);
     m_badge.setString("FINAL VAULT UNLOCKED");
     centreAt(m_badge, cx, py + 452.f);
@@ -130,7 +130,8 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_badgeBox.setOutlineColor(Theme::StarOn);
     m_badgeBox.setOutlineThickness(3.f);
 
-    // buttons
+    //  buttons
+    // Jeetne par Retry, Next aur Campaign teeno dikhte hain. Haarne par sirf Retry aur Campaign.
     const float by = py + ph - 38.f;
     const sf::Vector2f bs(220.f, Theme::ButtonH);
     if (m_won)
@@ -168,12 +169,14 @@ void ResultScreen::onCampaignClick(void* context)
     static_cast<ResultScreen*>(context)->onCampaign();
 }
 
+// Wahi level dobara shuru hota hai. Act 4 ke levels heap screen par jaate hain.
 void ResultScreen::onRetry()
 {
     m_ctx.selectedLevel = m_ctx.result.levelIndex;
     m_ctx.ui->requestScreen(m_ctx.result.levelIndex >= 15 ? ScreenId::HeapLevel : ScreenId::Level);
 }
 
+// Agla level briefing se shuru hota hai. Aakhri level ke baad Main Menu par jaata hai.
 void ResultScreen::onNext()
 {
     if (m_lastLevel)
@@ -187,13 +190,14 @@ void ResultScreen::onNext()
 
 void ResultScreen::onCampaign()
 {
-    m_ctx.selectedLevel = m_ctx.result.levelIndex;     // Campaign reopens on this level
+    m_ctx.selectedLevel = m_ctx.result.levelIndex;     // Campaign map wahi level dikhayega
     m_ctx.ui->requestScreen(ScreenId::Campaign);
 }
 
+//  input
+// Enter jeetne par Next aur haarne par Retry chalata hai. Esc UIManager handle karta hai.
 void ResultScreen::handleEvent(const sf::Event& e)
 {
-    // Esc is handled by UIManager (goes to the Campaign).
     if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Return)
     {
         if (m_won)
@@ -214,6 +218,7 @@ void ResultScreen::handleEvent(const sf::Event& e)
     }
 }
 
+// Dim layer ko dheere dheere dark karta hai.
 void ResultScreen::update(float dt)
 {
     m_retry.update(dt);

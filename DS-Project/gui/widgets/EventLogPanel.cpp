@@ -227,7 +227,7 @@ void EventLogPanel::draw(sf::RenderWindow& window) const
     window.draw(m_header);
     if (m_scroll > 0)
     {
-        window.draw(m_scrollHint);   // text label, not colour alone
+        window.draw(m_scrollHint);   // text label hai, not colour alone
     }
     int r = rows();
     for (int i = 0; i < r; ++i)

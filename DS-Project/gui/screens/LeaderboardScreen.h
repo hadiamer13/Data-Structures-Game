@@ -5,6 +5,8 @@
 #include "../widgets/Button.h"
 #include "../../game/Leaderboard.h"
 
+//  leaderboard screen
+// Endless mode ke local top scores dikhata hai.
 class LeaderboardScreen : public Screen
 {
 public:

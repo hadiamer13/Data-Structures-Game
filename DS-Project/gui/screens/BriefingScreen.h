@@ -4,7 +4,8 @@
 #include "../AppContext.h"
 #include "../widgets/Button.h"
 
-class BriefingScreen : public Screen {
+class BriefingScreen : public Screen 
+{
 public:
     explicit BriefingScreen(AppContext& ctx);
 

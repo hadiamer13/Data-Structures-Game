@@ -211,7 +211,6 @@
     <ClCompile Include="gui\widgets\LevelBanner.cpp" />
     <ClCompile Include="gui\widgets\NineSlice.cpp" />
     <ClCompile Include="gui\widgets\NumberField.cpp" />
-    <ClCompile Include="gui\widgets\Ornament.cpp" />
     <ClCompile Include="gui\widgets\Toolbar.cpp" />
     <ClCompile Include="gui\widgets\Tooltip.cpp" />
     <ClCompile Include="model\AVLTree.cpp" />
@@ -261,7 +260,7 @@
     <ClInclude Include="gui\UIManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="gui\screens\BriefingScreen.h" />
