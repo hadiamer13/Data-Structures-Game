@@ -3,7 +3,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-namespace Theme {
+namespace Theme
+{
 
     // ---- Window ----
     // TODO(YOU): set this to your background image size (e.g. 1280x720)
@@ -40,7 +41,7 @@ namespace Theme {
 
     // ---- Misc numbers ----
     inline const float Pi = 3.14159265f;
-    inline const float BannerH = 340.f;       // selected banner height
+    inline const float BannerH = 340.f; // selected banner height
 
     // ---- Colours (dark red theme) ----
     inline const sf::Color BtnIdle(28, 12, 16, 220);
@@ -70,11 +71,10 @@ namespace Theme {
         sf::Color(170, 40, 50, 200),
         sf::Color(150, 35, 60, 200),
         sf::Color(130, 30, 70, 200),
-        sf::Color(190, 50, 40, 200)
-    };
+        sf::Color(190, 50, 40, 200)};
 
     // Width of the untouched corner/edge band of a framed texture, in texture pixels.
-// Tune this if the frame corners look too thick or too thin.
+    // Tune this if the frame corners look too thick or too thin.
     inline const int FrameBorderPx = 12;
 
-}  // namespace Theme
+} // namespace Theme

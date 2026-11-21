@@ -7,13 +7,13 @@
 
 class ReportScreen : public Screen
 {
-public:
+  public:
     explicit ReportScreen(AppContext& ctx);
     void handleEvent(const sf::Event& event) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     static void onLeaderboard(void* context);
     static void onHome(void* context);
     void refreshCharts();

@@ -12,7 +12,7 @@
 
 class Hud
 {
-public:
+  public:
     Hud();
 
     void init(const sf::Font& font, float x, float y, float w, float h);
@@ -21,7 +21,7 @@ public:
     void setFrame(const sf::Texture* frame);
 
     void setTitle(const std::string& title);
-    void setObjective(const std::string& objective);   // '\n' becomes a space, then word-wrapped
+    void setObjective(const std::string& objective); // '\n' becomes a space, then word-wrapped
     void setAlarm(int alarm, int capacity);
     void setScore(int score);
     void setSteps(int steps, int maxSteps);
@@ -30,7 +30,7 @@ public:
     void update(float dt);
     void draw(sf::RenderWindow& window) const;
 
-private:
+  private:
     void layoutObjective();
     void refreshMeterLabel();
 
@@ -46,9 +46,9 @@ private:
     int m_score;
     int m_steps;
     int m_maxSteps;
-    float m_shown;     // eased meter fill 0..1
+    float m_shown; // eased meter fill 0..1
 
-    NineSlice m_frame;  // ornate frame behind the alarm bar
+    NineSlice m_frame; // ornate frame behind the alarm bar
 
     sf::RectangleShape m_bg;
     sf::RectangleShape m_barBack;

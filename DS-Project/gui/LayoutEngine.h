@@ -18,7 +18,7 @@
 
 class LayoutEngine
 {
-public:
+  public:
     LayoutEngine();
     ~LayoutEngine();
 
@@ -32,12 +32,12 @@ public:
     void copyFrom(const LayoutEngine& other);
 
     // Tree node lookup by id. nodePos is (0,0) if !hasNode.
-    bool  hasNode(int id) const;
+    bool hasNode(int id) const;
     Point nodePos(int id) const;
-    int   nodeCapacity() const;
+    int nodeCapacity() const;
 
     // Array row (heap only). cellPos = cell CENTRE.
-    int   cellCount() const;
+    int cellCount() const;
     Point cellPos(int index) const;
     float cellWidth() const;
     float cellHeight() const;
@@ -49,7 +49,7 @@ public:
     // Linear interpolation helper for from->to tweens.
     static Point mix(const Point& a, const Point& b, float t);
 
-private:
+  private:
     LayoutEngine(const LayoutEngine&);
     LayoutEngine& operator=(const LayoutEngine&);
 
@@ -61,7 +61,7 @@ private:
     void finish();
 
     bool validId(const ViewSnapshot& snap, int id) const;
-    int  layoutSub(const ViewSnapshot& snap, int id, float* lo, float* hi, int cap);
+    int layoutSub(const ViewSnapshot& snap, int id, float* lo, float* hi, int cap);
     void assignSub(const ViewSnapshot& snap, int id, float x, int depth);
 
     float m_hGap;
@@ -74,13 +74,12 @@ private:
     Point* m_pos;
     bool* m_has;
     float* m_rel;
-    int    m_cap;
+    int m_cap;
 
     Point* m_cell;
-    int    m_cellCount;
+    int m_cellCount;
 
-    int   m_guard;
+    int m_guard;
     float m_width;
     float m_height;
 };
-

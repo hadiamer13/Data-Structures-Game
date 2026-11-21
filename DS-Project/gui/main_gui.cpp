@@ -10,14 +10,15 @@
 // The model test runner is the project's active entry point while running the
 // integrated build. Re-enable this block to launch the SFML menu instead.
 
-int main() {
+int main()
+{
     // ---- Window (SFML 2.x: sf::VideoMode(w, h)) ----------------------
     GameSettings gameSettings;
     sf::ContextSettings contextSettings;
     contextSettings.antialiasingLevel = gameSettings.antialiasingLevel;
     sf::RenderWindow window(sf::VideoMode(Theme::WindowW, Theme::WindowH),
-        "Vault Heist: The Living Vault",
-        sf::Style::Titlebar | sf::Style::Close, contextSettings);
+                            "Vault Heist: The Living Vault",
+                            sf::Style::Titlebar | sf::Style::Close, contextSettings);
     // Use setFramerateLimit OR vsync, never both.
     window.setFramerateLimit(Theme::FrameLimit);
 
@@ -90,8 +91,8 @@ int main() {
             sf::ContextSettings changedSettings;
             changedSettings.antialiasingLevel = gameSettings.antialiasingLevel;
             window.create(sf::VideoMode(Theme::WindowW, Theme::WindowH),
-                "Vault Heist: The Living Vault",
-                sf::Style::Titlebar | sf::Style::Close, changedSettings);
+                          "Vault Heist: The Living Vault",
+                          sf::Style::Titlebar | sf::Style::Close, changedSettings);
             window.setFramerateLimit(Theme::FrameLimit);
         }
 

@@ -114,9 +114,8 @@ Event EventLog::inverse(const Event& e)
         r.oldV = e.newV;
         r.newV = e.oldV;
     }
-    // SWAP_VALUE and HEAP_SWAP: swapping the same pair again undoes it, so r == e.
-    // Everything else (ROTATE, ...): unchanged copy; undo uses snapshot restore.
-    r.alarmCost = 0;  // undoing never charges the alarm meter
+
+    r.alarmCost = 0; // undoing never charges the alarm meter
     return r;
 }
 

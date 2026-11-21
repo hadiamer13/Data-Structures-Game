@@ -20,7 +20,7 @@ typedef void (*AnimDoneCallback)(void* context);
 struct AnimItem
 {
     Event ev;
-    ViewSnapshot* after;   // owned by the controller, may be nullptr
+    ViewSnapshot* after; // owned by the controller, may be nullptr
 
     AnimItem() : after(nullptr)
     {
@@ -29,7 +29,7 @@ struct AnimItem
 
 class AnimationController
 {
-public:
+  public:
     explicit AnimationController(IEventVisualizer* visualizer);
     ~AnimationController();
 
@@ -39,7 +39,7 @@ public:
     // Batch building
     void beginBatch(const ViewSnapshot& before);
     void enqueue(const Event& e, const ViewSnapshot* afterEvent);
-    void endBatch(const ViewSnapshot& afterAll);   // starts playback
+    void endBatch(const ViewSnapshot& afterAll); // starts playback
 
     // Frame
     void update(float dt);
@@ -48,23 +48,23 @@ public:
     void play();
     void pause();
     void togglePause();
-    void stepOne();          // plays exactly one event, then stays paused
-    void skipAll();          // finish instantly, hard-sync to the end snapshot
-    void startReplay();      // snap to the start snapshot and play again
-    void setSpeed(float s);  // 0.1 .. 5 (fed from Toolbar::speed())
-    void clear();            // drop the batch and stop
+    void stepOne();         // plays exactly one event, then stays paused
+    void skipAll();         // finish instantly, hard-sync to the end snapshot
+    void startReplay();     // snap to the start snapshot and play again
+    void setSpeed(float s); // 0.1 .. 5 (fed from Toolbar::speed())
+    void clear();           // drop the batch and stop
 
     // State
-    bool busy() const;       // true while events remain (LevelScreen locks input)
+    bool busy() const; // true while events remain (LevelScreen locks input)
     bool paused() const;
     float speed() const;
     int playedCount() const;
     int totalCount() const;
-    float scrubProgress() const;   // 0..1, for a future scrubber bar
+    float scrubProgress() const; // 0..1, for a future scrubber bar
 
-    static float eventDuration(int eventType);   // seconds at speed 1
+    static float eventDuration(int eventType); // seconds at speed 1
 
-private:
+  private:
     AnimationController(const AnimationController&);
     AnimationController& operator=(const AnimationController&);
 
@@ -90,8 +90,8 @@ private:
     float m_speed;
     bool m_busy;
     bool m_paused;
-    bool m_active;     // an event is animating
-    bool m_stepping;   // single step in progress
+    bool m_active;   // an event is animating
+    bool m_stepping; // single step in progress
     bool m_stepReq;
     bool m_skipping;
 

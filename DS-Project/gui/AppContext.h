@@ -29,13 +29,13 @@ struct LevelResult
     int penalties;
     int score;
     bool won;
-    int levelIndex;        // act * 5 + level (0..19)
-    IntArray sortedArray;  // Act 4: final array (empty otherwise)
+    int levelIndex;       // act * 5 + level (0..19)
+    IntArray sortedArray; // Act 4: final array (empty otherwise)
     bool heapAct;
 
     LevelResult()
         : stars(0), alarm(0), optimal(0), penalties(0), score(0), won(false),
-        levelIndex(0), heapAct(false)
+          levelIndex(0), heapAct(false)
     {
     }
 };
@@ -44,11 +44,11 @@ struct AppContext
 {
     sf::RenderWindow* window = nullptr;
     const Assets* assets = nullptr;
-    UIManager* ui = nullptr;           // main_gui.cpp sets this to &uiManager
-    GameSession* session = nullptr;    // main_gui.cpp sets this (stub or real)
-    Campaign* campaign = nullptr;      // main_gui.cpp sets this; levels + star progress
-    GameSettings* settings = nullptr;  // shared display and animation settings
+    UIManager* ui = nullptr;          // main_gui.cpp sets this to &uiManager
+    GameSession* session = nullptr;   // main_gui.cpp sets this (stub or real)
+    Campaign* campaign = nullptr;     // main_gui.cpp sets this; levels + star progress
+    GameSettings* settings = nullptr; // shared display and animation settings
 
-    int selectedLevel = -1;            // index = act * 5 + level (0..19), -1 = none
+    int selectedLevel = -1; // index = act * 5 + level (0..19), -1 = none
     LevelResult result;
 };

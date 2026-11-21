@@ -52,7 +52,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x), H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
-    m_dim.setFillColor(sf::Color(0, 0, 0, 0));    // fades in via update()
+    m_dim.setFillColor(sf::Color(0, 0, 0, 0)); // fades in via update()
 
     const float pw = 760.f;
     const float ph = 540.f;
@@ -62,7 +62,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_panel.setPosition(px, py);
     m_panel.setFillColor(Theme::TooltipBg);
     m_panel.setOutlineColor(r.won ? Theme::StarOn : Theme::NodeLine);
-    m_panel.setOutlineThickness(r.won ? 6.f : 3.f);     // not colour alone
+    m_panel.setOutlineThickness(r.won ? 6.f : 3.f); // not colour alone
 
     // Status is a word, not only a colour.
     styleText(m_title, font, 44, r.won ? Theme::StarOn : Theme::TitleColor);
@@ -95,10 +95,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     }
 
     styleText(m_stats, font, 26, Theme::TextColor);
-    m_stats.setString("Steps: " + std::to_string(r.alarm) + "   (optimal " + std::to_string(r.optimal) + ")"
-        + "\nPenalties: " + std::to_string(r.penalties)
-        + "\nScore: " + std::to_string(r.score)
-        + "\nStars: " + std::to_string(r.stars) + " / 3");
+    m_stats.setString("Steps: " + std::to_string(r.alarm) + "   (optimal " + std::to_string(r.optimal) + ")" + "\nPenalties: " + std::to_string(r.penalties) + "\nScore: " + std::to_string(r.score) + "\nStars: " + std::to_string(r.stars) + " / 3");
     m_stats.setLineSpacing(1.15f);
     centreAt(m_stats, cx, py + 270.f);
 
@@ -187,7 +184,7 @@ void ResultScreen::onNext()
 
 void ResultScreen::onCampaign()
 {
-    m_ctx.selectedLevel = m_ctx.result.levelIndex;     // Campaign reopens on this level
+    m_ctx.selectedLevel = m_ctx.result.levelIndex; // Campaign reopens on this level
     m_ctx.ui->requestScreen(ScreenId::Campaign);
 }
 

@@ -1,3 +1,5 @@
+param([switch]$BuildOnly)
+
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -54,6 +56,12 @@ $command = 'call "' + $vcvars + '" x64 -vcvars_ver=14.44 && cl /nologo /EHsc /st
 if ($LASTEXITCODE -ne 0)
 {
     exit $LASTEXITCODE
+}
+
+if ($BuildOnly)
+{
+    Write-Host "Built model test runner: $outputExe"
+    exit 0
 }
 
 & $outputExe

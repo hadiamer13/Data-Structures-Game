@@ -10,13 +10,13 @@
 
 class EndlessScreen : public Screen
 {
-public:
+  public:
     explicit EndlessScreen(AppContext& ctx);
     void handleEvent(const sf::Event& event) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     struct ActionContext
     {
         EndlessScreen* owner;

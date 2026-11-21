@@ -1,5 +1,5 @@
 // contracts/Util.h
-// Own helpers replacing <algorithm>. Header-only, inline, no templates.
+
 #ifndef VH_UTIL_H
 #define VH_UTIL_H
 

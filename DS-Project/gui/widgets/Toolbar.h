@@ -26,13 +26,13 @@ struct ToolbarButtonCtx
 
 class Toolbar
 {
-public:
+  public:
     Toolbar();
 
     void init(const sf::Font& font, float x, float y, float w, float h);
     void setCallback(ToolbarCallback cb, void* context);
 
-    float speed() const;            // 0.25 .. 3.0, default 1.0
+    float speed() const; // 0.25 .. 3.0, default 1.0
 
     void handleEvent(const sf::Event& e);
     void update(float dt);
@@ -41,7 +41,7 @@ public:
     // Called by the static button callback (public so it can reach it).
     void fire(int action);
 
-private:
+  private:
     static void onButton(void* context);
 
     void setSpeedFromX(float x);

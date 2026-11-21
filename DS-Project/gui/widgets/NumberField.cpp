@@ -4,7 +4,7 @@
 
 NumberField::NumberField()
     : m_x(0.f), m_y(0.f), m_w(100.f), m_h(30.f), m_focused(false), m_time(0.f),
-    m_cb(nullptr), m_cbContext(nullptr)
+      m_cb(nullptr), m_cbContext(nullptr)
 {
 }
 

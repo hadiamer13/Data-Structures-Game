@@ -8,22 +8,22 @@
 
 class EventLogPanel
 {
-public:
+  public:
     EventLogPanel();
 
     void init(const sf::Font& font, float x, float y, float w, float h);
 
     void clear();
-    void addLine(const std::string& line);   // long lines are wrapped
+    void addLine(const std::string& line); // long lines are wrapped
 
     void handleEvent(const sf::Event& e);
     void update(float dt);
     void draw(sf::RenderWindow& window) const;
 
-private:
+  private:
     void pushWrapped(const std::string& line);
     void pushRaw(const std::string& line);
-    int  rows() const;
+    int rows() const;
     void rebuild();
 
     static const int kMaxLines = 300;
@@ -35,9 +35,9 @@ private:
     float m_h;
 
     std::string m_lines[kMaxLines];
-    int m_start;       // ring index of the oldest line
+    int m_start; // ring index of the oldest line
     int m_count;
-    int m_scroll;      // lines scrolled up from the newest (0 = following)
+    int m_scroll; // lines scrolled up from the newest (0 = following)
     bool m_dirty;
 
     sf::RectangleShape m_bg;

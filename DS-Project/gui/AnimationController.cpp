@@ -16,11 +16,11 @@ namespace
 
 AnimationController::AnimationController(IEventVisualizer* visualizer)
     : m_vis(visualizer), m_items(nullptr), m_count(0), m_cap(0),
-    m_hasStart(false), m_hasEnd(false),
-    m_index(0), m_t(0.f), m_speed(1.f),
-    m_busy(false), m_paused(false), m_active(false), m_stepping(false),
-    m_stepReq(false), m_skipping(false),
-    m_onEvent(nullptr), m_onDone(nullptr), m_cbContext(nullptr)
+      m_hasStart(false), m_hasEnd(false),
+      m_index(0), m_t(0.f), m_speed(1.f),
+      m_busy(false), m_paused(false), m_active(false), m_stepping(false),
+      m_stepReq(false), m_skipping(false),
+      m_onEvent(nullptr), m_onDone(nullptr), m_cbContext(nullptr)
 {
 }
 
@@ -105,7 +105,7 @@ void AnimationController::enqueue(const Event& e, const ViewSnapshot* afterEvent
         {
             nd[i] = m_items[i];
         }
-        delete[] m_items;   // item snapshot pointers were copied, not deleted
+        delete[] m_items; // item snapshot pointers were copied, not deleted
         m_items = nd;
         m_cap = newCap;
     }
@@ -274,7 +274,7 @@ void AnimationController::stepOne()
     m_paused = true;
     if (m_active)
     {
-        m_stepping = true;   // let the running event finish, then stay paused
+        m_stepping = true; // let the running event finish, then stay paused
     }
     else
     {
@@ -308,7 +308,7 @@ void AnimationController::startReplay()
     }
     if (m_hasStart)
     {
-        m_vis->snapTo(m_start);   // also clears highlights
+        m_vis->snapTo(m_start); // also clears highlights
     }
     startPlayback();
 }

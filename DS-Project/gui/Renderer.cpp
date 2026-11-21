@@ -71,15 +71,15 @@ namespace
 
 Renderer::Renderer(const sf::Font& font)
     : m_font(&font),
-    m_rx(0.f), m_ry(0.f), m_rw(800.f), m_rh(600.f),
-    m_nodes(0), m_cap(0), m_count(0), m_kind(TreeKind::BST), m_activeSize(0),
-    m_key(0), m_badge(0), m_cell(0), m_idx(0),
-    m_regionA(0), m_regionB(0),
-    m_edges(sf::Lines), m_edgesDirty(true),
-    m_tween(1.f),
-    m_zoom(1.f), m_cx(0.f), m_cy(0.f), m_tZoom(1.f), m_tCx(0.f), m_tCy(0.f),
-    m_userMoved(false), m_hasFit(false), m_dragging(false), m_lastMx(0), m_lastMy(0),
-    m_swapA(kNull), m_swapB(kNull), m_swapT(0.f)
+      m_rx(0.f), m_ry(0.f), m_rw(800.f), m_rh(600.f),
+      m_nodes(0), m_cap(0), m_count(0), m_kind(TreeKind::BST), m_activeSize(0),
+      m_key(0), m_badge(0), m_cell(0), m_idx(0),
+      m_regionA(0), m_regionB(0),
+      m_edges(sf::Lines), m_edgesDirty(true),
+      m_tween(1.f),
+      m_zoom(1.f), m_cx(0.f), m_cy(0.f), m_tZoom(1.f), m_tCx(0.f), m_tCy(0.f),
+      m_userMoved(false), m_hasFit(false), m_dragging(false), m_lastMx(0), m_lastMy(0),
+      m_swapA(kNull), m_swapB(kNull), m_swapT(0.f)
 {
     m_ringTex = nullptr;
     m_circle.setPointCount(32);
@@ -194,10 +194,10 @@ void Renderer::ensureCapacity(int n)
     }
 
     RenderNode* nn = new RenderNode[newCap];
-    sf::Text** nk = new sf::Text * [newCap];
-    sf::Text** nb = new sf::Text * [newCap];
-    sf::Text** nc = new sf::Text * [newCap];
-    sf::Text** ni = new sf::Text * [newCap];
+    sf::Text** nk = new sf::Text*[newCap];
+    sf::Text** nb = new sf::Text*[newCap];
+    sf::Text** nc = new sf::Text*[newCap];
+    sf::Text** ni = new sf::Text*[newCap];
 
     for (int i = 0; i < m_cap; i++)
     {
@@ -671,7 +671,7 @@ void Renderer::beginEvent(const Event& e)
         {
             if (t == EventType::UPDATE_HEIGHT)
             {
-                m_nodes[e.id].height = e.newV;   // bf arrives with the next snapshot
+                m_nodes[e.id].height = e.newV; // bf arrives with the next snapshot
             }
             else
             {
@@ -968,8 +968,7 @@ bool Renderer::handleCameraEvent(const sf::Event& ev)
         if (inCanvas(sx, sy))
         {
             bool bg = (pick(sx, sy) == kNull) && (pickCell(sx, sy) == kNull);
-            if (ev.mouseButton.button == sf::Mouse::Middle
-                || (ev.mouseButton.button == sf::Mouse::Left && bg))
+            if (ev.mouseButton.button == sf::Mouse::Middle || (ev.mouseButton.button == sf::Mouse::Left && bg))
             {
                 m_dragging = true;
                 m_lastMx = ev.mouseButton.x;
@@ -1512,7 +1511,7 @@ void Renderer::draw(sf::RenderWindow& window)
     sf::Vector2u ws = window.getSize();
     sf::View view(sf::Vector2f(m_cx, m_cy), sf::Vector2f(m_rw / m_zoom, m_rh / m_zoom));
     view.setViewport(sf::FloatRect(m_rx / (float)ws.x, m_ry / (float)ws.y,
-        m_rw / (float)ws.x, m_rh / (float)ws.y));
+                                   m_rw / (float)ws.x, m_rh / (float)ws.y));
     window.setView(view);
 
     float halfW = m_rw / (2.f * m_zoom) + 60.f;

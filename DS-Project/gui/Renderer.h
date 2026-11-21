@@ -31,15 +31,15 @@ namespace NodeMark
 namespace NodeFx
 {
     inline const int None = 0;
-    inline const int Insert = 1;   // expanding green ring
-    inline const int Unlink = 2;   // expanding red ring
-    inline const int Rotate = 3;   // gold ring on the pivot
+    inline const int Insert = 1; // expanding green ring
+    inline const int Unlink = 2; // expanding red ring
+    inline const int Rotate = 3; // gold ring on the pivot
 }
 
 struct RenderNode
 {
-    bool present;   // exists in the snapshot (heap: cell exists)
-    bool visible;   // drawn in the tree view (heap: index < activeSize)
+    bool present; // exists in the snapshot (heap: cell exists)
+    bool visible; // drawn in the tree view (heap: index < activeSize)
     int key;
     int left;
     int right;
@@ -56,14 +56,14 @@ struct RenderNode
     int mark;
     bool selected;
     bool target;
-    bool dying;     // removed node fading out (still drawn, edge retracting)
-    float fx;       // 0..1 effect strength
-    int fxKind;     // NodeFx::*
+    bool dying; // removed node fading out (still drawn, edge retracting)
+    float fx;   // 0..1 effect strength
+    int fxKind; // NodeFx::*
 };
 
 class Renderer : public IEventVisualizer
 {
-public:
+  public:
     explicit Renderer(const sf::Font& font);
     ~Renderer();
 
@@ -88,12 +88,12 @@ public:
     void fit(bool animate);
     void zoomAt(float sx, float sy, float factor);
     void panBy(float dxScreen, float dyScreen);
-    bool handleCameraEvent(const sf::Event& ev);     // wheel zoom, drag-bg / middle-drag pan
+    bool handleCameraEvent(const sf::Event& ev); // wheel zoom, drag-bg / middle-drag pan
     float zoom() const;
 
     // Picking (screen pixels). -1 if nothing.
-    int pick(float sx, float sy) const;              // tree node id (heap: index)
-    int pickCell(float sx, float sy) const;          // array cell index (heap only)
+    int pick(float sx, float sy) const;     // tree node id (heap: index)
+    int pickCell(float sx, float sy) const; // array cell index (heap only)
     bool nodeScreenPos(int id, float& sx, float& sy) const;
     bool nodeInfo(int id, int& key, int& height, int& size, int& balance, int& depth) const;
 
@@ -105,16 +105,16 @@ public:
 
     int kind() const;
     bool isHeap() const;
-    
+
     // Optional ornament drawn around each node. Pass nullptr to keep the plain circle.
     void setRingTexture(const sf::Texture* tex);
 
-private:
+  private:
     Renderer(const Renderer&);
     Renderer& operator=(const Renderer&);
 
     const sf::Texture* m_ringTex;
-    sf::Sprite         m_ringSprite;
+    sf::Sprite m_ringSprite;
 
     void resetNode(RenderNode& r) const;
     void ensureCapacity(int n);

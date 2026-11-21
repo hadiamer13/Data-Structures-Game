@@ -3,9 +3,12 @@
 #include <SFML/Graphics.hpp>
 
 // Base class for every screen (menu, campaign map, level, ...).
-class Screen {
-public:
-    virtual ~Screen() {}
+class Screen
+{
+  public:
+    virtual ~Screen()
+    {
+    }
 
     virtual void handleEvent(const sf::Event& e) = 0;
     virtual void update(float dt) = 0;

@@ -7,20 +7,34 @@
 
 static int iterativeHeight(const TreeNode* root)
 {
-    if (root == nullptr) return 0;
+    if (root == nullptr)
+    {
+        return 0;
+    }
+
     NodeQueue queue;
     queue.push(const_cast<TreeNode*>(root));
     int height = 0;
+
     while (!queue.empty())
     {
         int width = queue.size();
         height++;
+
         while (width-- > 0)
         {
             TreeNode* node = queue.front();
             queue.pop();
-            if (node->left != nullptr) queue.push(node->left);
-            if (node->right != nullptr) queue.push(node->right);
+            
+            if (node->left != nullptr)
+            {
+                queue.push(node->left);
+            }
+
+            if (node->right != nullptr)
+            {
+                queue.push(node->right);
+            }
         }
     }
     return height;
@@ -76,7 +90,7 @@ void runHeightSearchBench()
 {
     std::printf("\n[Height and 10,000 searches]\n");
     std::printf("n,shape,bst_height,avl_height,bst_build_ms,avl_build_ms,bst_avg_comparisons,avl_avg_comparisons,bst_search_ms,avl_search_ms\n");
-    const int sizes[] = { 100, 1000, 10000 };
+    const int sizes[] = {100, 1000, 10000};
     for (int s = 0; s < 3; s++)
     {
         for (int shape = 0; shape < 2; shape++)
@@ -84,9 +98,15 @@ void runHeightSearchBench()
             IntArray keys;
             if (shape == 0)
             {
-                for (int i = 0; i < sizes[s]; i++) keys.push(i + 1);
+                for (int i = 0; i < sizes[s]; i++)
+                {
+                    keys.push(i + 1);
+                }
             }
-            else makePermutation(sizes[s], 7351u + static_cast<std::uint32_t>(sizes[s]), keys);
+            else
+            {
+                makePermutation(sizes[s], 7351u + static_cast<std::uint32_t>(sizes[s]), keys);
+            }
             BST bst;
             AVLTree avl;
             EventLog log;
@@ -106,7 +126,10 @@ void runHeightSearchBench()
             const double avlBuild = elapsedMilliseconds(start, std::clock());
             IntArray queries;
             BenchRng queryRng(92311u + static_cast<std::uint32_t>(sizes[s]));
-            for (int i = 0; i < 10000; i++) queries.push(queryRng.below(sizes[s]) + 1);
+            for (int i = 0; i < 10000; i++)
+            {
+                queries.push(queryRng.below(sizes[s]) + 1);
+            }
             std::uint64_t bstComparisons = 0;
             std::uint64_t avlComparisons = 0;
             searchCounts(bst, avl, queries, bstComparisons, avlComparisons);

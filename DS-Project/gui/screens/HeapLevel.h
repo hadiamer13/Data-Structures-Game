@@ -31,14 +31,14 @@ namespace HeapOp
 
 class HeapLevel : public Screen
 {
-public:
+  public:
     explicit HeapLevel(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     HeapLevel(const HeapLevel&);
     HeapLevel& operator=(const HeapLevel&);
 
@@ -96,7 +96,7 @@ private:
     int m_pressY;
     bool m_pressing;
     int m_opCount;
-    float m_opNextX = 170.f;   // x where the next op button starts
+    float m_opNextX = 170.f; // x where the next op button starts
 
     sf::Sprite m_background;
     sf::RectangleShape m_dim;
@@ -108,7 +108,7 @@ private:
     sf::Text m_selText;
     sf::Text m_notice;
 
-    Renderer m_renderer;          // must be constructed before m_anim
+    Renderer m_renderer; // must be constructed before m_anim
     AnimationController m_anim;
     Hud m_hud;
     Toolbar m_toolbar;

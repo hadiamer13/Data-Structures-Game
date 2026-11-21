@@ -3,11 +3,14 @@
 #include "Theme.h"
 #include <cstdio>
 
-namespace {
+namespace
+{
 
     // Loads one texture, smooths it for scaling, and reports failures by path.
-    bool loadTexture(sf::Texture& tex, const char* path) {
-        if (!tex.loadFromFile(path)) {
+    bool loadTexture(sf::Texture& tex, const char* path)
+    {
+        if (!tex.loadFromFile(path))
+        {
             std::fprintf(stderr, "[Assets] Failed to load texture: %s\n", path);
             return false;
         }
@@ -15,13 +18,15 @@ namespace {
         return true;
     }
 
-}  // namespace
+} // namespace
 
-bool Assets::loadAll() {
+bool Assets::loadAll()
+{
     bool ok = true;
 
     // Required: the game cannot run without these.
-    if (!m_font.loadFromFile(Theme::FontPath)) {
+    if (!m_font.loadFromFile(Theme::FontPath))
+    {
         std::fprintf(stderr, "[Assets] Failed to load font: %s\n", Theme::FontPath);
         ok = false;
     }

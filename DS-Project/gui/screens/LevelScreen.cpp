@@ -82,16 +82,16 @@ namespace
         return out;
     }
 
-    const char* const TraversalNames[4] = { "PREORDER", "INORDER", "POSTORDER", "LEVEL ORDER" };
+    const char* const TraversalNames[4] = {"PREORDER", "INORDER", "POSTORDER", "LEVEL ORDER"};
 }
 
 // ------------------------------------------------------------ construction
 
 LevelScreen::LevelScreen(AppContext& ctx)
     : m_ctx(ctx), m_index(0), m_ok(false), m_mode(InputMode::Key), m_shownAlarm(0), m_endTimer(0.f),
-    m_selected(kNull), m_dragToken(-1), m_dragX(0), m_dragY(0), m_dragPivot(kNull),
-    m_renderer(ctx.assets->font()), m_anim(&m_renderer),
-    m_actCount(0), m_pressX(0), m_pressY(0), m_pressing(false)
+      m_selected(kNull), m_dragToken(-1), m_dragX(0), m_dragY(0), m_dragPivot(kNull),
+      m_renderer(ctx.assets->font()), m_anim(&m_renderer),
+      m_actCount(0), m_pressX(0), m_pressY(0), m_pressing(false)
 {
     m_index = ctx.selectedLevel;
     if (m_index < 0 || m_index > 19)
@@ -157,7 +157,7 @@ int LevelScreen::modeFor(int mission)
     {
         return InputMode::Buttons;
     }
-    return InputMode::Key;     // BST missions
+    return InputMode::Key; // BST missions
 }
 
 void LevelScreen::buildLayout()
@@ -286,7 +286,7 @@ void LevelScreen::buildActionButtons()
     const int mission = m_def.mission;
     m_mode = modeFor(mission);
 
-    const char* labels[kMaxAct] = { "", "", "", "", "", "" };
+    const char* labels[kMaxAct] = {"", "", "", "", "", ""};
     float w = 205.f;
     float step = 215.f;
     float x0 = 410.f;
@@ -429,7 +429,7 @@ void LevelScreen::onFieldEnter()
     }
     else
     {
-        doAction(0);       // Enter = the single / first action
+        doAction(0); // Enter = the single / first action
     }
 }
 
@@ -448,7 +448,7 @@ void LevelScreen::onToolbar(int action)
         if (m_anim.totalCount() > 0)
         {
             m_log.addLine("--- replay ---");
-            m_shownAlarm = m_lastHud.alarm - m_anim.totalCount();   // display only, corrected at the end
+            m_shownAlarm = m_lastHud.alarm - m_anim.totalCount(); // display only, corrected at the end
             if (m_shownAlarm < 0)
             {
                 m_shownAlarm = 0;
@@ -574,7 +574,8 @@ void LevelScreen::refreshPrompt()
     else if (mission == MissionKind::Reconstruct)
     {
         s = "Drag each token onto the tree: the first is the root, then drop on the left or right side "
-            "of a placed room. " + m_session.reconstructClue();
+            "of a placed room. " +
+            m_session.reconstructClue();
     }
     else if (mission == MissionKind::Mirror)
     {
@@ -592,7 +593,7 @@ void LevelScreen::refreshPrompt()
     }
     else if (m_mode != InputMode::Key)
     {
-        s = m_session.prompt();     // Act 3 prompts come from the session
+        s = m_session.prompt(); // Act 3 prompts come from the session
     }
     m_prompt.setString(wrapChars(s, 95));
 }
@@ -617,7 +618,7 @@ void LevelScreen::doAction(int which)
 {
     if (!m_ok || m_anim.busy() || m_endTimer > 0.f)
     {
-        return;      // input is locked while the animation plays
+        return; // input is locked while the animation plays
     }
     const int mission = m_def.mission;
     PlayerAction act;
@@ -681,7 +682,7 @@ void LevelScreen::doAction(int which)
             setMessage("Click a room first: it is the pivot.");
             return;
         }
-        const int types[4] = { RotationType::LL, RotationType::RR, RotationType::LR, RotationType::RL };
+        const int types[4] = {RotationType::LL, RotationType::RR, RotationType::LR, RotationType::RL};
         act.kind = ActionKind::Rotate;
         act.a = m_selected;
         act.b = types[which < 4 ? which : 0];
@@ -692,14 +693,14 @@ void LevelScreen::doAction(int which)
     }
     else if (mission == MissionKind::AvlAuto)
     {
-        const int types[5] = { RotationType::None, RotationType::LL, RotationType::RR,
-            RotationType::LR, RotationType::RL };
+        const int types[5] = {RotationType::None, RotationType::LL, RotationType::RR,
+                              RotationType::LR, RotationType::RL};
         act.kind = ActionKind::Rotate;
         act.b = types[which < 5 ? which : 0];
     }
     else
     {
-        return;      // Click mode has no buttons
+        return; // Click mode has no buttons
     }
 
     submit(act);
@@ -727,7 +728,7 @@ void LevelScreen::play(const ViewSnapshot& before, const ActionResult& r)
 {
     if (r.events.size() == 0)
     {
-        refreshHud(r.hud);      // rejected action: nothing to animate
+        refreshHud(r.hud); // rejected action: nothing to animate
         refreshPrompt();
         return;
     }
@@ -780,13 +781,13 @@ void LevelScreen::animEvent(const Event& e)
 
 void LevelScreen::animDone()
 {
-    refreshHud(m_lastHud);     // authoritative numbers from the session
+    refreshHud(m_lastHud); // authoritative numbers from the session
     applyMissionMarks();
     refreshPrompt();
     if (m_lastHud.status != HudStatus::Playing)
     {
         m_log.addLine(m_lastHud.status == HudStatus::Won ? "LEVEL CLEARED" : "ALARM FULL");
-        m_endTimer = 1.0f;     // Result screen only after the animation ends
+        m_endTimer = 1.0f; // Result screen only after the animation ends
     }
 }
 
@@ -798,7 +799,7 @@ void LevelScreen::doUndo()
     }
     if (m_mode == InputMode::Sequence && m_clicks.size() > 0)
     {
-        m_clicks.pop();        // 1.1: Z removes the last pick (no model state yet)
+        m_clicks.pop(); // 1.1: Z removes the last pick (no model state yet)
         m_renderer.clearHighlights();
         applyMissionMarks();
         refreshPrompt();
@@ -808,7 +809,7 @@ void LevelScreen::doUndo()
     act.kind = ActionKind::Undo;
     ActionResult r = m_session.apply(act);
     m_anim.clear();
-    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.snapTo(m_session.snapshot()); // hard sync, no stale positions
     m_renderer.setTarget(kNull);
     m_renderer.setSelected(kNull);
     m_selected = kNull;
@@ -852,7 +853,7 @@ void LevelScreen::doHint()
     PlayerAction act;
     act.kind = ActionKind::Hint;
     ActionResult r = m_session.apply(act);
-    m_renderer.setTarget(m_session.targetNodeId());     // gold ring on the target room
+    m_renderer.setTarget(m_session.targetNodeId()); // gold ring on the target room
     refreshHud(r.hud);
     setMessage(r.message);
 }
@@ -890,12 +891,12 @@ void LevelScreen::updateTooltip(int mx, int my)
         {
             // Level 1.3 asks for the height: do not give it away.
             m_tooltip.showText(sx + 16.f, sy + 16.f,
-                "key: " + std::to_string(key) + "\ndepth: " + std::to_string(depth));
+                               "key: " + std::to_string(key) + "\ndepth: " + std::to_string(depth));
         }
         else
         {
             m_tooltip.showNode(sx + 16.f, sy + 16.f, key, height, bal, size, depth,
-                m_renderer.kind() == TreeKind::AVL);
+                               m_renderer.kind() == TreeKind::AVL);
         }
         return;
     }
@@ -942,7 +943,7 @@ void LevelScreen::onCanvasClick(int mx, int my)
         refreshPrompt();
         if (m_clicks.size() >= m_session.binaryTree().nodeCount())
         {
-            doAction(0);       // last room picked: submit automatically
+            doAction(0); // last room picked: submit automatically
         }
     }
     else if (m_mode == InputMode::Click)
@@ -1284,7 +1285,7 @@ void LevelScreen::handleTokenDrag(const sf::Event& e)
     {
         m_dragX = e.mouseMove.x;
         m_dragY = e.mouseMove.y;
-        m_renderer.setSelected(m_renderer.pick((float)m_dragX, (float)m_dragY));   // ring the room under the pointer
+        m_renderer.setSelected(m_renderer.pick((float)m_dragX, (float)m_dragY)); // ring the room under the pointer
     }
     else if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Left && m_dragToken != -1)
     {
@@ -1306,7 +1307,7 @@ void LevelScreen::dropToken(int token, int mx, int my)
     const float canvasB = (float)Theme::WindowH - ToolbarH - BarH;
     if ((float)mx < 0.f || (float)mx > canvasR || (float)my < HudH || (float)my > canvasB)
     {
-        return;      // dropped outside the canvas: token stays on the shelf
+        return; // dropped outside the canvas: token stays on the shelf
     }
 
     const BinaryTree& built = m_session.builtTree();
@@ -1332,7 +1333,7 @@ void LevelScreen::dropToken(int token, int mx, int my)
         int side = ((float)mx < sx) ? Side::Left : Side::Right;
         if (side == Side::Left && n->left != nullptr && n->right == nullptr)
         {
-            side = Side::Right;      // only one side is free: use it
+            side = Side::Right; // only one side is free: use it
         }
         else if (side == Side::Right && n->right != nullptr && n->left == nullptr)
         {

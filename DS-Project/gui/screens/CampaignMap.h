@@ -8,7 +8,7 @@
 
 class CampaignMap : public Screen
 {
-public:
+  public:
     explicit CampaignMap(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
@@ -24,14 +24,14 @@ public:
     // Re-reads stars and locks from the Campaign (e.g. after a result is saved).
     void refreshFromData();
 
-private:
+  private:
     static const int ActCount = 4;
     static const int PerAct = 5;
 
     struct BannerCtx
     {
         CampaignMap* map;
-        int slot;     // 0..4 inside the current act
+        int slot; // 0..4 inside the current act
     };
 
     static void onBannerClick(void* context);
@@ -39,7 +39,11 @@ private:
     static void onBackClick(void* context);
     static void onDebugClick(void* context);
 
-    int levelIndex() const { return m_act * PerAct + m_sel; }
+    int levelIndex() const
+    {
+        return m_act * PerAct + m_sel;
+    }
+
     bool startEnabled() const;
     void setAct(int act);
     void setSelected(int slot);
@@ -50,35 +54,35 @@ private:
     void buildArrow(sf::ConvexShape& s, bool left, float cx, float cy);
     void buildStars(float x, float y);
     void styleText(sf::Text& t, const sf::Font& font, unsigned size,
-        const sf::Color& col, float x, float y);
+                   const sf::Color& col, float x, float y);
 
     AppContext& m_ctx;
     Campaign* m_campaign;
     const sf::Font* m_font;
 
-    int m_act = 0;      // 0..3
-    int m_sel = 0;      // 0..4 (selected banner in this act)
+    int m_act = 0; // 0..3
+    int m_sel = 0; // 0..4 (selected banner in this act)
 
     // Backdrop and decoration
-    sf::Sprite         m_background;
+    sf::Sprite m_background;
     sf::RectangleShape m_dim;
-    sf::Sprite         m_corners[4];   // TL, TR, BL, BR
-    sf::Sprite         m_divider;      // star ornament under the act name
+    sf::Sprite m_corners[4]; // TL, TR, BL, BR
+    sf::Sprite m_divider;    // star ornament under the act name
 
     // Top bar
-    sf::Text           m_tab[ActCount];
-    sf::Sprite         m_tabHighlight;  // T-shaped marker under the selected act
-    sf::FloatRect      m_tabRect[ActCount];
-    int                m_tabHover = -1;
-    sf::ConvexShape    m_arrow[2];      // 0 = left, 1 = right
-    sf::FloatRect      m_arrowRect[2];
-    float              m_arrowAmt[2];   // eased hover 0..1
-    bool               m_arrowHover[2];
-    sf::Text           m_actName;
+    sf::Text m_tab[ActCount];
+    sf::Sprite m_tabHighlight; // T-shaped marker under the selected act
+    sf::FloatRect m_tabRect[ActCount];
+    int m_tabHover = -1;
+    sf::ConvexShape m_arrow[2]; // 0 = left, 1 = right
+    sf::FloatRect m_arrowRect[2];
+    float m_arrowAmt[2]; // eased hover 0..1
+    bool m_arrowHover[2];
+    sf::Text m_actName;
 
     // Banners
     LevelBanner m_banner[PerAct];
-    BannerCtx   m_bannerCtx[PerAct];
+    BannerCtx m_bannerCtx[PerAct];
 
     // Info panel
     sf::RectangleShape m_panel;
@@ -89,5 +93,5 @@ private:
 
     Button m_start;
     Button m_back;
-    Button m_debug;     // DEBUG: toggles unlock-all
+    Button m_debug; // DEBUG: toggles unlock-all
 };

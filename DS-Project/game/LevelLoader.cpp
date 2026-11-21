@@ -12,36 +12,24 @@ namespace
     };
 
     const NameValue kTreeKinds[] =
-    {
-        { "binary", TreeKind::Binary }, { "bst", TreeKind::BST },
-        { "avl", TreeKind::AVL }, { "maxheap", TreeKind::MaxHeap }
-    };
+        {
+            {"binary", TreeKind::Binary}, {"bst", TreeKind::BST}, {"avl", TreeKind::AVL}, {"maxheap", TreeKind::MaxHeap}};
     const NameValue kMissions[] =
-    {
-        { "traversal", MissionKind::Traversal }, { "reconstruct", MissionKind::Reconstruct },
-        { "heightDiameter", MissionKind::HeightDiameter }, { "lcaPath", MissionKind::LcaPath },
-        { "mirror", MissionKind::Mirror }, { "bstSearch", MissionKind::BstSearch },
-        { "bstInsert", MissionKind::BstInsert }, { "bstDelete", MissionKind::BstDelete },
-        { "bstRange", MissionKind::BstRange }, { "bstBoss", MissionKind::BstBoss },
-        { "avlBadges", MissionKind::AvlBadges }, { "avlSingle", MissionKind::AvlSingle },
-        { "avlDouble", MissionKind::AvlDouble }, { "avlAuto", MissionKind::AvlAuto },
-        { "avlOrderStat", MissionKind::AvlOrderStat }, { "heapBuild", MissionKind::HeapBuild },
-        { "heapRepair", MissionKind::HeapRepair }, { "heapExtract", MissionKind::HeapExtract },
-        { "heapRace", MissionKind::HeapRace }, { "heapBoss", MissionKind::HeapBoss },
-        { "endless", MissionKind::Endless }
-    };
+        {
+            {"traversal", MissionKind::Traversal}, {"reconstruct", MissionKind::Reconstruct}, {"heightDiameter", MissionKind::HeightDiameter}, {"lcaPath", MissionKind::LcaPath}, {"mirror", MissionKind::Mirror}, {"bstSearch", MissionKind::BstSearch}, {"bstInsert", MissionKind::BstInsert}, {"bstDelete", MissionKind::BstDelete}, {"bstRange", MissionKind::BstRange}, {"bstBoss", MissionKind::BstBoss}, {"avlBadges", MissionKind::AvlBadges}, {"avlSingle", MissionKind::AvlSingle}, {"avlDouble", MissionKind::AvlDouble}, {"avlAuto", MissionKind::AvlAuto}, {"avlOrderStat", MissionKind::AvlOrderStat}, {"heapBuild", MissionKind::HeapBuild}, {"heapRepair", MissionKind::HeapRepair}, {"heapExtract", MissionKind::HeapExtract}, {"heapRace", MissionKind::HeapRace}, {"heapBoss", MissionKind::HeapBoss}, {"endless", MissionKind::Endless}};
     const NameValue kStyles[] =
-    {
-        { "random", 0 }, { "skewed", 1 }, { "sorted", 2 },
-        { "reverse", 3 }, { "heap", 4 }, { "duplicates", 5 }
-    };
+        {
+            {"random", 0}, {"skewed", 1}, {"sorted", 2}, {"reverse", 3}, {"heap", 4}, {"duplicates", 5}};
 
     bool readInteger(const JsonValue* object, const char* key, int& value, std::string* error)
     {
         const JsonValue* field = object == nullptr ? nullptr : object->get(key);
         if (field == nullptr || !field->asInteger(value))
         {
-            if (error != nullptr) *error = std::string("Missing or non-integer field: ") + key;
+            if (error != nullptr)
+            {
+                *error = std::string("Missing or non-integer field: ") + key;
+            }
             return false;
         }
         return true;
@@ -52,7 +40,10 @@ namespace
         const JsonValue* field = object == nullptr ? nullptr : object->get(key);
         if (field == nullptr || !field->asString(value))
         {
-            if (error != nullptr) *error = std::string("Missing or non-string field: ") + key;
+            if (error != nullptr)
+            {
+                *error = std::string("Missing or non-string field: ") + key;
+            }
             return false;
         }
         return true;
@@ -93,24 +84,36 @@ namespace
             !readNamedValue(missionName, kMissions, 21, level.mission) ||
             !readNamedValue(styleName, kStyles, 6, level.style))
         {
-            if (error != nullptr) *error = "Unknown treeKind, mission, or style value";
+            if (error != nullptr)
+            {
+                *error = "Unknown treeKind, mission, or style value";
+            }
             return false;
         }
         const JsonValue* boss = source->get("boss");
         if (boss == nullptr || !boss->asBoolean(level.boss))
         {
-            if (error != nullptr) *error = "Missing or non-boolean field: boss";
+            if (error != nullptr)
+            {
+                *error = "Missing or non-boolean field: boss";
+            }
             return false;
         }
         const JsonValue* preorder = source->get("preorder");
         if (preorder != nullptr && !preorder->asString(level.preorder))
         {
-            if (error != nullptr) *error = "Field preorder must be a string";
+            if (error != nullptr)
+            {
+                *error = "Field preorder must be a string";
+            }
             return false;
         }
         if (level.index < 1 || level.index > 5 || level.seed < 0 || level.nodeCount < 0)
         {
-            if (error != nullptr) *error = "Level index, seed, or nodeCount is out of range";
+            if (error != nullptr)
+            {
+                *error = "Level index, seed, or nodeCount is out of range";
+            }
             return false;
         }
         return true;
@@ -132,7 +135,10 @@ LevelDefArray& LevelDefArray::operator=(const LevelDefArray& other)
     {
         clear();
         reserve(other.m_size);
-        for (int i = 0; i < other.m_size; i++) m_data[i] = other.m_data[i];
+        for (int i = 0; i < other.m_size; i++)
+        {
+            m_data[i] = other.m_data[i];
+        }
         m_size = other.m_size;
     }
     return *this;
@@ -143,16 +149,37 @@ LevelDefArray::~LevelDefArray()
     delete[] m_data;
 }
 
-int LevelDefArray::size() const { return m_size; }
-bool LevelDefArray::empty() const { return m_size == 0; }
-LevelDef& LevelDefArray::operator[](int index) { return m_data[index]; }
-const LevelDef& LevelDefArray::operator[](int index) const { return m_data[index]; }
+int LevelDefArray::size() const
+{
+    return m_size;
+}
+
+bool LevelDefArray::empty() const
+{
+    return m_size == 0;
+}
+
+LevelDef& LevelDefArray::operator[](int index)
+{
+    return m_data[index];
+}
+
+const LevelDef& LevelDefArray::operator[](int index) const
+{
+    return m_data[index];
+}
 
 void LevelDefArray::reserve(int capacity)
 {
-    if (capacity <= m_capacity) return;
+    if (capacity <= m_capacity)
+    {
+        return;
+    }
     LevelDef* data = new LevelDef[capacity];
-    for (int i = 0; i < m_size; i++) data[i] = m_data[i];
+    for (int i = 0; i < m_size; i++)
+    {
+        data[i] = m_data[i];
+    }
     delete[] m_data;
     m_data = data;
     m_capacity = capacity;
@@ -160,11 +187,17 @@ void LevelDefArray::reserve(int capacity)
 
 void LevelDefArray::push(const LevelDef& value)
 {
-    if (m_size == m_capacity) reserve(m_capacity == 0 ? 4 : m_capacity * 2);
+    if (m_size == m_capacity)
+    {
+        reserve(m_capacity == 0 ? 4 : m_capacity * 2);
+    }
     m_data[m_size++] = value;
 }
 
-void LevelDefArray::clear() { m_size = 0; }
+void LevelDefArray::clear()
+{
+    m_size = 0;
+}
 
 bool LevelLoader::missionFromName(const std::string& name, int& mission)
 {
@@ -176,7 +209,10 @@ bool LevelLoader::loadFile(const std::string& path, LevelDefArray& out, std::str
     std::ifstream input(path.c_str(), std::ios::binary);
     if (!input)
     {
-        if (error != nullptr) *error = std::string("Unable to open level file: ") + path;
+        if (error != nullptr)
+        {
+            *error = std::string("Unable to open level file: ") + path;
+        }
         return false;
     }
     std::ostringstream contents;
@@ -186,7 +222,10 @@ bool LevelLoader::loadFile(const std::string& path, LevelDefArray& out, std::str
 
 bool LevelLoader::loadJson(const std::string& text, LevelDefArray& out, std::string* error)
 {
-    if (error != nullptr) error->clear();
+    if (error != nullptr)
+    {
+        error->clear();
+    }
     JsonDocument document;
     JsonError parseError;
     if (!JsonParser::parse(text, document, &parseError))
@@ -203,13 +242,19 @@ bool LevelLoader::loadJson(const std::string& text, LevelDefArray& out, std::str
     const JsonValue* root = document.root();
     if (root == nullptr || root->type() != JsonType::Object || !readInteger(root, "act", act, error) || act < 1 || act > 4)
     {
-        if (error != nullptr && error->empty()) *error = "Root must contain an act number from 1 to 4";
+        if (error != nullptr && error->empty())
+        {
+            *error = "Root must contain an act number from 1 to 4";
+        }
         return false;
     }
     const JsonValue* levels = root->get("levels");
     if (levels == nullptr || levels->type() != JsonType::Array || levels->size() != 5)
     {
-        if (error != nullptr) *error = "The act must contain exactly five level definitions";
+        if (error != nullptr)
+        {
+            *error = "The act must contain exactly five level definitions";
+        }
         return false;
     }
     LevelDefArray loaded;
@@ -219,7 +264,10 @@ bool LevelLoader::loadJson(const std::string& text, LevelDefArray& out, std::str
         level.act = act;
         if (!decodeLevel(levels->at(i), level, error) || level.index != i + 1)
         {
-            if (error != nullptr && error->empty()) *error = "Level indices must be in order from 1 to 5";
+            if (error != nullptr && error->empty())
+            {
+                *error = "Level indices must be in order from 1 to 5";
+            }
             return false;
         }
         loaded.push(level);

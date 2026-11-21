@@ -7,7 +7,7 @@
 
 class NineSlice
 {
-public:
+  public:
     NineSlice();
 
     // border = width of the untouched corner/edge band, in texture pixels.
@@ -22,12 +22,12 @@ public:
 
     void draw(sf::RenderWindow& window) const;
 
-private:
+  private:
     void rebuild();
 
-    sf::Sprite         m_part[9];   // row-major: 0..2 top, 3..5 middle, 6..8 bottom
+    sf::Sprite m_part[9]; // row-major: 0..2 top, 3..5 middle, 6..8 bottom
     const sf::Texture* m_tex;
-    int                m_border;
-    sf::FloatRect      m_rect;
-    sf::Color          m_color;
+    int m_border;
+    sf::FloatRect m_rect;
+    sf::Color m_color;
 };

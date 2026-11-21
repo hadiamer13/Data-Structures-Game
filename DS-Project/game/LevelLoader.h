@@ -6,7 +6,7 @@
 
 class LevelDefArray
 {
-public:
+  public:
     LevelDefArray();
     LevelDefArray(const LevelDefArray& other);
     LevelDefArray& operator=(const LevelDefArray& other);
@@ -19,7 +19,7 @@ public:
     void push(const LevelDef& value);
     void clear();
 
-private:
+  private:
     void reserve(int capacity);
     LevelDef* m_data;
     int m_size;
@@ -28,7 +28,7 @@ private:
 
 class LevelLoader
 {
-public:
+  public:
     static bool loadFile(const std::string& path, LevelDefArray& out, std::string* error = nullptr);
     static bool loadJson(const std::string& text, LevelDefArray& out, std::string* error = nullptr);
     static bool missionFromName(const std::string& name, int& mission);

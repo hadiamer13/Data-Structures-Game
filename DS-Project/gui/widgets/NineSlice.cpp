@@ -73,24 +73,24 @@ void NineSlice::rebuild()
     const int th = static_cast<int>(ts.y);
     const int bx = clampBorder(m_border, ts.x);
     const int by = clampBorder(m_border, ts.y);
-    const int b = (bx < by) ? bx : by;     // one square border size for all corners
+    const int b = (bx < by) ? bx : by; // one square border size for all corners
     const float bf = static_cast<float>(b);
 
     // Corners keep their texture size unless the frame is smaller than two corners.
     const float k = minF(1.f, minF(m_rect.width / (2.f * bf), m_rect.height / (2.f * bf)));
-    const float cw = bf * k;                // on-screen size of a corner or edge band
+    const float cw = bf * k; // on-screen size of a corner or edge band
     const float midW = m_rect.width - 2.f * cw;
     const float midH = m_rect.height - 2.f * cw;
 
-    const int srcX[3] = { 0, b, tw - b };
-    const int srcW[3] = { b, tw - 2 * b, b };
-    const int srcY[3] = { 0, b, th - b };
-    const int srcH[3] = { b, th - 2 * b, b };
+    const int srcX[3] = {0, b, tw - b};
+    const int srcW[3] = {b, tw - 2 * b, b};
+    const int srcY[3] = {0, b, th - b};
+    const int srcH[3] = {b, th - 2 * b, b};
 
-    const float dstX[3] = { m_rect.left, m_rect.left + cw, m_rect.left + cw + midW };
-    const float dstY[3] = { m_rect.top, m_rect.top + cw, m_rect.top + cw + midH };
-    const float dstW[3] = { cw, midW, cw };
-    const float dstH[3] = { cw, midH, cw };
+    const float dstX[3] = {m_rect.left, m_rect.left + cw, m_rect.left + cw + midW};
+    const float dstY[3] = {m_rect.top, m_rect.top + cw, m_rect.top + cw + midH};
+    const float dstW[3] = {cw, midW, cw};
+    const float dstH[3] = {cw, midH, cw};
 
     for (int row = 0; row < 3; ++row)
     {
@@ -101,7 +101,7 @@ void NineSlice::rebuild()
             s.setTextureRect(sf::IntRect(srcX[col], srcY[row], srcW[col], srcH[row]));
             s.setPosition(dstX[col], dstY[row]);
             s.setScale(dstW[col] / static_cast<float>(srcW[col]),
-                dstH[row] / static_cast<float>(srcH[row]));
+                       dstH[row] / static_cast<float>(srcH[row]));
             s.setColor(m_color);
         }
     }

@@ -15,15 +15,14 @@ struct SortStats
     }
 };
 
-// In-place comparison sorts over the project's concrete IntArray container.
 class Sorts
 {
-public:
+  public:
     static void insertionSort(IntArray& values, SortStats* stats = nullptr);
     static void mergeSort(IntArray& values, SortStats* stats = nullptr);
     static void quickSort(IntArray& values, SortStats* stats = nullptr);
 
-private:
+  private:
     static void mergeSortRange(IntArray& values, int* scratch, int first, int last, SortStats* stats);
     static void quickSortRange(IntArray& values, int first, int last, SortStats* stats);
     static void swapValues(int& left, int& right, SortStats* stats);

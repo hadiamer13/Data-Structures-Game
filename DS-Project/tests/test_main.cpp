@@ -87,7 +87,7 @@ TEST_CASE("Campaign JSON, generation, save, and leaderboard")
     runCampaignSupportTests();
 }
 
-TEST_CASE("Act 4 heap missions") 
+TEST_CASE("Act 4 heap missions")
 {
-    runAct4SessionTests(); 
+    runAct4SessionTests();
 }

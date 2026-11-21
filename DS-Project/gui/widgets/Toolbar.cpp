@@ -11,7 +11,7 @@ namespace
 
 Toolbar::Toolbar()
     : m_trackX0(0.f), m_trackX1(0.f), m_trackY(0.f),
-    m_speed(1.f), m_dragging(false), m_cb(nullptr), m_cbContext(nullptr)
+      m_speed(1.f), m_dragging(false), m_cb(nullptr), m_cbContext(nullptr)
 {
     for (int i = 0; i < kButtons; ++i)
     {
@@ -28,7 +28,7 @@ void Toolbar::init(const sf::Font& font, float x, float y, float w, float h)
     m_bg.setOutlineColor(Theme::BtnOutline);
     m_bg.setOutlineThickness(-2.f);
 
-    const char* labels[kButtons] = { "Undo", "Replay", "Reset", "Hint" };
+    const char* labels[kButtons] = {"Undo", "Replay", "Reset", "Hint"};
     const float bh = h - 12.f;
     const float cy = y + h * 0.5f;
     float bx = x + 16.f;
@@ -139,8 +139,7 @@ void Toolbar::handleEvent(const sf::Event& e)
     {
         float mx = (float)e.mouseButton.x;
         float my = (float)e.mouseButton.y;
-        if (mx >= m_trackX0 - 10.f && mx <= m_trackX1 + 10.f
-            && my >= m_trackY - 16.f && my <= m_trackY + 16.f)
+        if (mx >= m_trackX0 - 10.f && mx <= m_trackX1 + 10.f && my >= m_trackY - 16.f && my <= m_trackY + 16.f)
         {
             m_dragging = true;
             setSpeedFromX(mx);

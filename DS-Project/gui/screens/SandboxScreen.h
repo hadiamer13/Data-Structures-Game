@@ -17,7 +17,7 @@
 
 class SandboxScreen : public Screen
 {
-public:
+  public:
     explicit SandboxScreen(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
@@ -30,7 +30,7 @@ public:
     void onToolbar(int action);
     void onFieldEnter();
 
-private:
+  private:
     SandboxScreen(const SandboxScreen&);
     SandboxScreen& operator=(const SandboxScreen&);
 
@@ -42,6 +42,7 @@ private:
         SandboxScreen* owner;
         int kind;
     };
+
     struct OpCtx
     {
         SandboxScreen* owner;
@@ -93,7 +94,7 @@ private:
     sf::Text m_validText;
 
     Renderer m_renderer;
-    AnimationController m_anim;   // must come after m_renderer
+    AnimationController m_anim; // must come after m_renderer
     Toolbar m_toolbar;
     EventLogPanel m_log;
     Tooltip m_tooltip;

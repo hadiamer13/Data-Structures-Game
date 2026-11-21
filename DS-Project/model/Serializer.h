@@ -8,12 +8,9 @@
 #include "AVLTree.h"
 #include "MaxHeap.h"
 
-// Small deterministic text format used for saves and undo snapshots.
-// Trees use preorder with # null markers; heaps store activeSize followed by
-// every backing-array value, including the sorted suffix.
 class Serializer
 {
-public:
+  public:
     static std::string serializeBinaryTree(const BinaryTree& tree);
     static bool deserializeBinaryTree(const std::string& text, BinaryTree& tree);
     static std::string serializeBST(const BST& tree);
@@ -23,7 +20,7 @@ public:
     static std::string serializeHeap(const MaxHeap& heap);
     static bool deserializeHeap(const std::string& text, MaxHeap& heap);
 
-private:
+  private:
     static void writeBinary(const TreeNode* node, std::ostringstream& out);
     static void writeBST(const BSTNode* node, std::ostringstream& out);
     static void writeAVL(const AVLNode* node, std::ostringstream& out);

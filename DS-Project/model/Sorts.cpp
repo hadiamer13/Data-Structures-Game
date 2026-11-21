@@ -8,17 +8,26 @@ void Sorts::insertionSort(IntArray& values, SortStats* stats)
         int j = i;
         while (j > 0)
         {
-            if (stats != nullptr) stats->comparisons++;
+            if (stats != nullptr)
+            {
+                stats->comparisons++;
+            }
             if (values[j - 1] <= value)
             {
                 break;
             }
             values[j] = values[j - 1];
-            if (stats != nullptr) stats->moves++;
+            if (stats != nullptr)
+            {
+                stats->moves++;
+            }
             j--;
         }
         values[j] = value;
-        if (stats != nullptr && j != i) stats->moves++;
+        if (stats != nullptr && j != i)
+        {
+            stats->moves++;
+        }
     }
 }
 
@@ -36,7 +45,10 @@ void Sorts::mergeSortRange(IntArray& values, int* scratch, int first, int last, 
     int out = first;
     while (left < middle && right < last)
     {
-        if (stats != nullptr) stats->comparisons++;
+        if (stats != nullptr)
+        {
+            stats->comparisons++;
+        }
         if (values[left] <= values[right])
         {
             scratch[out++] = values[left++];
@@ -45,22 +57,34 @@ void Sorts::mergeSortRange(IntArray& values, int* scratch, int first, int last, 
         {
             scratch[out++] = values[right++];
         }
-        if (stats != nullptr) stats->moves++;
+        if (stats != nullptr)
+        {
+            stats->moves++;
+        }
     }
     while (left < middle)
     {
         scratch[out++] = values[left++];
-        if (stats != nullptr) stats->moves++;
+        if (stats != nullptr)
+        {
+            stats->moves++;
+        }
     }
     while (right < last)
     {
         scratch[out++] = values[right++];
-        if (stats != nullptr) stats->moves++;
+        if (stats != nullptr)
+        {
+            stats->moves++;
+        }
     }
     for (int i = first; i < last; i++)
     {
         values[i] = scratch[i];
-        if (stats != nullptr) stats->moves++;
+        if (stats != nullptr)
+        {
+            stats->moves++;
+        }
     }
 }
 
@@ -104,14 +128,26 @@ void Sorts::quickSortRange(IntArray& values, int first, int last, SortStats* sta
         {
             while (left <= high)
             {
-                if (stats != nullptr) stats->comparisons++;
-                if (values[left] >= pivot) break;
+                if (stats != nullptr)
+                {
+                    stats->comparisons++;
+                }
+                if (values[left] >= pivot)
+                {
+                    break;
+                }
                 left++;
             }
             while (right >= low)
             {
-                if (stats != nullptr) stats->comparisons++;
-                if (values[right] <= pivot) break;
+                if (stats != nullptr)
+                {
+                    stats->comparisons++;
+                }
+                if (values[right] <= pivot)
+                {
+                    break;
+                }
                 right--;
             }
             if (left >= right)
@@ -125,12 +161,18 @@ void Sorts::quickSortRange(IntArray& values, int first, int last, SortStats* sta
         const int split = right;
         if (split - low < high - split)
         {
-            if (low < split) quickSortRange(values, low, split, stats);
+            if (low < split)
+            {
+                quickSortRange(values, low, split, stats);
+            }
             low = split + 1;
         }
         else
         {
-            if (split + 1 < high) quickSortRange(values, split + 1, high, stats);
+            if (split + 1 < high)
+            {
+                quickSortRange(values, split + 1, high, stats);
+            }
             high = split;
         }
     }

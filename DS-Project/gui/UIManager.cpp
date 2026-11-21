@@ -83,7 +83,7 @@ void UIManager::applyPending()
     Screen* next = makeScreen(m_pendingId);
     if (next != nullptr)
     {
-        delete m_current;          // safe: we are not inside its handler
+        delete m_current; // safe: we are not inside its handler
         m_current = next;
         m_currentId = m_pendingId;
     }
@@ -116,7 +116,7 @@ void UIManager::handleEvent(const sf::Event& e)
 
 void UIManager::update(float dt)
 {
-    applyPending();                // switches happen here, once per frame
+    applyPending(); // switches happen here, once per frame
     if (m_current)
     {
         m_current->update(dt);

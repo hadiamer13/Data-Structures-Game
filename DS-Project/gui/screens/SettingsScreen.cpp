@@ -8,7 +8,7 @@
 namespace
 {
     void setText(sf::Text& text, const sf::Font& font, unsigned size,
-        const sf::Color& color, float x, float y)
+                 const sf::Color& color, float x, float y)
     {
         text.setFont(font);
         text.setCharacterSize(size);
@@ -49,10 +49,10 @@ SettingsScreen::SettingsScreen(AppContext& ctx) : m_ctx(ctx)
     setText(m_help, font, 16, Theme::NodeGlow, 270.f, 470.f);
     m_help.setString("Display changes apply immediately. Animation speed affects game playback.");
 
-    const char* labels[5] = { "-", "+", "-", "+", "Main Menu" };
-    const float xs[5] = { 850.f, 1000.f, 850.f, 1000.f, 640.f };
-    const float ys[5] = { 250.f, 250.f, 385.f, 385.f, 570.f };
-    const float ws[5] = { 68.f, 68.f, 68.f, 68.f, 220.f };
+    const char* labels[5] = {"-", "+", "-", "+", "Main Menu"};
+    const float xs[5] = {850.f, 1000.f, 850.f, 1000.f, 640.f};
+    const float ys[5] = {250.f, 250.f, 385.f, 385.f, 570.f};
+    const float ws[5] = {68.f, 68.f, 68.f, 68.f, 220.f};
     for (int i = 0; i < 5; ++i)
     {
         m_buttonContexts[i].owner = this;
@@ -65,11 +65,26 @@ SettingsScreen::SettingsScreen(AppContext& ctx) : m_ctx(ctx)
 void SettingsScreen::onButton(void* context)
 {
     ButtonContext* button = static_cast<ButtonContext*>(context);
-    if (button->action == 0) button->owner->change(0, -1);
-    else if (button->action == 1) button->owner->change(1, 1);
-    else if (button->action == 2) button->owner->change(2, -1);
-    else if (button->action == 3) button->owner->change(3, 1);
-    else button->owner->change(4, 0);
+    if (button->action == 0)
+    {
+        button->owner->change(0, -1);
+    }
+    else if (button->action == 1)
+    {
+        button->owner->change(1, 1);
+    }
+    else if (button->action == 2)
+    {
+        button->owner->change(2, -1);
+    }
+    else if (button->action == 3)
+    {
+        button->owner->change(3, 1);
+    }
+    else
+    {
+        button->owner->change(4, 0);
+    }
 }
 
 void SettingsScreen::change(int setting, int direction)
@@ -79,15 +94,27 @@ void SettingsScreen::change(int setting, int direction)
         m_ctx.ui->requestScreen(ScreenId::MainMenu);
         return;
     }
-    if (m_ctx.settings == nullptr) return;
+    if (m_ctx.settings == nullptr)
+    {
+        return;
+    }
     if (setting < 2)
     {
-        const unsigned int levels[4] = { 0, 2, 4, 8 };
+        const unsigned int levels[4] = {0, 2, 4, 8};
         int index = 0;
-        while (index < 3 && levels[index] < m_ctx.settings->antialiasingLevel) ++index;
+        while (index < 3 && levels[index] < m_ctx.settings->antialiasingLevel)
+        {
+            ++index;
+        }
         index += direction;
-        if (index < 0) index = 0;
-        if (index > 3) index = 3;
+        if (index < 0)
+        {
+            index = 0;
+        }
+        if (index > 3)
+        {
+            index = 3;
+        }
         if (levels[index] != m_ctx.settings->antialiasingLevel)
         {
             m_ctx.settings->antialiasingLevel = levels[index];
@@ -97,15 +124,24 @@ void SettingsScreen::change(int setting, int direction)
     else
     {
         float next = m_ctx.settings->animationSpeed + 0.25f * direction;
-        if (next < 0.5f) next = 0.5f;
-        if (next > 2.f) next = 2.f;
+        if (next < 0.5f)
+        {
+            next = 0.5f;
+        }
+        if (next > 2.f)
+        {
+            next = 2.f;
+        }
         m_ctx.settings->animationSpeed = next;
     }
 }
 
 void SettingsScreen::handleEvent(const sf::Event& event)
 {
-    for (int i = 0; i < 5; ++i) m_buttons[i].handleEvent(event);
+    for (int i = 0; i < 5; ++i)
+    {
+        m_buttons[i].handleEvent(event);
+    }
 }
 
 void SettingsScreen::update(float dt)
@@ -123,7 +159,10 @@ void SettingsScreen::update(float dt)
     {
         m_speed.setString(speedLabel);
     }
-    for (int i = 0; i < 5; ++i) m_buttons[i].update(dt);
+    for (int i = 0; i < 5; ++i)
+    {
+        m_buttons[i].update(dt);
+    }
 }
 
 void SettingsScreen::draw(sf::RenderWindow& window)
@@ -151,8 +190,14 @@ void SettingsScreen::draw(sf::RenderWindow& window)
     if (m_ctx.settings != nullptr)
     {
         float progress = (m_ctx.settings->animationSpeed - 0.5f) / 1.5f;
-        if (progress < 0.f) progress = 0.f;
-        if (progress > 1.f) progress = 1.f;
+        if (progress < 0.f)
+        {
+            progress = 0.f;
+        }
+        if (progress > 1.f)
+        {
+            progress = 1.f;
+        }
         fill.setSize(sf::Vector2f(300.f * progress, 8.f));
     }
     window.draw(fill);
@@ -160,5 +205,8 @@ void SettingsScreen::draw(sf::RenderWindow& window)
     window.draw(m_antialiasing);
     window.draw(m_speed);
     window.draw(m_help);
-    for (int i = 0; i < 5; ++i) m_buttons[i].draw(window);
+    for (int i = 0; i < 5; ++i)
+    {
+        m_buttons[i].draw(window);
+    }
 }

@@ -19,12 +19,14 @@ namespace
         {
             return 0;
         }
+
         return maxI(heightOf(n->left), heightOf(n->right)) + 1;
     }
 
     std::string joinValues(const IntArray& v)
     {
         std::string s;
+
         for (int i = 0; i < v.size(); i++)
         {
             if (i == 12)
@@ -32,10 +34,12 @@ namespace
                 s += " ... (" + std::to_string(v.size()) + " total)";
                 break;
             }
+
             if (i > 0)
             {
                 s += " ";
             }
+
             s += std::to_string(v[i]);
         }
         return s;
@@ -44,6 +48,7 @@ namespace
     int findIdByValue(const BinaryTree& t, int value)
     {
         const NodePtrArray& pool = t.pool();
+
         for (int i = 0; i < pool.size(); i++)
         {
             if (t.isAlive(i) && pool[i]->value == value)
@@ -51,6 +56,7 @@ namespace
                 return i;
             }
         }
+
         return kNull;
     }
 
@@ -60,14 +66,17 @@ namespace
         {
             return;
         }
+
         if (n->key > lo)
         {
             collectRange(static_cast<const AVLNode*>(n->left), lo, hi, out);
         }
+
         if (n->key >= lo && n->key <= hi)
         {
             out.push(n->key);
         }
+
         if (n->key < hi)
         {
             collectRange(static_cast<const AVLNode*>(n->right), lo, hi, out);
@@ -88,10 +97,10 @@ SandboxSession::SandboxSession() : m_kind(TreeKind::BST), m_seed(1), m_empty(fal
 bool SandboxSession::isMutating(int op)
 {
     return op == SandboxOp::Insert || op == SandboxOp::Delete || op == SandboxOp::RotLL ||
-        op == SandboxOp::RotRR || op == SandboxOp::RotLR || op == SandboxOp::RotRL ||
-        op == SandboxOp::Mirror || op == SandboxOp::Build || op == SandboxOp::Heapify ||
-        op == SandboxOp::SiftUp || op == SandboxOp::Swap || op == SandboxOp::Extract ||
-        op == SandboxOp::Sort;
+           op == SandboxOp::RotRR || op == SandboxOp::RotLR || op == SandboxOp::RotRL ||
+           op == SandboxOp::Mirror || op == SandboxOp::Build || op == SandboxOp::Heapify ||
+           op == SandboxOp::SiftUp || op == SandboxOp::Swap || op == SandboxOp::Extract ||
+           op == SandboxOp::Sort;
 }
 
 int SandboxSession::kind() const
@@ -126,7 +135,6 @@ void SandboxSession::reset()
     build();
 }
 
-// Rebuilds the seeded starting structure (no events).
 void SandboxSession::build()
 {
     m_bin.clear();
@@ -146,20 +154,24 @@ void SandboxSession::build()
     if (m_kind == TreeKind::MaxHeap)
     {
         IntArray values;
+
         for (int i = 0; i < 10; i++)
         {
             values.push((int)(nextRandom(state) % 90u) + 10);
         }
+
         m_heap.buildMaxHeap(values);
         return;
     }
 
     int placed = 0;
     int attempts = 0;
+
     while (placed < 7 && attempts < 80)
     {
         attempts++;
         int key = (int)(nextRandom(state) % 90u) + 10;
+
         if (run(SandboxOp::Insert, key, 0, nullptr, ignoreMsg, ignoreFocus))
         {
             placed++;
@@ -172,6 +184,7 @@ void SandboxSession::replayHistory()
     build();
     std::string msg;
     int focus = kNull;
+
     for (int i = 0; i + 3 < m_history.size(); i += 4)
     {
         run(m_history[i], m_history[i + 1], m_history[i + 2], nullptr, msg, focus);
@@ -184,12 +197,15 @@ bool SandboxSession::undo()
     {
         return false;
     }
+
     int cost = m_history[m_history.size() - 1];
     m_steps = m_steps - cost;
+
     for (int i = 0; i < 4; i++)
     {
         m_history.pop();
     }
+
     replayHistory();
     return true;
 }
@@ -200,14 +216,17 @@ ViewSnapshot SandboxSession::snapshot() const
     {
         return SnapshotBuilder::fromBinaryTree(m_bin);
     }
+
     if (m_kind == TreeKind::BST)
     {
         return SnapshotBuilder::fromBST(m_bst);
     }
+
     if (m_kind == TreeKind::AVL)
     {
         return SnapshotBuilder::fromAVL(m_avl);
     }
+
     return SnapshotBuilder::fromMaxHeap(m_heap);
 }
 
@@ -215,14 +234,17 @@ bool SandboxSession::check(std::string& text) const
 {
     std::string err;
     bool ok = true;
+
     if (m_kind == TreeKind::Binary)
     {
         ok = Validator::validateBinaryTree(m_bin, &err);
     }
+
     else if (m_kind == TreeKind::BST)
     {
         ok = Validator::validateBST(m_bst, &err);
     }
+
     else if (m_kind == TreeKind::AVL)
     {
         ok = Validator::validateAVL(m_avl, &err);
@@ -231,6 +253,7 @@ bool SandboxSession::check(std::string& text) const
     {
         ok = Validator::validateMaxHeap(m_heap, &err);
     }
+
     text = ok ? "Structure: VALID" : ("Structure: INVALID - " + err);
     return ok;
 }
@@ -251,6 +274,7 @@ SandboxResult SandboxSession::apply(int op, int a, int b)
     r.changed = r.accepted && isMutating(op);
 
     int cost = 0;
+
     for (int i = 0; i < r.events.size(); i++)
     {
         int t = r.events[i].type;
@@ -259,6 +283,7 @@ SandboxResult SandboxSession::apply(int op, int a, int b)
             cost++;
         }
     }
+
     m_steps = m_steps + cost;
 
     if (r.changed)
@@ -271,7 +296,6 @@ SandboxResult SandboxSession::apply(int op, int a, int b)
 
     if (m_kind == TreeKind::MaxHeap && op == SandboxOp::Insert && r.accepted)
     {
-        // The new value starts in its last cell so the sift-up swaps have somewhere to run.
         r.before.heap.array.push(a);
         r.before.heap.activeSize = r.before.heap.activeSize + 1;
     }
@@ -283,18 +307,22 @@ SandboxResult SandboxSession::apply(int op, int a, int b)
 bool SandboxSession::run(int op, int a, int b, EventLog* log, std::string& msg, int& focus)
 {
     focus = kNull;
+
     if (m_kind == TreeKind::Binary)
     {
         return runBinary(op, a, b, log, msg, focus);
     }
+
     if (m_kind == TreeKind::BST)
     {
         return runBST(op, a, b, log, msg, focus);
     }
+
     if (m_kind == TreeKind::AVL)
     {
         return runAVL(op, a, b, log, msg, focus);
     }
+
     return runHeap(op, a, b, log, msg, focus);
 }
 
@@ -312,15 +340,19 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
             msg = "Value " + num(a) + " is already in the tree (distinct values only).";
             return false;
         }
+
         TreeNode* node = nullptr;
+
         if (m_bin.root() == nullptr)
         {
             node = m_bin.createNode(a);
             m_bin.setRoot(node, log);
         }
+
         else
         {
             IntArray order = m_bin.levelOrder(nullptr);
+
             for (int i = 0; i < order.size() && node == nullptr; i++)
             {
                 TreeNode* p = pool[order[i]];
@@ -336,11 +368,13 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
                 }
             }
         }
+
         if (node == nullptr)
         {
             msg = "No free slot found.";
             return false;
         }
+
         focus = node->id;
         msg = "Inserted " + num(a) + " at the first free slot (level order).";
         return true;
@@ -349,6 +383,7 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
     if (op == SandboxOp::Search)
     {
         IntArray order = m_bin.levelOrder(nullptr);
+
         for (int i = 0; i < order.size(); i++)
         {
             Event v(EventType::VISIT);
@@ -361,6 +396,7 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
                 return true;
             }
         }
+
         msg = num(a) + " is not in the tree (visited all " + num(order.size()) + " rooms).";
         return true;
     }
@@ -370,35 +406,43 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
     {
         IntArray ids;
         const char* name = "Preorder";
+
         if (op == SandboxOp::Preorder)
         {
             ids = m_bin.preorder(log);
         }
+
         else if (op == SandboxOp::Inorder)
         {
             ids = m_bin.inorder(log);
             name = "Inorder";
         }
+
         else if (op == SandboxOp::Postorder)
         {
             ids = m_bin.postorder(log);
             name = "Postorder";
         }
+
         else
         {
             ids = m_bin.levelOrder(log);
             name = "Level order";
         }
+
         if (ids.size() == 0)
         {
             msg = "The tree is empty.";
             return true;
         }
+
         IntArray vals;
+
         for (int i = 0; i < ids.size(); i++)
         {
             vals.push(pool[ids[i]]->value);
         }
+
         msg = std::string(name) + ": " + joinValues(vals);
         return true;
     }
@@ -410,6 +454,7 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
             msg = "The tree is empty.";
             return false;
         }
+
         m_bin.mirror(log);
         msg = "Mirrored: every room swapped its children.";
         return true;
@@ -422,9 +467,11 @@ bool SandboxSession::runBinary(int op, int a, int b, EventLog* log, std::string&
             msg = "The tree is empty.";
             return true;
         }
+
         msg = "Rooms " + num(m_bin.nodeCount()) + ", height " + num(m_bin.height()) +
-            " (nodes), diameter " + num(m_bin.diameter()) + " (edges), symmetric: " +
-            (m_bin.isSymmetric() ? "yes" : "no");
+              " (nodes), diameter " + num(m_bin.diameter()) + " (edges), symmetric: " +
+              (m_bin.isSymmetric() ? "yes" : "no");
+
         return true;
     }
 
@@ -445,6 +492,7 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
             focus = (d != nullptr) ? d->id : kNull;
             return false;
         }
+
         BSTNode* n = m_bst.search(a, nullptr);
         focus = (n != nullptr) ? n->id : kNull;
         msg = "Inserted " + num(a) + ".";
@@ -454,11 +502,13 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
     if (op == SandboxOp::Search)
     {
         BSTNode* n = m_bst.search(a, log);
+
         if (n == nullptr)
         {
             msg = num(a) + " is not in the tree.";
             return true;
         }
+
         focus = n->id;
         msg = "Found " + num(a) + ".";
         return true;
@@ -467,14 +517,16 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
     if (op == SandboxOp::Delete)
     {
         BSTNode* n = m_bst.search(a, nullptr);
+
         if (n == nullptr)
         {
             msg = "Key " + num(a) + " not found.";
-            m_bst.search(a, log);       // show the failed search path
+            m_bst.search(a, log); 
             return false;
         }
+
         const char* kind = (n->left != nullptr && n->right != nullptr) ? "two children (inorder successor swap)"
-            : ((n->left == nullptr && n->right == nullptr) ? "leaf" : "one child (bypass)");
+                                                                       : ((n->left == nullptr && n->right == nullptr) ? "leaf" : "one child (bypass)");
         m_bst.remove(a, log);
         msg = "Deleted " + num(a) + ": " + kind + ".";
         return true;
@@ -495,6 +547,7 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
             msg = "k must be between 1 and " + num(m_bst.nodeCount()) + " (O(n) inorder scan).";
             return false;
         }
+
         int key = m_bst.kthSmallest(a);
         BSTNode* n = m_bst.search(key, nullptr);
         focus = (n != nullptr) ? n->id : kNull;
@@ -505,11 +558,13 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
     if (op == SandboxOp::Min || op == SandboxOp::Max)
     {
         BSTNode* n = (op == SandboxOp::Min) ? m_bst.findMin() : m_bst.findMax();
+
         if (n == nullptr)
         {
             msg = "The tree is empty.";
             return false;
         }
+
         focus = n->id;
         msg = std::string(op == SandboxOp::Min ? "Minimum" : "Maximum") + " key = " + num(n->key) + ".";
         return true;
@@ -522,12 +577,15 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
             msg = "Key " + num(a) + " is not in the tree.";
             return false;
         }
+
         BSTNode* n = (op == SandboxOp::Succ) ? m_bst.successor(a) : m_bst.predecessor(a);
+
         if (n == nullptr)
         {
             msg = std::string("No ") + (op == SandboxOp::Succ ? "successor" : "predecessor") + " for " + num(a) + ".";
             return true;
         }
+
         focus = n->id;
         msg = std::string(op == SandboxOp::Succ ? "Successor" : "Predecessor") + " of " + num(a) + " = " + num(n->key) + ".";
         return true;
@@ -540,8 +598,10 @@ bool SandboxSession::runBST(int op, int a, int b, EventLog* log, std::string& ms
             msg = "The tree is empty.";
             return true;
         }
+
         msg = "Keys " + num(m_bst.nodeCount()) + ", height " + num(heightOf(m_bst.root())) +
-            ", min " + num(m_bst.findMin()->key) + ", max " + num(m_bst.findMax()->key);
+              ", min " + num(m_bst.findMin()->key) + ", max " + num(m_bst.findMax()->key);
+
         return true;
     }
 
@@ -562,6 +622,7 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
             focus = (d != nullptr) ? d->id : kNull;
             return false;
         }
+
         AVLNode* n = m_avl.find(a, nullptr);
         focus = (n != nullptr) ? n->id : kNull;
         msg = "Inserted " + num(a) + " (rebalanced if needed).";
@@ -571,11 +632,13 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
     if (op == SandboxOp::Search)
     {
         AVLNode* n = m_avl.find(a, log);
+
         if (n == nullptr)
         {
             msg = num(a) + " is not in the tree.";
             return true;
         }
+
         focus = n->id;
         msg = "Found " + num(a) + ".";
         return true;
@@ -589,6 +652,7 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
             m_avl.find(a, log);
             return false;
         }
+
         m_avl.remove(a, log);
         msg = "Deleted " + num(a) + " (rebalanced if needed).";
         return true;
@@ -605,11 +669,13 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
     if (op == SandboxOp::Kth)
     {
         int key = kNull;
+
         if (!m_avl.kth(a, key))
         {
             msg = "k must be between 1 and " + num(m_avl.nodeCount()) + ".";
             return false;
         }
+
         AVLNode* n = m_avl.find(key, nullptr);
         focus = (n != nullptr) ? n->id : kNull;
         msg = num(a) + "-th smallest key = " + num(key) + " (O(log n) with subtree sizes).";
@@ -635,6 +701,7 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
             msg = "Click a room first: it is the pivot.";
             return false;
         }
+
         AVLNode* pv = static_cast<AVLNode*>(m_avl.pool()[a]);
         focus = pv->id;
 
@@ -645,10 +712,12 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
                 msg = "LL needs a left child at the pivot.";
                 return false;
             }
+
             m_avl.rotateRight(pv, log);
             msg = "LL: right rotation at the pivot.";
             return true;
         }
+
         if (op == SandboxOp::RotRR)
         {
             if (pv->right == nullptr)
@@ -656,39 +725,50 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
                 msg = "RR needs a right child at the pivot.";
                 return false;
             }
+
             m_avl.rotateLeft(pv, log);
             msg = "RR: left rotation at the pivot.";
             return true;
         }
+
         if (op == SandboxOp::RotLR)
         {
             AVLNode* child = static_cast<AVLNode*>(pv->left);
+
             if (child == nullptr || child->right == nullptr)
             {
                 msg = "LR needs a left child that has a right child.";
                 return false;
             }
+
             TreeNode* raised = child->right;
             m_avl.rotateLeft(child, log);
+
             if (pv->parent != raised)
             {
                 m_avl.rotateRight(pv, log);
             }
+
             msg = "LR: left rotation on the child, then right rotation at the pivot.";
             return true;
         }
+
         AVLNode* child = static_cast<AVLNode*>(pv->right);
+
         if (child == nullptr || child->left == nullptr)
         {
             msg = "RL needs a right child that has a left child.";
             return false;
         }
+
         TreeNode* raised = child->left;
         m_avl.rotateRight(child, log);
+
         if (pv->parent != raised)
         {
             m_avl.rotateLeft(pv, log);
         }
+
         msg = "RL: right rotation on the child, then left rotation at the pivot.";
         return true;
     }
@@ -700,8 +780,10 @@ bool SandboxSession::runAVL(int op, int a, int b, EventLog* log, std::string& ms
             msg = "The tree is empty.";
             return true;
         }
+
         msg = "Keys " + num(m_avl.nodeCount()) + ", height " + num(m_avl.height()) +
-            ", balanced: " + (m_avl.isBalanced() ? "yes" : "no");
+              ", balanced: " + (m_avl.isBalanced() ? "yes" : "no");
+
         return true;
     }
 
@@ -724,6 +806,7 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "Insert needs an empty sorted region. Use Build or Random first.";
             return false;
         }
+
         m_heap.insert(a, log);
         msg = "Inserted " + num(a) + " and sifted it up.";
         return true;
@@ -732,11 +815,13 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
     if (op == SandboxOp::Extract)
     {
         int value = 0;
+
         if (!m_heap.extractMax(value, log))
         {
             msg = "The active heap is empty.";
             return false;
         }
+
         msg = "Extracted " + num(value) + " into the sorted region.";
         return true;
     }
@@ -748,6 +833,7 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "The array is empty.";
             return false;
         }
+
         m_heap.buildMaxHeap(log);
         msg = "Bottom-up Max Heap construction over the whole array.";
         return true;
@@ -760,6 +846,7 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "Index " + num(a) + " is outside the active heap (size " + num(active) + ").";
             return false;
         }
+
         msg = "Sift-down from index " + num(a) + ".";
         return true;
     }
@@ -771,6 +858,7 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "Index " + num(a) + " is outside the active heap (size " + num(active) + ").";
             return false;
         }
+
         msg = "Sift-up from index " + num(a) + ".";
         return true;
     }
@@ -782,11 +870,13 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "Pick two different indices.";
             return false;
         }
+
         if (!m_heap.swapIdx(a, b, log))
         {
             msg = "Both indices must be inside the active heap (size " + num(active) + ").";
             return false;
         }
+
         msg = "Swapped cells " + num(a) + " and " + num(b) + ".";
         return true;
     }
@@ -798,16 +888,17 @@ bool SandboxSession::runHeap(int op, int a, int b, EventLog* log, std::string& m
             msg = "The array is empty.";
             return false;
         }
+        
         m_heap.heapSort(log);
         msg = "Heap Sort complete: ascending (comparisons " + std::to_string((unsigned long long)m_heap.comparisonCount()) +
-            ", swaps " + std::to_string((unsigned long long)m_heap.swapCount()) + ").";
+              ", swaps " + std::to_string((unsigned long long)m_heap.swapCount()) + ").";
         return true;
     }
 
     if (op == SandboxOp::Info)
     {
         msg = "Active heap " + num(active) + " of " + num(total) + " cells" +
-            (active > 0 ? (", max = " + num(m_heap.array()[0])) : std::string("")) + ".";
+              (active > 0 ? (", max = " + num(m_heap.array()[0])) : std::string("")) + ".";
         return true;
     }
 

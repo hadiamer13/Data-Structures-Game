@@ -25,49 +25,26 @@ namespace
     };
 
     const OpDef kBinaryOps[] =
-    {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Preorder, "Preorder" }, { SandboxOp::Inorder, "Inorder" },
-        { SandboxOp::Postorder, "Postorder" }, { SandboxOp::LevelOrder, "Level" },
-        { SandboxOp::Mirror, "Mirror" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
-    };
+        {
+            {SandboxOp::Insert, "Insert"}, {SandboxOp::Search, "Search"}, {SandboxOp::Preorder, "Preorder"}, {SandboxOp::Inorder, "Inorder"}, {SandboxOp::Postorder, "Postorder"}, {SandboxOp::LevelOrder, "Level"}, {SandboxOp::Mirror, "Mirror"}, {SandboxOp::Info, "Info"}, {ScreenOp::Random, "Random"}, {ScreenOp::Clear, "Clear"}};
     const OpDef kBstOps[] =
-    {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Delete, "Delete" }, { SandboxOp::Range, "Range" },
-        { SandboxOp::Min, "Min" }, { SandboxOp::Max, "Max" },
-        { SandboxOp::Succ, "Succ" }, { SandboxOp::Pred, "Pred" },
-        { SandboxOp::Kth, "Kth" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
-    };
+        {
+            {SandboxOp::Insert, "Insert"}, {SandboxOp::Search, "Search"}, {SandboxOp::Delete, "Delete"}, {SandboxOp::Range, "Range"}, {SandboxOp::Min, "Min"}, {SandboxOp::Max, "Max"}, {SandboxOp::Succ, "Succ"}, {SandboxOp::Pred, "Pred"}, {SandboxOp::Kth, "Kth"}, {SandboxOp::Info, "Info"}, {ScreenOp::Random, "Random"}, {ScreenOp::Clear, "Clear"}};
     const OpDef kAvlOps[] =
-    {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Search, "Search" },
-        { SandboxOp::Delete, "Delete" }, { SandboxOp::Range, "Range" },
-        { SandboxOp::RotLL, "Rot LL" }, { SandboxOp::RotRR, "Rot RR" },
-        { SandboxOp::RotLR, "Rot LR" }, { SandboxOp::RotRL, "Rot RL" },
-        { SandboxOp::Kth, "Kth" }, { SandboxOp::Rank, "Rank" },
-        { SandboxOp::CountRange, "Count" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
-    };
+        {
+            {SandboxOp::Insert, "Insert"}, {SandboxOp::Search, "Search"}, {SandboxOp::Delete, "Delete"}, {SandboxOp::Range, "Range"}, {SandboxOp::RotLL, "Rot LL"}, {SandboxOp::RotRR, "Rot RR"}, {SandboxOp::RotLR, "Rot LR"}, {SandboxOp::RotRL, "Rot RL"}, {SandboxOp::Kth, "Kth"}, {SandboxOp::Rank, "Rank"}, {SandboxOp::CountRange, "Count"}, {SandboxOp::Info, "Info"}, {ScreenOp::Random, "Random"}, {ScreenOp::Clear, "Clear"}};
     const OpDef kHeapOps[] =
-    {
-        { SandboxOp::Insert, "Insert" }, { SandboxOp::Extract, "Extract" },
-        { SandboxOp::Build, "Build" }, { SandboxOp::Heapify, "Heapify" },
-        { SandboxOp::SiftUp, "SiftUp" }, { SandboxOp::Swap, "Swap" },
-        { SandboxOp::Sort, "Sort" }, { SandboxOp::Info, "Info" },
-        { ScreenOp::Random, "Random" }, { ScreenOp::Clear, "Clear" }
-    };
+        {
+            {SandboxOp::Insert, "Insert"}, {SandboxOp::Extract, "Extract"}, {SandboxOp::Build, "Build"}, {SandboxOp::Heapify, "Heapify"}, {SandboxOp::SiftUp, "SiftUp"}, {SandboxOp::Swap, "Swap"}, {SandboxOp::Sort, "Sort"}, {SandboxOp::Info, "Info"}, {ScreenOp::Random, "Random"}, {ScreenOp::Clear, "Clear"}};
 
-    const char* const TabNames[4] = { "Binary", "BST", "AVL", "MaxHeap" };
+    const char* const TabNames[4] = {"Binary", "BST", "AVL", "MaxHeap"};
 
     bool needsA(int op)
     {
         return op == SandboxOp::Insert || op == SandboxOp::Search || op == SandboxOp::Delete ||
-            op == SandboxOp::Range || op == SandboxOp::Kth || op == SandboxOp::Rank ||
-            op == SandboxOp::CountRange || op == SandboxOp::Succ || op == SandboxOp::Pred ||
-            op == SandboxOp::Heapify || op == SandboxOp::SiftUp || op == SandboxOp::Swap;
+               op == SandboxOp::Range || op == SandboxOp::Kth || op == SandboxOp::Rank ||
+               op == SandboxOp::CountRange || op == SandboxOp::Succ || op == SandboxOp::Pred ||
+               op == SandboxOp::Heapify || op == SandboxOp::SiftUp || op == SandboxOp::Swap;
     }
 
     bool needsB(int op)
@@ -80,7 +57,6 @@ namespace
         return op >= SandboxOp::RotLL && op <= SandboxOp::RotRL;
     }
 
-    
     bool animated(int type)
     {
         return type != EventType::UPDATE_HEIGHT && type != EventType::UPDATE_SIZE;
@@ -91,7 +67,6 @@ namespace
         return type == EventType::INSERT || type == EventType::UNLINK || type == EventType::ROTATE;
     }
 
-    
     std::string wrapChars(const std::string& s, int width)
     {
         std::string out;
@@ -247,7 +222,7 @@ void SandboxScreen::loadKind(int kind, bool empty)
     refreshInfo();
     m_log.addLine(std::string("Sandbox: ") + TabNames[kind] + (empty ? " (empty)" : (" (seed " + std::to_string(m_seed) + ")")));
     setMessage(empty ? "Empty structure. Type a value in A and press Insert."
-        : "Ready. Type a value in A, then press an operation.");
+                     : "Ready. Type a value in A, then press an operation.");
 }
 
 void SandboxScreen::rebuildOps()
@@ -278,14 +253,14 @@ void SandboxScreen::rebuildOps()
     const float px = (float)Theme::WindowW - PanelW;
     const float y0 = TabH + 160.f;
     const float rowH = 38.f;
-    const float margin = 15.f;   // inner margin of the panel
-    const float gap = 10.f;      // space between the two columns
+    const float margin = 15.f; // inner margin of the panel
+    const float gap = 10.f;    // space between the two columns
     const float btnH = 30.f;
 
     m_opCount = n;
 
     // Pass 1: create the buttons with a small label and padding, and find each column's widest button.
-    float colW[2] = { 0.f, 0.f };
+    float colW[2] = {0.f, 0.f};
     for (int i = 0; i < n; ++i)
     {
         const int col = i % 2;
@@ -302,10 +277,9 @@ void SandboxScreen::rebuildOps()
 
     // Pass 2: place each column's buttons centred in that column.
     const float colX[2] =
-    {
-        px + margin + colW[0] * 0.5f,
-        px + margin + colW[0] + gap + colW[1] * 0.5f
-    };
+        {
+            px + margin + colW[0] * 0.5f,
+            px + margin + colW[0] + gap + colW[1] * 0.5f};
     for (int i = 0; i < n; ++i)
     {
         const int col = i % 2;
@@ -321,7 +295,7 @@ void SandboxScreen::refreshTabs()
         std::string label = TabNames[i];
         if (i == m_kind)
         {
-            label = "[ " + label + " ]";    // not colour alone: brackets + underline
+            label = "[ " + label + " ]"; // not colour alone: brackets + underline
         }
         m_tab[i].setLabel(label.c_str());
     }
@@ -416,7 +390,7 @@ void SandboxScreen::onOp(int op)
 
 void SandboxScreen::onFieldEnter()
 {
-    doOp(SandboxOp::Insert);     // Enter = insert
+    doOp(SandboxOp::Insert); // Enter = insert
 }
 
 void SandboxScreen::onToolbar(int action)
@@ -453,7 +427,7 @@ void SandboxScreen::doOp(int op)
 {
     if (m_anim.busy())
     {
-        m_anim.skipAll();     // finish the running animation first
+        m_anim.skipAll(); // finish the running animation first
     }
 
     if (op == ScreenOp::Random)
@@ -560,7 +534,7 @@ void SandboxScreen::doUndo()
 {
     m_anim.clear();
     bool ok = m_session.undo();
-    m_renderer.snapTo(m_session.snapshot());     // hard sync, no stale positions
+    m_renderer.snapTo(m_session.snapshot()); // hard sync, no stale positions
     m_renderer.setTarget(kNull);
     m_selected = kNull;
     m_renderer.setSelected(kNull);
@@ -599,13 +573,12 @@ void SandboxScreen::updateTooltip(int mx, int my)
         if (m_renderer.isHeap())
         {
             m_tooltip.showText(sx + 16.f, sy + 16.f,
-                "value: " + std::to_string(key) + "\nindex: " + std::to_string(id)
-                + "\ndepth: " + std::to_string(depth));
+                               "value: " + std::to_string(key) + "\nindex: " + std::to_string(id) + "\ndepth: " + std::to_string(depth));
         }
         else
         {
             m_tooltip.showNode(sx + 16.f, sy + 16.f, key, height, bal, size, depth,
-                m_renderer.kind() == TreeKind::AVL);
+                               m_renderer.kind() == TreeKind::AVL);
         }
         return;
     }
@@ -613,7 +586,7 @@ void SandboxScreen::updateTooltip(int mx, int my)
     if (cell != kNull && m_renderer.nodeInfo(cell, key, height, size, bal, depth))
     {
         m_tooltip.showText(sx + 16.f, sy + 16.f,
-            "array cell\nindex: " + std::to_string(cell) + "\nvalue: " + std::to_string(key));
+                           "array cell\nindex: " + std::to_string(cell) + "\nvalue: " + std::to_string(key));
         return;
     }
     m_tooltip.hide();
@@ -639,7 +612,7 @@ void SandboxScreen::onCanvasClick(int mx, int my)
     if (id != kNull && m_renderer.nodeInfo(id, key, h, s, b, d))
     {
         bool second = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-        int value = m_renderer.isHeap() ? id : key;     // tree: key, heap: array index
+        int value = m_renderer.isHeap() ? id : key; // tree: key, heap: array index
         if (second)
         {
             m_fieldB.setValue(value);
@@ -794,5 +767,3 @@ void SandboxScreen::draw(sf::RenderWindow& window)
     m_toolbar.draw(window);
     m_tooltip.draw(window);
 }
-
-

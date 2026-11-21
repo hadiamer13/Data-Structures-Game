@@ -12,8 +12,14 @@ int main(int argc, char** argv)
 {
     for (int i = 1; i < argc; i++)
     {
-        if (std::strcmp(argv[i], "--events") == 0) g_recordBenchEvents = true;
-        else if (std::strcmp(argv[i], "--no-events") == 0) g_recordBenchEvents = false;
+        if (std::strcmp(argv[i], "--events") == 0)
+        {
+            g_recordBenchEvents = true;
+        }
+        else if (std::strcmp(argv[i], "--no-events") == 0)
+        {
+            g_recordBenchEvents = false;
+        }
         else if (std::strcmp(argv[i], "--help") == 0)
         {
             std::printf("Usage: benchmarks [--events|--no-events]\n");

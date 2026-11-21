@@ -21,10 +21,9 @@ namespace
 
     // Act names alone.
     const char* const ActNames[4] =
-    {
-        "The Blueprint Wing", "The Sorted Wing",
-        "The Architect's Wing", "The Heap Fortress"
-    };
+        {
+            "The Blueprint Wing", "The Sorted Wing",
+            "The Architect's Wing", "The Heap Fortress"};
 
     void centerOrigin(sf::Text& t)
     {
@@ -40,9 +39,9 @@ namespace
 }
 
 void CampaignMap::styleText(sf::Text& t, const sf::Font& font, unsigned size,
-    const sf::Color& col, float x, float y)
+                            const sf::Color& col, float x, float y)
 {
-    t.setFont(font);                          // SFML 2.x API
+    t.setFont(font); // SFML 2.x API
     t.setCharacterSize(size);
     t.setFillColor(col);
     t.setOutlineColor(sf::Color(0, 0, 0, 200));
@@ -54,7 +53,7 @@ void CampaignMap::buildArrow(sf::ConvexShape& s, bool left, float cx, float cy)
 {
     s.setPointCount(3);
     float d = left ? -1.f : 1.f;
-    s.setPoint(0, sf::Vector2f(d * 14.f, 0.f));      // tip
+    s.setPoint(0, sf::Vector2f(d * 14.f, 0.f)); // tip
     s.setPoint(1, sf::Vector2f(-d * 10.f, -16.f));
     s.setPoint(2, sf::Vector2f(-d * 10.f, 16.f));
     s.setPosition(cx, cy);
@@ -93,12 +92,12 @@ CampaignMap::CampaignMap(AppContext& ctx)
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x),
-        H / static_cast<float>(bg.getSize().y));
+                          H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
     m_dim.setFillColor(sf::Color(0, 0, 0, 110));
 
     // ---- Corner decoration (4 L shapes made of 2 bars each) ----------
-        // ---- Corner ornaments (one sprite, mirrored for each corner) ----
+    // ---- Corner ornaments (one sprite, mirrored for each corner) ----
     {
         const sf::Texture& ct = ctx.assets->corner();
         const float inset = 12.f;
@@ -107,7 +106,8 @@ CampaignMap::CampaignMap(AppContext& ctx)
         placeCorner(m_corners[1], ct, W - inset, inset, cs, true, false);
         placeCorner(m_corners[2], ct, inset, H - inset, cs, false, true);
         placeCorner(m_corners[3], ct, W - inset, H - inset, cs, true, true);
-        for (int c = 0; c < 4; ++c) {
+        for (int c = 0; c < 4; ++c)
+        {
             m_corners[c].setColor(Theme::NodeLine);
         }
     }
@@ -160,8 +160,10 @@ CampaignMap::CampaignMap(AppContext& ctx)
     }
 
     // ---- Info panel (under the banners) -------------------------------
-    m_panelX = 100.f;  m_panelY = 448.f;
-    m_panelW = W - 200.f;  m_panelH = 252.f;
+    m_panelX = 100.f;
+    m_panelY = 448.f;
+    m_panelW = W - 200.f;
+    m_panelH = 252.f;
     m_panel.setSize(sf::Vector2f(m_panelW, m_panelH));
     m_panel.setPosition(m_panelX, m_panelY);
     m_panel.setFillColor(Theme::TooltipBg);
@@ -182,20 +184,20 @@ CampaignMap::CampaignMap(AppContext& ctx)
 
     // ---- Buttons ----------------------------------------------------------
     m_start.init("Start", font,
-        sf::Vector2f(m_panelX + m_panelW - 150.f, m_panelY + m_panelH - 55.f),
-        sf::Vector2f(240.f, Theme::ButtonH));
+                 sf::Vector2f(m_panelX + m_panelW - 150.f, m_panelY + m_panelH - 55.f),
+                 sf::Vector2f(240.f, Theme::ButtonH));
     m_start.setCallback(&CampaignMap::onStartClick, this);
     m_start.setFrame(&ctx.assets->buttonFrame());
 
     m_back.init("Back", font, sf::Vector2f(110.f, tabY),
-        sf::Vector2f(150.f, 42.f));
+                sf::Vector2f(150.f, 42.f));
     m_back.setCallback(&CampaignMap::onBackClick, this);
     m_back.setFrame(&ctx.assets->buttonFrame());
 
     // DEBUG button: bottom-left of the info panel, clear of the text and Start.
     m_debug.init("DEBUG: UNLOCK ALL (OFF)", font,
-        sf::Vector2f(m_panelX + 250.f, m_panelY + m_panelH - 55.f),
-        sf::Vector2f(260.f, Theme::ButtonH));
+                 sf::Vector2f(m_panelX + 250.f, m_panelY + m_panelH - 55.f),
+                 sf::Vector2f(260.f, Theme::ButtonH));
     m_debug.setCallback(&CampaignMap::onDebugClick, this);
     m_debug.setFrame(&ctx.assets->buttonFrame());
     refreshDebugLabel();
@@ -224,8 +226,8 @@ void CampaignMap::initBanners()
         std::snprintf(num, sizeof(num), "%d", i + 1);
         const bool boss = m_campaign->isBoss(m_act * PerAct + i);
         m_banner[i].init(num, *m_font, m_ctx.assets->banner(), m_ctx.assets->skull(),
-            sf::Vector2f(W / 2.f + (i - 2) * 215.f, 276.f),
-            Theme::BannerH, boss);
+                         sf::Vector2f(W / 2.f + (i - 2) * 215.f, 276.f),
+                         Theme::BannerH, boss);
     }
 }
 
@@ -266,7 +268,7 @@ void CampaignMap::setAct(int act)
         m_tab[a].setFillColor(a == act ? Theme::NodeGlow : Theme::TextColor);
     }
     m_tabHighlight.setPosition(m_tab[act].getPosition().x,
-        m_tab[act].getPosition().y + 26.f);
+                               m_tab[act].getPosition().y + 26.f);
 
     m_actName.setString(ActNames[act]);
     centerOrigin(m_actName);
@@ -405,7 +407,7 @@ void CampaignMap::onStart()
 {
     if (!startEnabled())
     {
-        return;      // locked or data missing: nothing happens
+        return; // locked or data missing: nothing happens
     }
     m_ctx.selectedLevel = levelIndex();
     m_ctx.ui->requestScreen(ScreenId::Briefing);
@@ -574,7 +576,6 @@ void CampaignMap::draw(sf::RenderWindow& window)
     window.draw(m_arrow[1]);
     window.draw(m_actName);
     window.draw(m_divider);
-  
 
     // Banners: selected one last so its glow and scale sit on top.
     for (int s = 0; s < PerAct; ++s)
