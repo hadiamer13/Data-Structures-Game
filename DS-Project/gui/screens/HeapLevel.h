@@ -30,14 +30,14 @@ namespace HeapOp
 // Model decide karta hai ke har action valid hai ya nahi.
 class HeapLevel : public Screen
 {
-public:
+  public:
     explicit HeapLevel(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
     void update(float dt) override;
     void draw(sf::RenderWindow& window) override;
 
-private:
+  private:
     HeapLevel(const HeapLevel&);
     HeapLevel& operator=(const HeapLevel&);
 

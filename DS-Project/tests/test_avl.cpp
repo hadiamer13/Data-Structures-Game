@@ -21,7 +21,7 @@ void runAVLTests()
     checkRotation(10, 30, 20, 20); // RL
 
     AVLTree deletionTree;
-    const int deletionKeys[] = { 4, 2, 5, 1, 3 };
+    const int deletionKeys[] = {4, 2, 5, 1, 3};
     for (int i = 0; i < 5; i++)
     {
         deletionTree.insert(deletionKeys[i]);
@@ -33,7 +33,7 @@ void runAVLTests()
     testCheck(Validator::validateAVL(deletionTree), "AVL remains valid after zero-child-balance deletion");
 
     AVLTree removalTree;
-    const int removalKeys[] = { 20, 10, 30, 25, 40, 22 };
+    const int removalKeys[] = {20, 10, 30, 25, 40, 22};
     for (int i = 0; i < 6; i++)
     {
         removalTree.insert(removalKeys[i]);
@@ -51,7 +51,7 @@ void runAVLTests()
     oneChildTree.insert(4);
     testCheck(oneChildTree.remove(8), "AVL removes a root with one child");
     testCheck(oneChildTree.root() != nullptr && oneChildTree.root()->key == 4 &&
-              oneChildTree.root()->parent == nullptr,
+                  oneChildTree.root()->parent == nullptr,
               "AVL promotes the only child to a parentless root");
     testCheck(Validator::validateAVL(oneChildTree), "AVL remains valid after one-child root removal");
     testCheck(oneChildTree.remove(4), "AVL removes its final leaf");

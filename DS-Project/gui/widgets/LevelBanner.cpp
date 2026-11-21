@@ -3,10 +3,13 @@
 #include "../Theme.h"
 #include <cmath>
 
-namespace {
+namespace
+{
 
-    float minF(float a, float b) { return a < b ? a : b; }
-    float maxF(float a, float b) { return a > b ? a : b; }
+    float minF(float a, float b)
+    {
+        return a < b ? a : b;
+    }
 
     sf::Uint8 mixChannel(sf::Uint8 x, sf::Uint8 y, float t) 
     {
@@ -15,7 +18,7 @@ namespace {
     sf::Color lerpColor(const sf::Color& a, const sf::Color& b, float t) 
     {
         return sf::Color(mixChannel(a.r, b.r, t), mixChannel(a.g, b.g, t),
-            mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
+                         mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
     }
 
     void centerOrigin(sf::Text& t) 
@@ -34,7 +37,7 @@ namespace {
         t.setOutlineThickness(2.f);
     }
 
-}  // namespace
+} // namespace
 
 void LevelBanner::init(const char* number, const sf::Font& font,
     const sf::Texture& banner, const sf::Texture& skull,
@@ -102,18 +105,34 @@ void LevelBanner::setState(int stars, bool unlocked)
 {
     m_unlocked = unlocked;
     m_stars = unlocked ? stars : 0;
-    if (m_stars < 0) m_stars = 0;
-    if (m_stars > 3) m_stars = 3;
+    if (m_stars < 0)
+    {
+        m_stars = 0;
+    }
+    if (m_stars > 3)
+    {
+        m_stars = 3;
+    }
 
     // Not colour alone: status word + padlock/stars.
     const char* word = "OPEN";
-    if (!m_unlocked)       word = "LOCKED";
-    else if (m_boss)       word = "BOSS";
-    else if (m_stars > 0)  word = "CLEARED";
+    if (!m_unlocked)
+    {
+        word = "LOCKED";
+    }
+    else if (m_boss)
+    {
+        word = "BOSS";
+    }
+    else if (m_stars > 0)
+    {
+        word = "CLEARED";
+    }
     m_status.setString(word);
     centerOrigin(m_status);
 
-    for (int s = 0; s < 3; ++s) {
+    for (int s = 0; s < 3; ++s)
+    {
         bool on = s < m_stars;
         m_star[s].setFillColor(on ? Theme::StarOn : sf::Color(0, 0, 0, 0));
         m_star[s].setOutlineColor(on ? Theme::StarOn : Theme::StarOff);
@@ -153,7 +172,8 @@ void LevelBanner::applyLayout(float s)
 
     // Stars (cleared/unlocked) or padlock (locked) share the bottom slot.
     float by = cy + 0.24f * H;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         m_star[i].setScale(s, s);
         m_star[i].setPosition(cx + (i - 1) * 28.f * s, by);
     }
@@ -170,23 +190,28 @@ void LevelBanner::handleEvent(const sf::Event& e)
     if (e.type == sf::Event::MouseMoved) 
     {
         if (m_state != StatePressed)
+        {
             m_state = b.contains(static_cast<float>(e.mouseMove.x),
-                static_cast<float>(e.mouseMove.y))
-            ? StateHover : StateIdle;
+                                 static_cast<float>(e.mouseMove.y))
+                          ? StateHover
+                          : StateIdle;
+        }
     }
     else if (e.type == sf::Event::MouseButtonPressed) 
     {
         if (e.mouseButton.button == sf::Mouse::Left &&
             b.contains(static_cast<float>(e.mouseButton.x),
-                static_cast<float>(e.mouseButton.y)))
+                       static_cast<float>(e.mouseButton.y)))
+        {
             m_state = StatePressed;
+        }
     }
-    else if (e.type == sf::Event::MouseButtonReleased) 
+    else if (e.type == sf::Event::MouseButtonReleased)
     {
-        if (e.mouseButton.button == sf::Mouse::Left && m_state == StatePressed) 
+        if (e.mouseButton.button == sf::Mouse::Left && m_state == StatePressed)
         {
             bool still = b.contains(static_cast<float>(e.mouseButton.x),
-                static_cast<float>(e.mouseButton.y));
+                                    static_cast<float>(e.mouseButton.y));
             m_state = still ? StateHover : StateIdle;
             
             if (still && m_onClick) m_onClick(m_context);
@@ -200,17 +225,32 @@ void LevelBanner::update(float dt)
 
     float ht = (m_state == StateIdle) ? 0.f : 1.f;
     float hs = 8.f * dt;
-    if (m_hoverAmt < ht) m_hoverAmt = minF(ht, m_hoverAmt + hs);
-    else                 m_hoverAmt = maxF(ht, m_hoverAmt - hs);
+    if (m_hoverAmt < ht)
+    {
+        m_hoverAmt = minF(ht, m_hoverAmt + hs);
+    }
+    else
+    {
+        m_hoverAmt = maxF(ht, m_hoverAmt - hs);
+    }
 
     float st = m_selected ? 1.f : 0.f;
     float ss = 7.f * dt;
-    if (m_selAmt < st) m_selAmt = minF(st, m_selAmt + ss);
-    else               m_selAmt = maxF(st, m_selAmt - ss);
+    if (m_selAmt < st)
+    {
+        m_selAmt = minF(st, m_selAmt + ss);
+    }
+    else
+    {
+        m_selAmt = maxF(st, m_selAmt - ss);
+    }
 
     // Scale: 0.82 unselected, 1.0 selected, +0.04 on hover, 0.97x pressed.
     float s = 0.82f + 0.18f * m_selAmt + 0.04f * m_hoverAmt;
-    if (m_state == StatePressed) s *= 0.97f;
+    if (m_state == StatePressed)
+    {
+        s *= 0.97f;
+    }
     applyLayout(s);
 
     // Banner tint: grey when locked, red otherwise, brighter when selected.
@@ -232,7 +272,10 @@ void LevelBanner::draw(sf::RenderWindow& window) const
     if (m_hoverAmt > 0.01f || m_selAmt > 0.01f) window.draw(m_glow);
     window.draw(m_banner);
 
-    if (m_boss) window.draw(m_skull);
+    if (m_boss)
+    {
+        window.draw(m_skull);
+    }
     window.draw(m_head);
     window.draw(m_num);
     window.draw(m_status);
@@ -242,8 +285,11 @@ void LevelBanner::draw(sf::RenderWindow& window) const
         window.draw(m_lockShackle);
         window.draw(m_lockBody);
     }
-    else 
+    else
     {
-        for (int s = 0; s < 3; ++s) window.draw(m_star[s]);   // empty = outline
+        for (int s = 0; s < 3; ++s)
+        {
+            window.draw(m_star[s]); // empty = outline
+        }
     }
 }

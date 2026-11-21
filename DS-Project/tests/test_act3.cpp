@@ -35,17 +35,18 @@ void runAct3SessionTests()
     testCheck(single.startLevel(avlLevel(MissionKind::AvlSingle, RotationType::LL, "")), "3.2 level starts from a template");
     ActionResult wrong = single.apply(rotate(0, RotationType::RR));
     testCheck(!wrong.accepted && wrong.hud.penalties == 50 && wrong.hud.alarm == 2 &&
-        wrong.hud.status == HudStatus::Playing, "wrong rotation costs 2 alarm and 50 points");
+                  wrong.hud.status == HudStatus::Playing,
+              "wrong rotation costs 2 alarm and 50 points");
     ActionResult right = single.apply(rotate(0, RotationType::LL));
     testCheck(right.accepted && right.hud.status == HudStatus::Won && single.avlTree().isBalanced(),
-        "LL repair balances the tree and wins");
+              "LL repair balances the tree and wins");
 
     // 3.3 double rotation: both rotations run in one action.
     GameSession dbl;
     testCheck(dbl.startLevel(avlLevel(MissionKind::AvlDouble, RotationType::LR, "")), "3.3 level starts");
     ActionResult lr = dbl.apply(rotate(0, RotationType::LR));
     testCheck(lr.accepted && lr.hud.status == HudStatus::Won && dbl.avlTree().isBalanced(),
-        "LR repair balances the tree");
+              "LR repair balances the tree");
     int rotates = 0;
     for (int i = 0; i < lr.events.size(); i++)
     {
@@ -66,7 +67,7 @@ void runAct3SessionTests()
     // 3.1 badges: only the root of this tree is violated.
     GameSession badges;
     testCheck(badges.startLevel(avlLevel(MissionKind::AvlBadges, 0, "50 30 20 10 # # # 40 # # 60 # #")),
-        "3.1 level starts from a preorder");
+              "3.1 level starts from a preorder");
     ActionResult miss = badges.apply(click(1));
     testCheck(!miss.accepted && miss.hud.status == HudStatus::Playing, "a balanced room is a wrong click");
     ActionResult hit = badges.apply(click(0));

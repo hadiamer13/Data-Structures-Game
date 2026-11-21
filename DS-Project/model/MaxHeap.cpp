@@ -19,8 +19,15 @@ const IntArray& MaxHeap::array() const
     return m_array;
 }
 
-std::uint64_t MaxHeap::comparisonCount() const { return m_comparisons; }
-std::uint64_t MaxHeap::swapCount() const { return m_swaps; }
+std::uint64_t MaxHeap::comparisonCount() const
+{
+    return m_comparisons;
+}
+
+std::uint64_t MaxHeap::swapCount() const
+{
+    return m_swaps;
+}
 
 bool MaxHeap::loadRaw(const IntArray& values, int activeSize)
 {
@@ -78,12 +85,18 @@ void MaxHeap::siftDownRaw(int index, int heapSize, int reason, EventLog* log)
         if (left < heapSize)
         {
             m_comparisons++;
-            if (m_array[left] > m_array[largest]) largest = left;
+            if (m_array[left] > m_array[largest])
+            {
+                largest = left;
+            }
         }
         if (right < heapSize)
         {
             m_comparisons++;
-            if (m_array[right] > m_array[largest]) largest = right;
+            if (m_array[right] > m_array[largest])
+            {
+                largest = right;
+            }
         }
         if (largest == current)
         {

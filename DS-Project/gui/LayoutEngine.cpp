@@ -25,10 +25,10 @@ namespace
 
 LayoutEngine::LayoutEngine()
     : m_hGap(60.f), m_vGap(80.f),
-    m_cellW(48.f), m_cellH(48.f), m_cellGap(6.f), m_arrayGap(90.f),
-    m_pos(0), m_has(0), m_rel(0), m_cap(0),
-    m_cell(0), m_cellCount(0),
-    m_guard(0), m_width(0.f), m_height(0.f)
+      m_cellW(48.f), m_cellH(48.f), m_cellGap(6.f), m_arrayGap(90.f),
+      m_pos(0), m_has(0), m_rel(0), m_cap(0),
+      m_cell(0), m_cellCount(0),
+      m_guard(0), m_width(0.f), m_height(0.f)
 {
 }
 

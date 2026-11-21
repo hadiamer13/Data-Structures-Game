@@ -13,11 +13,9 @@ struct ScoreEntry
     }
 };
 
-// Fixed-size local top-ten score table. Higher scores rank first; ties use
-// player name order for repeatable results.
 class Leaderboard
 {
-public:
+  public:
     static const int Capacity = 10;
 
     Leaderboard();
@@ -28,7 +26,7 @@ public:
     bool load(const std::string& path, std::string* error = nullptr);
     bool save(const std::string& path, std::string* error = nullptr) const;
 
-private:
+  private:
     ScoreEntry m_entries[Capacity];
     int m_size;
 };

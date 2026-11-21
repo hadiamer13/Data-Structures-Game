@@ -4,8 +4,11 @@
 
 static void seedBST(BST& tree)
 {
-    const int values[] = { 8, 4, 12, 2, 6, 10, 14, 5 };
-    for (int i = 0; i < 8; i++) tree.insert(values[i]);
+    const int values[] = {8, 4, 12, 2, 6, 10, 14, 5};
+    for (int i = 0; i < 8; i++)
+    {
+        tree.insert(values[i]);
+    }
 }
 
 void runBSTTests()
@@ -19,7 +22,7 @@ void runBSTTests()
     testCheck(tree.successor(6)->key == 8 && tree.predecessor(6)->key == 5, "BST computes successor and predecessor");
     testCheck(tree.successor(14) == nullptr && tree.predecessor(2) == nullptr, "BST reports missing boundary neighbors");
     IntArray range = tree.rangeQuery(5, 12);
-    const int expected[] = { 5, 6, 8, 10, 12 };
+    const int expected[] = {5, 6, 8, 10, 12};
     testCheck(range.size() == 5 && sameInts(range.data(), expected, 5), "range query returns sorted inclusive keys");
     testCheck(tree.kthSmallest(1) == 2 && tree.kthSmallest(8) == 14 && tree.kthSmallest(9) == kNull,
               "BST kthSmallest is one-based and bounds checked");

@@ -7,11 +7,10 @@
 #include "EventLog.h"
 #include "NodePool.h"
 
-// Self-balancing integer-key tree. Heights count nodes (empty = 0, leaf = 1).
-// kth() uses one-based indexing and returns kNull when k is out of range.
+
 class AVLTree
 {
-public:
+  public:
     AVLTree();
     ~AVLTree();
 
@@ -34,17 +33,16 @@ public:
 
     int kth(int k) const;
     bool kth(int k, int& outKey) const;
-    int rank(int key) const; // Number of keys less than or equal to key.
+    int rank(int key) const; 
     int countInRange(int lo, int hi) const;
     bool isBalanced() const;
 
-    // Exposed for manual-rotation activities. A successful call updates metadata.
     bool rotateLeft(AVLNode* pivot, EventLog* log = nullptr);
     bool rotateRight(AVLNode* pivot, EventLog* log = nullptr);
 
     void clear();
 
-private:
+  private:
     friend class Serializer;
     AVLNode* findWithoutEvents(int key) const;
     AVLNode* rotateLeftRaw(AVLNode* pivot, EventLog* log);

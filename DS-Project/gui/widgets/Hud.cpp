@@ -17,13 +17,13 @@ namespace
     const float Pad = 16.f;
     const float ObjectiveWrapW = 560.f;
     const float BarH = 20.f;
-    const float FrameX = 10.f;   // frame extends this far left and right of the bar
-    const float FrameY = 8.f;    // and this far above and below it
+    const float FrameX = 10.f; // frame extends this far left and right of the bar
+    const float FrameY = 8.f;  // and this far above and below it
 }
 
 Hud::Hud()
     : m_x(0.f), m_y(0.f), m_w(1280.f), m_h(84.f),
-    m_alarm(0), m_cap(1), m_score(0), m_steps(0), m_maxSteps(0), m_shown(0.f)
+      m_alarm(0), m_cap(1), m_score(0), m_steps(0), m_maxSteps(0), m_shown(0.f)
 {
 }
 
@@ -75,7 +75,7 @@ void Hud::init(const sf::Font& font, float x, float y, float w, float h)
 
     // Frame is drawn first, so the bar sits on top of its interior.
     m_frame.setRect(sf::FloatRect(mx - FrameX, y + 46.f - FrameY,
-        mw + 2.f * FrameX, BarH + 2.f * FrameY));
+                                  mw + 2.f * FrameX, BarH + 2.f * FrameY));
 
     for (int i = 0; i < 3; ++i)
     {

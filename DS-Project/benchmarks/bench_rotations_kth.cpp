@@ -20,7 +20,10 @@ static void rotationCounts(const IntArray& keys, std::uint64_t& insertTotal,
         tree.remove(keys[i], &log);
         const int rotations = countEvents(log, EventType::ROTATE);
         deleteTotal += static_cast<std::uint64_t>(rotations);
-        if (rotations > maxDelete) maxDelete = rotations;
+        if (rotations > maxDelete)
+        {
+            maxDelete = rotations;
+        }
         log.clear();
     }
 }
@@ -49,7 +52,7 @@ void runRotationsKthBench()
 {
     std::printf("\n[AVL rotations and order statistics]\n");
     std::printf("n,shape,avg_insert_rotations,avg_delete_rotations,max_rotations_per_delete,insert_ms,delete_ms\n");
-    const int sizes[] = { 1000, 10000 };
+    const int sizes[] = {1000, 10000};
     for (int s = 0; s < 2; s++)
     {
         for (int shape = 0; shape < 2; shape++)
@@ -57,9 +60,15 @@ void runRotationsKthBench()
             IntArray keys;
             if (shape == 0)
             {
-                for (int i = 0; i < sizes[s]; i++) keys.push(i + 1);
+                for (int i = 0; i < sizes[s]; i++)
+                {
+                    keys.push(i + 1);
+                }
             }
-            else makePermutation(sizes[s], 4403u + static_cast<std::uint32_t>(sizes[s]), keys);
+            else
+            {
+                makePermutation(sizes[s], 4403u + static_cast<std::uint32_t>(sizes[s]), keys);
+            }
             std::uint64_t inserted = 0;
             std::uint64_t deleted = 0;
             int maxDelete = 0;
@@ -88,10 +97,16 @@ void runRotationsKthBench()
         }
         volatile int sink = 0;
         std::clock_t start = std::clock();
-        for (int query = 0; query < 1000; query++) sink += bst.kthSmallest((query * 31) % sizes[s] + 1);
+        for (int query = 0; query < 1000; query++)
+        {
+            sink += bst.kthSmallest((query * 31) % sizes[s] + 1);
+        }
         const double bstMs = elapsedMilliseconds(start, std::clock());
         start = std::clock();
-        for (int query = 0; query < 1000; query++) sink += avl.kth((query * 31) % sizes[s] + 1);
+        for (int query = 0; query < 1000; query++)
+        {
+            sink += avl.kth((query * 31) % sizes[s] + 1);
+        }
         const double avlMs = elapsedMilliseconds(start, std::clock());
         std::printf("%d,%.3f,%.3f\n", sizes[s], bstMs, avlMs);
         (void)sink;

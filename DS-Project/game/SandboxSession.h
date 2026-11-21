@@ -1,6 +1,4 @@
 // game/SandboxSession.h
-// Sandbox backend: real model classes, real events, real snapshots. No SFML.
-// Undo = replay of the action history from the seeded start (works for disturbed heaps too).
 #ifndef VH_SANDBOXSESSION_H
 #define VH_SANDBOXSESSION_H
 
@@ -47,14 +45,14 @@ namespace SandboxOp
 
 struct SandboxResult
 {
-    bool accepted;          // the operation did what was asked
-    bool changed;           // the structure was modified
+    bool accepted; 
+    bool changed;  
     std::string message;
     EventArray events;
-    int focusId;            // node to ring afterwards (kNull = none)
-    ViewSnapshot before;    // animation start (heap insert: includes the new cell)
+    int focusId;         
+    ViewSnapshot before; 
     ViewSnapshot after;
-    bool valid;             // Validator verdict after the operation
+    bool valid; 
     std::string validText;
 
     SandboxResult() : accepted(false), changed(false), focusId(kNull), valid(true)
@@ -64,7 +62,7 @@ struct SandboxResult
 
 class SandboxSession
 {
-public:
+  public:
     SandboxSession();
 
     void start(int kind, int seed, bool empty);
@@ -73,14 +71,14 @@ public:
     void reset();
 
     ViewSnapshot snapshot() const;
-    bool check(std::string& text) const;    // Validator verdict + text
+    bool check(std::string& text) const; 
     int kind() const;
-    int steps() const;                      // visits + compares so far
+    int steps() const; 
     bool canUndo() const;
 
     static bool isMutating(int op);
 
-private:
+  private:
     SandboxSession(const SandboxSession&);
     SandboxSession& operator=(const SandboxSession&);
 
@@ -102,7 +100,7 @@ private:
     AVLTree m_avl;
     MaxHeap m_heap;
 
-    IntArray m_history;     // stride 4: op, a, b, cost (mutating actions only)
+    IntArray m_history; 
 };
 
 #endif

@@ -115,8 +115,8 @@ namespace
 // Builds the layout, loads the level, and sets the buttons and HUD once it is ready.
 HeapLevel::HeapLevel(AppContext& ctx)
     : m_ctx(ctx), m_index(FirstHeapIndex), m_ok(false), m_selected(kNull), m_endTimer(0.f),
-    m_pressX(0), m_pressY(0), m_pressing(false), m_opCount(0),
-    m_renderer(ctx.assets->font()), m_anim(&m_renderer)
+      m_pressX(0), m_pressY(0), m_pressing(false), m_opCount(0),
+      m_renderer(ctx.assets->font()), m_anim(&m_renderer)
 {
     m_index = ctx.selectedLevel;
     if (m_index < FirstHeapIndex || m_index > 19)
@@ -245,7 +245,7 @@ bool HeapLevel::allowsHeapify() const
 bool HeapLevel::allowsExtract() const
 {
     return m_def.mission == MissionKind::HeapExtract ||
-        m_def.mission == MissionKind::HeapRace || m_def.mission == MissionKind::HeapBoss;
+           m_def.mission == MissionKind::HeapRace || m_def.mission == MissionKind::HeapBoss;
 }
 
 bool HeapLevel::allowsSwap() const
@@ -410,8 +410,8 @@ void HeapLevel::refreshPrompt()
     s += " " + m_session.prompt();
     m_prompt.setString(wrapChars(s, 110));
     m_selText.setString(m_selected == kNull
-        ? std::string("Selected: none")
-        : ("Selected: index " + std::to_string(m_selected)));
+                            ? std::string("Selected: none")
+                            : ("Selected: index " + std::to_string(m_selected)));
 }
 
 // Tooltip mein node ki value, index aur depth dikhti hai.
@@ -436,10 +436,10 @@ void HeapLevel::updateTooltip(int mx, int my)
     if (id != kNull && m_renderer.nodeInfo(id, key, height, size, balance, depth))
     {
         m_tooltip.showText(sx + 16.f, sy + 16.f,
-            std::string(isCell ? "array cell" : "heap node") +
-            "\nvalue: " + std::to_string(key) +
-            "\nindex: " + std::to_string(id) +
-            (isCell ? std::string("") : ("\ndepth: " + std::to_string(depth))));
+                           std::string(isCell ? "array cell" : "heap node") +
+                               "\nvalue: " + std::to_string(key) +
+                               "\nindex: " + std::to_string(id) +
+                               (isCell ? std::string("") : ("\ndepth: " + std::to_string(depth))));
         return;
     }
     m_tooltip.hide();

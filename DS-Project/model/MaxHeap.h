@@ -6,11 +6,9 @@
 #include "../contracts/Event.h"
 #include "EventLog.h"
 
-// Zero-based max heap. array()[0..activeSize()) is the heap; the remaining
-// suffix is the ascending sorted region produced by repeated extractMax().
 class MaxHeap
 {
-public:
+  public:
     MaxHeap();
 
     int activeSize() const;
@@ -36,7 +34,7 @@ public:
     bool isSortedAscending() const;
     bool loadRaw(const IntArray& values, int activeSize);
 
-private:
+  private:
     void siftDownRaw(int index, int heapSize, int reason, EventLog* log);
     void siftUpRaw(int index, int reason, EventLog* log);
     void swapIndices(int indexA, int indexB, int reason, EventLog* log);

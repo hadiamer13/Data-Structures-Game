@@ -62,7 +62,7 @@ struct RenderNode
 
 class Renderer : public IEventVisualizer
 {
-public:
+  public:
     explicit Renderer(const sf::Font& font);
     ~Renderer();
 
@@ -108,12 +108,12 @@ public:
     // Har node ke gird optional ornament. nullptr do to saada circle rahega.
     void setRingTexture(const sf::Texture* tex);
 
-private:
+  private:
     Renderer(const Renderer&);
     Renderer& operator=(const Renderer&);
 
     const sf::Texture* m_ringTex;
-    sf::Sprite         m_ringSprite;
+    sf::Sprite m_ringSprite;
 
     void resetNode(RenderNode& r) const;
     void ensureCapacity(int n);

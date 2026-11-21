@@ -10,7 +10,7 @@
 // Retry level par le jaata hai, Next agle briefing par, aur Campaign map par wapas.
 class ResultScreen : public Screen
 {
-public:
+  public:
     explicit ResultScreen(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
@@ -22,7 +22,7 @@ public:
     void onNext();
     void onCampaign();
 
-private:
+  private:
     static void onRetryClick(void* context);
     static void onNextClick(void* context);
     static void onCampaignClick(void* context);

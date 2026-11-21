@@ -43,7 +43,7 @@ void runOrderStatisticTests()
     AVLTree tree;
     int values[32];
     int count = 0;
-    const int inputs[] = { 12, 5, 18, 2, 9, 15, 21, -3, 7, 11, 17, 1 };
+    const int inputs[] = {12, 5, 18, 2, 9, 15, 21, -3, 7, 11, 17, 1};
     for (int i = 0; i < 12; i++)
     {
         testCheck(tree.insert(inputs[i]), "AVL accepts a unique order-statistic key");
@@ -54,7 +54,7 @@ void runOrderStatisticTests()
     testCheck(!tree.insert(9), "AVL rejects duplicate keys");
     verifyOrderStatistics(tree, values, count);
 
-    const int removals[] = { 12, -3, 21, 5 };
+    const int removals[] = {12, -3, 21, 5};
     for (int i = 0; i < 4; i++)
     {
         testCheck(tree.remove(removals[i]), "AVL removes an existing order-statistic key");

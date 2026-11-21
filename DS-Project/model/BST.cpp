@@ -143,7 +143,7 @@ bool BST::remove(int key, EventLog* log)
     }
 
     BSTNode* child = node->left != nullptr ? static_cast<BSTNode*>(node->left)
-                                          : static_cast<BSTNode*>(node->right);
+                                           : static_cast<BSTNode*>(node->right);
     BSTNode* parent = static_cast<BSTNode*>(node->parent);
     const int side = parent == nullptr ? Side::None : (parent->left == node ? Side::Left : Side::Right);
     if (parent == nullptr)
@@ -262,7 +262,6 @@ void BST::rangeRec(BSTNode* node, int low, int high, IntArray& out, EventLog* lo
         out.push(node->key);
     }
 
-    // Left subtree holds keys below node->key. Skip it when every such key is below low.
     if (node->key > low)
     {
         rangeRec(static_cast<BSTNode*>(node->left), low, high, out, log);
@@ -272,7 +271,6 @@ void BST::rangeRec(BSTNode* node, int low, int high, IntArray& out, EventLog* lo
         emitSkipped(static_cast<BSTNode*>(node->left), log);
     }
 
-    // Right subtree holds keys above node->key. Skip it when every such key is above high.
     if (node->key < high)
     {
         rangeRec(static_cast<BSTNode*>(node->right), low, high, out, log);

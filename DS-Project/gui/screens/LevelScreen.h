@@ -40,7 +40,7 @@ namespace InputMode
 
 class LevelScreen : public Screen
 {
-public:
+  public:
     explicit LevelScreen(AppContext& ctx);
 
     void handleEvent(const sf::Event& e) override;
@@ -52,7 +52,7 @@ public:
     void onAction(int which);
     void onFieldEnter();
 
-private:
+  private:
     LevelScreen(const LevelScreen&);
     LevelScreen& operator=(const LevelScreen&);
 
@@ -117,12 +117,12 @@ private:
     int m_shownAlarm;
     float m_endTimer;
     int m_selected;
-    IntArray m_clicks;            // 1.1: rooms picked so far, in order
-    IntArray m_tokens;            // 1.2: token values still on the shelf
-    int m_dragToken;              // 1.2: shelf index being dragged, -1 = none
+    IntArray m_clicks; // 1.1: rooms picked so far, in order
+    IntArray m_tokens; // 1.2: token values still on the shelf
+    int m_dragToken;   // 1.2: shelf index being dragged, -1 = none
     int m_dragX;
     int m_dragY;
-    int m_dragPivot;              // 3.2 / 3.3: pivot room being dragged, kNull = none
+    int m_dragPivot; // 3.2 / 3.3: pivot room being dragged, kNull = none
 
     sf::Sprite m_background;
     sf::RectangleShape m_dim;
@@ -133,22 +133,22 @@ private:
     sf::Text m_prompt;
     sf::Text m_targetText;
     sf::Text m_notice;
-    sf::CircleShape m_tokenCircle;   // 1.2 shelf and dragged token
-    sf::CircleShape m_slotCircle;    // 1.2 open-slot marker
+    sf::CircleShape m_tokenCircle; // 1.2 shelf and dragged token
+    sf::CircleShape m_slotCircle;  // 1.2 open-slot marker
     sf::Text m_tokenText;
     sf::Text m_slotText;
     sf::Text m_rootText;
     sf::RectangleShape m_rootBox;
 
     Renderer m_renderer;
-    AnimationController m_anim;   // must come after m_renderer
+    AnimationController m_anim; // must come after m_renderer
     Hud m_hud;
     Toolbar m_toolbar;
     EventLogPanel m_log;
     Tooltip m_tooltip;
 
     NumberField m_field;
-    NumberField m_field2;         // 1.3: diameter
+    NumberField m_field2; // 1.3: diameter
     Button m_act[kMaxAct];
     ActCtx m_actCtx[kMaxAct];
     int m_actCount;

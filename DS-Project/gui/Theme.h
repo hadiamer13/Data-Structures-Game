@@ -3,7 +3,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-namespace Theme {
+namespace Theme
+{
 
     // Window
     
@@ -40,7 +41,7 @@ namespace Theme {
 
     // Misc numbers
     inline const float Pi = 3.14159265f;
-    inline const float BannerH = 340.f;       // selected banner ki height
+    inline const float BannerH = 340.f; // selected banner height
 
     // Rang (dark red theme)
     inline const sf::Color BtnIdle(28, 12, 16, 220);
@@ -71,8 +72,7 @@ namespace Theme {
         sf::Color(170, 40, 50, 200),
         sf::Color(150, 35, 60, 200),
         sf::Color(130, 30, 70, 200),
-        sf::Color(190, 50, 40, 200)
-    };
+        sf::Color(190, 50, 40, 200)};
 
     // Framed texture ki woh chaurai jo bina scale hue rehti hai (texture pixels mein).
     // Agar frame ke kone zyada motay ya patle lagen to yeh value badlo.

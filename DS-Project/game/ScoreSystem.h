@@ -4,10 +4,9 @@
 #include <string>
 #include "../contracts/GameTypes.h"
 
-// Pure C++ alarm, score, penalty and star rules; it has no GUI dependencies.
 class ScoreSystem
 {
-public:
+  public:
     ScoreSystem();
 
     void configure(int optimalSteps, const std::string& objective);
@@ -29,7 +28,7 @@ public:
     void useHint();
     bool hintUsed() const;
 
-private:
+  private:
     int m_alarm;
     int m_alarmCap;
     bool m_hintUsed;

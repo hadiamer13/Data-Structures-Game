@@ -6,7 +6,7 @@
 namespace
 {
     void setText(sf::Text& text, const sf::Font& font, unsigned size,
-        const sf::Color& color, float x, float y)
+                 const sf::Color& color, float x, float y)
     {
         text.setFont(font);
         text.setCharacterSize(size);
@@ -41,8 +41,8 @@ LeaderboardScreen::LeaderboardScreen(AppContext& ctx) : m_ctx(ctx), m_loaded(fal
     for (int i = 0; i < Leaderboard::Capacity; ++i)
     {
         setText(m_rows[i], font, 21,
-            i == 0 ? Theme::StarOn : Theme::TextColor,
-            305.f, 180.f + static_cast<float>(i) * 37.f);
+                i == 0 ? Theme::StarOn : Theme::TextColor,
+                305.f, 180.f + static_cast<float>(i) * 37.f);
     }
 
     m_home.init("Main Menu", font, sf::Vector2f(415.f, 610.f), sf::Vector2f(220.f, 50.f));
@@ -89,7 +89,7 @@ void LeaderboardScreen::update(float dt)
                 name = name.substr(0, 18) + "..";
             }
             m_rows[i].setString("#" + std::to_string(i + 1) + "     " + name +
-                "                         " + std::to_string(entry.score) + " pts");
+                                "                         " + std::to_string(entry.score) + " pts");
         }
         else
         {
@@ -122,8 +122,14 @@ void LeaderboardScreen::draw(sf::RenderWindow& window)
         window.draw(row);
     }
     window.draw(m_title);
-    if (m_scores.size() == 0) window.draw(m_empty);
-    for (int i = 0; i < Leaderboard::Capacity; ++i) window.draw(m_rows[i]);
+    if (m_scores.size() == 0)
+    {
+        window.draw(m_empty);
+    }
+    for (int i = 0; i < Leaderboard::Capacity; ++i)
+    {
+        window.draw(m_rows[i]);
+    }
     window.draw(m_error);
     m_home.draw(window);
     m_reports.draw(window);

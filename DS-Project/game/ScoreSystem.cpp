@@ -2,7 +2,7 @@
 
 ScoreSystem::ScoreSystem()
     : m_alarm(0), m_alarmCap(2), m_stepsTaken(0), m_optimalSteps(1),
-    m_penalties(0), m_penaltyCount(0), m_status(HudStatus::Playing), m_hintUsed(false)
+      m_penalties(0), m_penaltyCount(0), m_status(HudStatus::Playing), m_hintUsed(false)
 {
 }
 
@@ -57,12 +57,35 @@ void ScoreSystem::markLost()
     m_status = HudStatus::Lost;
 }
 
-int ScoreSystem::alarm() const { return m_alarm; }
-int ScoreSystem::alarmCap() const { return m_alarmCap; }
-int ScoreSystem::stepsTaken() const { return m_stepsTaken; }
-int ScoreSystem::optimalSteps() const { return m_optimalSteps; }
-int ScoreSystem::penalties() const { return m_penalties; }
-int ScoreSystem::status() const { return m_status; }
+int ScoreSystem::alarm() const
+{
+    return m_alarm;
+}
+
+int ScoreSystem::alarmCap() const
+{
+    return m_alarmCap;
+}
+
+int ScoreSystem::stepsTaken() const
+{
+    return m_stepsTaken;
+}
+
+int ScoreSystem::optimalSteps() const
+{
+    return m_optimalSteps;
+}
+
+int ScoreSystem::penalties() const
+{
+    return m_penalties;
+}
+
+int ScoreSystem::status() const
+{
+    return m_status;
+}
 
 int ScoreSystem::score() const
 {
@@ -97,7 +120,7 @@ int ScoreSystem::stars() const
     }
     if (m_hintUsed && result > 2)
     {
-        result = 2;     // hint = star cap of 2
+        result = 2; // hint = star cap of 2
     }
     return result;
 }

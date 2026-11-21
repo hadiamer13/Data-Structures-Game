@@ -32,9 +32,12 @@ void runSerializerTests()
     testCheck(!Serializer::deserializeBST("10 12 # # #", bstCopy) && bstCopy.root() == nullptr,
               "BST deserializer rejects invalid ordering");
 
-    const int heapValues[] = { 9, 6, 8, 1, 4, 3, 7 };
+    const int heapValues[] = {9, 6, 8, 1, 4, 3, 7};
     IntArray values;
-    for (int i = 0; i < 7; i++) values.push(heapValues[i]);
+    for (int i = 0; i < 7; i++)
+    {
+        values.push(heapValues[i]);
+    }
     MaxHeap heap;
     heap.buildMaxHeap(values);
     int discarded = 0;
@@ -43,7 +46,8 @@ void runSerializerTests()
     MaxHeap heapCopy;
     testCheck(Serializer::deserializeHeap(heapText, heapCopy), "heap serializer restores active and sorted regions");
     testCheck(heapCopy.activeSize() == heap.activeSize() && heapCopy.totalSize() == heap.totalSize() &&
-              sameInts(heapCopy.array().data(), heap.array().data(), heap.totalSize()), "heap round trip preserves the full backing array");
+                  sameInts(heapCopy.array().data(), heap.array().data(), heap.totalSize()),
+              "heap round trip preserves the full backing array");
     testCheck(!Serializer::deserializeHeap("3 2 1 2", heapCopy), "heap deserializer rejects inconsistent sizes");
     testCheck(!Serializer::deserializeHeap("2 2 1 2", heapCopy) && heapCopy.array()[0] == heap.array()[0],
               "heap deserializer rejects invalid order without altering the loaded heap");

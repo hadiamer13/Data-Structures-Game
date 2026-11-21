@@ -20,12 +20,18 @@ bool TreeNodeLinks::attach(TreeNode* parent, TreeNode* child, int side)
     }
     if (side == Side::Left)
     {
-        if (parent->left != nullptr) return false;
+        if (parent->left != nullptr)
+        {
+            return false;
+        }
         parent->left = child;
     }
     else
     {
-        if (parent->right != nullptr) return false;
+        if (parent->right != nullptr)
+        {
+            return false;
+        }
         parent->right = child;
     }
     child->parent = parent;

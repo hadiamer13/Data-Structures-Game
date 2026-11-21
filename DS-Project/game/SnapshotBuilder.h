@@ -7,10 +7,9 @@
 #include "../model/AVLTree.h"
 #include "../model/MaxHeap.h"
 
-// Converts model-owned raw nodes to an id-indexed, read-only GUI snapshot.
 class SnapshotBuilder
 {
-public:
+  public:
     static ViewSnapshot fromBinaryTree(const BinaryTree& tree);
     static ViewSnapshot fromBST(const BST& tree);
     static ViewSnapshot fromAVL(const AVLTree& tree);

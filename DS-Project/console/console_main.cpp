@@ -7,7 +7,7 @@
 
 int main()
 {
-    const int values[] = { 8, 3, 10, 1, 6, 14, 4, 7, 13 };
+    const int values[] = {8, 3, 10, 1, 6, 14, 4, 7, 13};
     BST bst;
     AVLTree avl;
     for (int i = 0; i < 9; i++)

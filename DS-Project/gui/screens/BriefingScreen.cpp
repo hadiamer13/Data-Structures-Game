@@ -7,8 +7,8 @@
 #include <cstdio>
 
 void BriefingScreen::makeLabel(sf::Text& t, const sf::Font& font,
-    const char* str, unsigned size,
-    const sf::Color& col, float x, float y)
+                               const char* str, unsigned size,
+                               const sf::Color& col, float x, float y)
 
 {
     // check  if boss level
@@ -76,7 +76,7 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     const sf::Texture& bg = ctx.assets->campaignBackground();
     m_background.setTexture(bg);
     m_background.setScale(W / static_cast<float>(bg.getSize().x),
-        H / static_cast<float>(bg.getSize().y));
+                          H / static_cast<float>(bg.getSize().y));
     m_dim.setSize(sf::Vector2f(W, H));
     m_dim.setFillColor(sf::Color(0, 0, 0, 0));   // fades in inside update()
 
@@ -116,9 +116,9 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     // the model via LevelManager. Show it here once the session exists.
     makeLabel(m_ruleHead, font, "ALARM RULE", 18, Theme::NodeGlow, lx, py + 345.f);
     makeLabel(m_rule, font,
-        "Every room visited or key compared costs 1 alarm step.\n"
-        "When the alarm is full, the level is failed.",
-        18, Theme::TextColor, lx, py + 372.f);
+              "Every room visited or key compared costs 1 alarm step.\n"
+              "When the alarm is full, the level is failed.",
+              18, Theme::TextColor, lx, py + 372.f);
 
     makeLabel(m_bestLabel, font, "BEST", 18, Theme::NodeGlow, lx, py + 430.f);
     buildStars(lx + 110.f, py + 441.f);
@@ -126,12 +126,12 @@ BriefingScreen::BriefingScreen(AppContext& ctx) : m_ctx(ctx)
     // ---- Buttons -----------------------------------------------------------
     const float by = py + ph - 45.f;
     m_backBtn.init("Back", font, sf::Vector2f(W / 2.f - 180.f, by),
-        sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
+                   sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
     m_backBtn.setCallback(&BriefingScreen::onBackClick, this);
     m_backBtn.setFrame(&ctx.assets->buttonFrame());
 
     m_start.init("Start", font, sf::Vector2f(W / 2.f + 180.f, by),
-        sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
+                 sf::Vector2f(Theme::ButtonW * 0.8f, Theme::ButtonH));
     m_start.setCallback(&BriefingScreen::onStartClick, this);
     m_start.setFrame(&ctx.assets->buttonFrame());
 }
@@ -178,7 +178,7 @@ void BriefingScreen::update(float dt)
 
     if (m_fade < 1.f)
     {
-        m_fade += dt * 4.f;                 // ~0.25 s fade-in
+        m_fade += dt * 4.f; // ~0.25 s fade-in
         if (m_fade > 1.f)
         {
             m_fade = 1.f;

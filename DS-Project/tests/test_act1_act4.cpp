@@ -109,12 +109,14 @@ namespace
         if (bf > 1)
         {
             return AVLTree::balanceFactor(static_cast<const AVLNode*>(n->left)) >= 0
-                ? RotationType::LL : RotationType::LR;
+                       ? RotationType::LL
+                       : RotationType::LR;
         }
         if (bf < -1)
         {
             return AVLTree::balanceFactor(static_cast<const AVLNode*>(n->right)) <= 0
-                ? RotationType::RR : RotationType::RL;
+                       ? RotationType::RR
+                       : RotationType::RL;
         }
         return RotationType::None;
     }
@@ -247,7 +249,7 @@ namespace
             s.apply(makeAction(ActionKind::Place, rootValue, kNull, Side::None));
             const IntArray after = s.reconstructTokens();
             testCheck(after.size() == shelf.size() - 1 && after.indexOf(rootValue) == kNull,
-                "1.2 placed token leaves the shelf");
+                      "1.2 placed token leaves the shelf");
 
             GameSession fresh;
             testCheck(startCampaignLevel(fresh, 1, 1) && solveReconstruct(fresh), "1.2 tree rebuilt");
@@ -260,9 +262,9 @@ namespace
             const int height = s.binaryTree().height();
             const int diameter = s.binaryTree().diameter();
             testCheck(!s.apply(makeAction(ActionKind::SubmitSequence, height + 1, diameter)).accepted && playing(s),
-                "1.3 wrong height is rejected");
+                      "1.3 wrong height is rejected");
             testCheck(s.apply(makeAction(ActionKind::SubmitSequence, height, diameter)).accepted && won(s),
-                "1.3 height and diameter solved");
+                      "1.3 height and diameter solved");
         }
 
         // 1.4 lowest common ancestor of rooms n-1 and n/2.
@@ -274,7 +276,7 @@ namespace
             testCheck(common != kNull, "1.4 lca exists");
             const int wrongId = (common == 0) ? 1 : 0;
             testCheck(!s.apply(makeAction(ActionKind::ClickNode, wrongId)).accepted && playing(s),
-                "1.4 wrong room is rejected");
+                      "1.4 wrong room is rejected");
             testCheck(s.apply(makeAction(ActionKind::ClickNode, common)).accepted && won(s), "1.4 meeting room solved");
         }
 
@@ -330,7 +332,7 @@ namespace
             const ActionResult bad = s.apply(makeAction(ActionKind::Delete, target, kNull, wrong));
             testCheck(!bad.accepted && bad.hud.penalties == 10 && playing(s), "2.3 wrong delete case is rejected");
             testCheck(s.apply(makeAction(ActionKind::Delete, target, kNull, correct)).accepted && won(s),
-                "2.3 delete solved");
+                      "2.3 delete solved");
         }
 
         // 2.4 range raid: click every key in [lo, hi]. A key outside the range is a wrong click.
@@ -396,10 +398,10 @@ namespace
         const int correct = correctRotation(node);
         testCheck(correct != RotationType::None, "repair level has a correct rotation");
 
-        const int wrong = (correct == RotationType::LL) ? RotationType::RR
-            : (correct == RotationType::RR) ? RotationType::LL
-            : (correct == RotationType::LR) ? RotationType::RL
-            : RotationType::LR;
+        const int wrong = (correct == RotationType::LL)   ? RotationType::RR
+                          : (correct == RotationType::RR) ? RotationType::LL
+                          : (correct == RotationType::LR) ? RotationType::RL
+                                                          : RotationType::LR;
 
         const ActionResult bad = s.apply(makeAction(ActionKind::Rotate, pivot, wrong));
         testCheck(!bad.accepted && bad.hud.penalties == 50 && playing(s), "wrong rotation costs 50 points");
@@ -572,20 +574,20 @@ void runCampaignConstraintTests()
     {
         LevelDef def;
         testCheck(loadCampaignLevel(1, slot, def) && def.nodeCount >= 6 && def.nodeCount <= 15,
-            "act 1 level sizes are 6 to 15 rooms");
+                  "act 1 level sizes are 6 to 15 rooms");
     }
 
     // 4.4: the model's optimum must fit inside the operation limit.
     GameSession race;
     testCheck(startCampaignLevel(race, 4, 3), "4.4 starts for the constraint check");
     testCheck(race.opLimit() > 0 && race.hud().optimalSteps <= race.opLimit(),
-        "4.4 optimal steps fit inside the operation limit");
+              "4.4 optimal steps fit inside the operation limit");
 
     // Every Act 4 level must be a heap mission.
     for (int slot = 0; slot < 5; slot++)
     {
         LevelDef def;
         testCheck(loadCampaignLevel(4, slot, def) && GameSession::isHeapMission(def.mission),
-            "act 4 levels are heap missions");
+                  "act 4 levels are heap missions");
     }
 }

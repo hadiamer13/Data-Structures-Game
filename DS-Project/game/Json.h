@@ -16,11 +16,9 @@ namespace JsonType
     inline const int Object = 5;
 }
 
-// Concrete owning array used only by the small JSON tree. JsonValue owns each
-// child; the array owns only its pointer buffer.
 class JsonPtrArray
 {
-public:
+  public:
     JsonPtrArray();
     JsonPtrArray(const JsonPtrArray&) = delete;
     JsonPtrArray& operator=(const JsonPtrArray&) = delete;
@@ -32,7 +30,7 @@ public:
     void push(JsonValue* value);
     void clear();
 
-private:
+  private:
     void reserve(int capacity);
     JsonValue** m_data;
     int m_size;
@@ -41,7 +39,7 @@ private:
 
 class JsonValue
 {
-public:
+  public:
     explicit JsonValue(int type = JsonType::Null);
     JsonValue(const JsonValue&) = delete;
     JsonValue& operator=(const JsonValue&) = delete;
@@ -56,7 +54,7 @@ public:
     const JsonValue* get(const std::string& key) const;
     const std::string& keyAt(int index) const;
 
-private:
+  private:
     friend class JsonParser;
     friend class JsonParserState;
     int m_type;
@@ -79,7 +77,7 @@ struct JsonError
 
 class JsonDocument
 {
-public:
+  public:
     JsonDocument();
     JsonDocument(const JsonDocument&) = delete;
     JsonDocument& operator=(const JsonDocument&) = delete;
@@ -88,20 +86,20 @@ public:
     const JsonValue* root() const;
     void clear();
 
-private:
+  private:
     friend class JsonParser;
     JsonValue* m_root;
 };
 
 class JsonParser
 {
-public:
+  public:
     static bool parse(const std::string& text, JsonDocument& document, JsonError* error = nullptr);
 };
 
 class JsonWriter
 {
-public:
+  public:
     static std::string quote(const std::string& value);
 };
 

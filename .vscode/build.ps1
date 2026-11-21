@@ -56,6 +56,7 @@ $sourceFiles = @(
     'gui\widgets\EventLogPanel.cpp',
     'gui\widgets\Hud.cpp',
     'gui\widgets\LevelBanner.cpp',
+    'gui\widgets\NineSlice.cpp',
     'gui\widgets\NumberField.cpp',
     'gui\widgets\Toolbar.cpp',
     'gui\widgets\Tooltip.cpp'

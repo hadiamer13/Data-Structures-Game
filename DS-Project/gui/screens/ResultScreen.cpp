@@ -62,7 +62,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     m_panel.setPosition(px, py);
     m_panel.setFillColor(Theme::TooltipBg);
     m_panel.setOutlineColor(r.won ? Theme::StarOn : Theme::NodeLine);
-    m_panel.setOutlineThickness(r.won ? 6.f : 3.f);     // rang ke saath border bhi badalta hai
+    m_panel.setOutlineThickness(r.won ? 6.f : 3.f); // not colour alone
 
     // Status sirf rang se nahi, text se bhi dikhta hai.
     styleText(m_title, font, 44, r.won ? Theme::StarOn : Theme::TitleColor);
@@ -95,10 +95,7 @@ ResultScreen::ResultScreen(AppContext& ctx) : m_ctx(ctx)
     }
 
     styleText(m_stats, font, 26, Theme::TextColor);
-    m_stats.setString("Steps: " + std::to_string(r.alarm) + "   (optimal " + std::to_string(r.optimal) + ")"
-        + "\nPenalties: " + std::to_string(r.penalties)
-        + "\nScore: " + std::to_string(r.score)
-        + "\nStars: " + std::to_string(r.stars) + " / 3");
+    m_stats.setString("Steps: " + std::to_string(r.alarm) + "   (optimal " + std::to_string(r.optimal) + ")" + "\nPenalties: " + std::to_string(r.penalties) + "\nScore: " + std::to_string(r.score) + "\nStars: " + std::to_string(r.stars) + " / 3");
     m_stats.setLineSpacing(1.15f);
     centreAt(m_stats, cx, py + 270.f);
 
@@ -190,7 +187,7 @@ void ResultScreen::onNext()
 
 void ResultScreen::onCampaign()
 {
-    m_ctx.selectedLevel = m_ctx.result.levelIndex;     // Campaign map wahi level dikhayega
+    m_ctx.selectedLevel = m_ctx.result.levelIndex; // Campaign reopens on this level
     m_ctx.ui->requestScreen(ScreenId::Campaign);
 }
 
@@ -260,4 +257,5 @@ void ResultScreen::draw(sf::RenderWindow& window)
         m_next.draw(window);
     }
     m_campaign.draw(window);
+    
 }

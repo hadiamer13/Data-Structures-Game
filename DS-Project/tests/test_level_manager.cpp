@@ -79,7 +79,8 @@ void runLevelManagerTests()
     IntArray pre = tree.preorder();
     testCheck(LevelManager::traversalMatches(tree, 0, pre), "the exact preorder wins level 1.1");
     testCheck(!LevelManager::traversalMatches(tree, 1, pre) || tree.inorder().size() != pre.size() ||
-        tree.preorder().size() == 1, "a preorder answer does not satisfy an inorder question on this tree");
+                  tree.preorder().size() == 1,
+              "a preorder answer does not satisfy an inorder question on this tree");
     pre[0] = pre[1];
     testCheck(!LevelManager::traversalMatches(tree, 0, pre), "a wrong sequence fails");
 

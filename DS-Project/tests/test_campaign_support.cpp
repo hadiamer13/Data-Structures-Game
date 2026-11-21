@@ -19,7 +19,7 @@ void runCampaignSupportTests()
     std::string parsedString;
     const JsonValue* nested = document.root()->get("a");
     testCheck(nested != nullptr && nested->size() == 3 && nested->at(0)->asInteger(parsedInteger) && parsedInteger == 1 &&
-              nested->at(1)->asBoolean(parsedBoolean) && parsedBoolean && nested->at(2)->asString(parsedString) && parsedString == "ok\n",
+                  nested->at(1)->asBoolean(parsedBoolean) && parsedBoolean && nested->at(2)->asString(parsedString) && parsedString == "ok\n",
               "JSON values retain their parsed types");
     testCheck(!JsonParser::parse("{\"a\":1,\"a\":2}", document, &jsonError) && jsonError.position > 0,
               "JSON parser reports duplicate keys with a position");
@@ -32,7 +32,10 @@ void runCampaignSupportTests()
         const std::string path = std::string("DS-Project/levels/act") + static_cast<char>('0' + act) + ".json";
         LevelDefArray actLevels;
         loadedAllActs = loadedAllActs && LevelLoader::loadFile(path, actLevels, &error) && actLevels.size() == 5;
-        if (actLevels.size() > 0) loadedAllActs = loadedAllActs && actLevels[0].act == act && actLevels[0].index == 1;
+        if (actLevels.size() > 0)
+        {
+            loadedAllActs = loadedAllActs && actLevels[0].act == act && actLevels[0].index == 1;
+        }
     }
     testCheck(loadedAllActs, "all four shipped campaign files load five levels");
 
@@ -45,7 +48,7 @@ void runCampaignSupportTests()
     const bool binaryGenerated = LevelGenerator::generateBinaryTree(generated, binaryA) &&
                                  LevelGenerator::generateBinaryTree(generated, binaryB);
     testCheck(binaryGenerated && Validator::validateBinaryTree(binaryA) && Validator::validateBinaryTree(binaryB) &&
-              binaryA.nodeCount() == 15 && binaryB.nodeCount() == 15,
+                  binaryA.nodeCount() == 15 && binaryB.nodeCount() == 15,
               "seeded binary generation creates valid repeatable-size trees");
 
     LevelDef showcase;
@@ -53,15 +56,17 @@ void runCampaignSupportTests()
     AVLTree avl;
     EventLog rotationLog;
     const bool showcaseGenerated = LevelGenerator::generateAVLRotationShowcase(showcase, avl, &rotationLog);
-    int rotations[4] = { 0, 0, 0, 0 };
+    int rotations[4] = {0, 0, 0, 0};
     for (int i = 0; i < rotationLog.size(); i++)
     {
         const Event& event = rotationLog.at(i);
         if (event.type == EventType::ROTATE && event.result >= RotationType::LL && event.result <= RotationType::RL)
+        {
             rotations[event.result]++;
+        }
     }
     testCheck(showcaseGenerated && avl.isBalanced() && rotations[RotationType::LL] >= 2 &&
-              rotations[RotationType::RR] >= 2 && rotations[RotationType::LR] >= 2 && rotations[RotationType::RL] >= 2,
+                  rotations[RotationType::RR] >= 2 && rotations[RotationType::LR] >= 2 && rotations[RotationType::RL] >= 2,
               "AVL showcase emits each rotation pattern twice");
 
     SaveData saveData;
@@ -78,7 +83,10 @@ void runCampaignSupportTests()
 
     Leaderboard leaderboard;
     bool added = true;
-    for (int i = 0; i < 12; i++) added = added && leaderboard.add(std::string("Player") + static_cast<char>('A' + i), i * 100);
+    for (int i = 0; i < 12; i++)
+    {
+        added = added && leaderboard.add(std::string("Player") + static_cast<char>('A' + i), i * 100);
+    }
     const char* leaderboardPath = "DS-Project/tests/.phase78-leaderboard-test.json";
     Leaderboard loadedLeaderboard;
     const bool leaderboardRoundTrip = added && leaderboard.size() == Leaderboard::Capacity &&

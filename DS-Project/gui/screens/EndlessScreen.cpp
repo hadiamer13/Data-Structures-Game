@@ -40,7 +40,7 @@ namespace
     }
 
     void setText(sf::Text& text, const sf::Font& font, unsigned size,
-        const sf::Color& color, float x, float y)
+                 const sf::Color& color, float x, float y)
     {
         text.setFont(font);
         text.setCharacterSize(size);
@@ -80,9 +80,9 @@ EndlessScreen::EndlessScreen(AppContext& ctx)
     setText(m_hint, font, 14, Theme::TextColor, 52.f, 375.f);
 
     m_keyField.init("KEY", font, 76.f, 445.f, 280.f, 44.f);
-    const int operations[3] = { SandboxOp::Insert, SandboxOp::Search, SandboxOp::Delete };
-    const char* labels[3] = { "Insert", "Search", "Delete" };
-    const float centres[3] = { 108.f, 242.f, 376.f };
+    const int operations[3] = {SandboxOp::Insert, SandboxOp::Search, SandboxOp::Delete};
+    const char* labels[3] = {"Insert", "Search", "Delete"};
+    const float centres[3] = {108.f, 242.f, 376.f};
     for (int i = 0; i < 3; ++i)
     {
         m_actionContexts[i].owner = this;
@@ -105,7 +105,10 @@ bool EndlessScreen::containsKey(int key) const
 {
     for (int i = 0; i < m_keys.size(); ++i)
     {
-        if (m_keys[i] == key) return true;
+        if (m_keys[i] == key)
+        {
+            return true;
+        }
     }
     return false;
 }
@@ -117,7 +120,10 @@ void EndlessScreen::removeKey(int key)
     {
         if (m_keys[i] == key)
         {
-            for (int j = i; j + 1 < m_keys.size(); ++j) m_keys[j] = m_keys[j + 1];
+            for (int j = i; j + 1 < m_keys.size(); ++j)
+            {
+                m_keys[j] = m_keys[j + 1];
+            }
             m_keys.pop();
             return;
         }
@@ -129,12 +135,18 @@ void EndlessScreen::startRound()
 {
     m_random = m_random * 1664525u + 1013904223u;
     int operation = static_cast<int>((m_random >> 16) % 3u);
-    if (m_keys.empty()) operation = SandboxOp::Insert;
+    if (m_keys.empty())
+    {
+        operation = SandboxOp::Insert;
+    }
     m_expectedOperation = operation;
     if (operation == SandboxOp::Insert)
     {
         int candidate = 10 + static_cast<int>((m_random >> 5) % 90u);
-        while (containsKey(candidate)) candidate = candidate == 99 ? 10 : candidate + 1;
+        while (containsKey(candidate))
+        {
+            candidate = candidate == 99 ? 10 : candidate + 1;
+        }
         m_expectedKey = candidate;
         m_prompt.setString("Insert a new key\nChoose the key yourself.");
     }
@@ -151,7 +163,10 @@ void EndlessScreen::startRound()
 // Player ka action check karta hai. Galat ho to time kat jaata hai, sahi ho to score aur time milta hai.
 void EndlessScreen::applyAction(int operation)
 {
-    if (m_gameOver) return;
+    if (m_gameOver)
+    {
+        return;
+    }
     if (!m_keyField.hasValue())
     {
         m_feedback = "Pehle key type karo.";
@@ -166,7 +181,10 @@ void EndlessScreen::applyAction(int operation)
         m_seconds -= static_cast<float>(penalty);
         m_feedback = "Galat move. " + std::to_string(penalty) + " seconds gaye.";
         m_keyField.clear();
-        if (m_seconds <= 0.f) finishGame();
+        if (m_seconds <= 0.f)
+        {
+            finishGame();
+        }
         return;
     }
 
@@ -179,12 +197,21 @@ void EndlessScreen::applyAction(int operation)
             "Rejected. " + std::to_string(penalty) + " seconds gaye." :
             wrapText(result.message, 36);
         m_keyField.clear();
-        if (m_seconds <= 0.f) finishGame();
+        if (m_seconds <= 0.f)
+        {
+            finishGame();
+        }
         return;
     }
 
-    if (operation == SandboxOp::Insert) m_keys.push(key);
-    else if (operation == SandboxOp::Delete) removeKey(key);
+    if (operation == SandboxOp::Insert)
+    {
+        m_keys.push(key);
+    }
+    else if (operation == SandboxOp::Delete)
+    {
+        removeKey(key);
+    }
     m_score += 100;
     m_seconds += 2.f;
     if (m_seconds > 90.f) m_seconds = 90.f;
@@ -196,7 +223,10 @@ void EndlessScreen::applyAction(int operation)
 // Game khatam hone par score leaderboard file mein ek hi dafa save hota hai.
 void EndlessScreen::finishGame()
 {
-    if (m_gameOver) return;
+    if (m_gameOver)
+    {
+        return;
+    }
     m_gameOver = true;
     m_seconds = 0.f;
     m_feedback = "Vault sealed. Final score: " + std::to_string(m_score);
@@ -246,10 +276,16 @@ void EndlessScreen::handleEvent(const sf::Event& event)
     if (!m_gameOver)
     {
         m_keyField.handleEvent(event);
-        for (int i = 0; i < 3; ++i) m_actions[i].handleEvent(event);
+        for (int i = 0; i < 3; ++i)
+        {
+            m_actions[i].handleEvent(event);
+        }
     }
     m_home.handleEvent(event);
-    if (m_gameOver) m_restart.handleEvent(event);
+    if (m_gameOver)
+    {
+        m_restart.handleEvent(event);
+    }
 }
 
 //  update
@@ -259,20 +295,32 @@ void EndlessScreen::update(float dt)
     if (!m_gameOver)
     {
         m_seconds -= dt;
-        if (m_seconds <= 0.f) finishGame();
+        if (m_seconds <= 0.f)
+        {
+            finishGame();
+        }
         m_renderer.update(dt);
         m_keyField.update(dt);
-        for (int i = 0; i < 3; ++i) m_actions[i].update(dt);
+        for (int i = 0; i < 3; ++i)
+        {
+            m_actions[i].update(dt);
+        }
     }
     m_home.update(dt);
-    if (m_gameOver) m_restart.update(dt);
+    if (m_gameOver)
+    {
+        m_restart.update(dt);
+    }
     const std::string scoreLabel = "SCORE  " + std::to_string(m_score);
     if (m_scoreText.getString().toAnsiString() != scoreLabel)
     {
         m_scoreText.setString(scoreLabel);
     }
     int seconds = static_cast<int>(m_seconds + 0.99f);
-    if (seconds < 0) seconds = 0;
+    if (seconds < 0)
+    {
+        seconds = 0;
+    }
     const std::string timerLabel = "TIME  " + std::to_string(seconds) + "s";
     if (m_timerText.getString().toAnsiString() != timerLabel)
     {
@@ -309,8 +357,14 @@ void EndlessScreen::draw(sf::RenderWindow& window)
     timerTrack.setFillColor(sf::Color(65, 40, 45));
     window.draw(timerTrack);
     float timerProgress = m_seconds / 60.f;
-    if (timerProgress < 0.f) timerProgress = 0.f;
-    if (timerProgress > 1.f) timerProgress = 1.f;
+    if (timerProgress < 0.f)
+    {
+        timerProgress = 0.f;
+    }
+    if (timerProgress > 1.f)
+    {
+        timerProgress = 1.f;
+    }
     sf::RectangleShape timerFill(sf::Vector2f(350.f * timerProgress, 9.f));
     timerFill.setPosition(64.f, 177.f);
     timerFill.setFillColor(m_seconds <= 10.f ? Theme::NodeGlow : Theme::StarOn);
@@ -324,7 +378,10 @@ void EndlessScreen::draw(sf::RenderWindow& window)
     if (!m_gameOver)
     {
         m_keyField.draw(window);
-        for (int i = 0; i < 3; ++i) m_actions[i].draw(window);
+        for (int i = 0; i < 3; ++i)
+        {
+            m_actions[i].draw(window);
+        }
     }
     else
     {

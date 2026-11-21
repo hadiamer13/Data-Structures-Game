@@ -3,7 +3,8 @@
 #include "Theme.h"
 #include <cstdio>
 
-namespace {
+namespace
+{
 
     // Aik texture load karta hai, scaling ke liye smooth karta hai, aur failure par path print karta hai.
     bool loadTexture(sf::Texture& tex, const char* path) {
@@ -15,9 +16,10 @@ namespace {
         return true;
     }
 
-}  // namespace
+} // namespace
 
-bool Assets::loadAll() {
+bool Assets::loadAll()
+{
     bool ok = true;
 
     // Zaroori assets: in ke bina game nahi chal sakti.
