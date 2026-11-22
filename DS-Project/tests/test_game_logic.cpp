@@ -58,6 +58,8 @@ void runGameSessionTests()
 
     LevelDef sandbox;
     sandbox.objective = "Practice";
+    sandbox.treeKind = TreeKind::BST;
+    sandbox.mission = MissionKind::Endless;   // no mission rules, so every BST action is allowed
     sandbox.preorder = "8 4 # # 12 # #";
     testCheck(session.startLevel(sandbox), "GameSession can restart a level");
     testCheck(session.apply(action(ActionKind::Insert, 6)).accepted && session.canUndo(), "insert records an undo snapshot");
