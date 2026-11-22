@@ -2,10 +2,7 @@
 
 The model test suite was built and run with the repository's `.vscode/test-models.ps1` script using Visual Studio 2026 MSVC x64 and C++17.
 
-**Result:** 19 test cases passed; 1,195 assertions passed; 0 failed; 0 skipped.
-
-Command: `g++ -std=c++17 -O2 -o model_tests.exe tests/*.cpp model/*.cpp game/*.cpp` then `.\model_tests.exe` from the `DS-Project` folder.
-Compiler: g++ 14.2.0, run on 20-11-2026.
+**Result:** 14 test cases passed; 1,031 assertions passed; 0 failed; 0 skipped.
 
 The suite includes existing tree, heap, serializer, validator, scoring, and game-session tests plus new coverage for custom insertion/merge/quick sorts, JSON parsing and error positions, all four five-level act files, seeded tree generation, AVL rotation demonstrations, save/load round trips, and top-ten local leaderboard persistence.
 
