@@ -292,6 +292,8 @@ void LevelScreen::buildActionButtons()
     float w = 205.f;
     float step = 215.f;
     float x0 = 410.f;
+    unsigned textSize = Theme::ButtonTextSize;
+    float pad = 12.f;
     m_actCount = 0;
 
     if (m_mode == InputMode::Key)
@@ -302,6 +304,10 @@ void LevelScreen::buildActionButtons()
             labels[1] = "Delete: one child";
             labels[2] = "Delete: two children";
             m_actCount = 3;
+            w = 150.f;       // narrower minimum width
+            x0 = 280.f;      // start after the KEY field and "Target" label
+            textSize = 16;   // smaller label so "two children" fits
+            pad = 8.f;
         }
         else if (mission == MissionKind::BstInsert)
         {
@@ -379,7 +385,8 @@ void LevelScreen::buildActionButtons()
     for (int i = 0; i < m_actCount; ++i)
     {
         m_act[i].init(labels[i], font, sf::Vector2f(0.f, barY + 34.f), sf::Vector2f(w, Theme::ButtonH));
-        m_act[i].setPadding(12.f);
+        m_act[i].setPadding(pad);
+        m_act[i].setTextSize(textSize);
         m_act[i].setCallback(&LevelScreen::onActionClick, &m_actCtx[i]);
         m_act[i].setFrame(&m_ctx.assets->buttonFrame());
         const float bw = m_act[i].width();
