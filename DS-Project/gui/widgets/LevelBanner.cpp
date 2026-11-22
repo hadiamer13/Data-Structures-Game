@@ -21,6 +21,11 @@ namespace
                          mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
     }
 
+    float maxF(float a, float b)
+    {
+        return a > b ? a : b;
+    }
+
     void centerOrigin(sf::Text& t) 
     {
         sf::FloatRect b = t.getLocalBounds();

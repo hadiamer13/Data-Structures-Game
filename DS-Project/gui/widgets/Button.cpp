@@ -23,6 +23,11 @@ namespace
                          mixChannel(a.b, b.b, t), mixChannel(a.a, b.a, t));
     }
 
+    float maxF(float a, float b)
+    {
+        return a > b ? a : b;
+    }
+
 } // namespace
 
 // Button ko shuru karta hai: position, size, font aur label set karta hai.
