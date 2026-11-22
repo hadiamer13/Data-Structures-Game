@@ -29,7 +29,7 @@ void runCampaignSupportTests()
     bool loadedAllActs = true;
     for (int act = 1; act <= 4; act++)
     {
-        const std::string path = std::string("DS-Project/levels/act") + static_cast<char>('0' + act) + ".json";
+        const std::string path = std::string("levels/act") + static_cast<char>('0' + act) + ".json";
         LevelDefArray actLevels;
         loadedAllActs = loadedAllActs && LevelLoader::loadFile(path, actLevels, &error) && actLevels.size() == 5;
         if (actLevels.size() > 0)
@@ -73,7 +73,7 @@ void runCampaignSupportTests()
     saveData.stars[0] = 3;
     saveData.endlessSeed = 84;
     saveData.bestScore = 1200;
-    const char* savePath = "DS-Project/tests/.phase78-save-test.json";
+    const char* savePath = "tests/.phase78-save-test.json";
     SaveData roundTrip;
     const bool saveRoundTrip = SaveManager::save(savePath, saveData, &error) &&
                                SaveManager::load(savePath, roundTrip, &error) &&
@@ -87,7 +87,7 @@ void runCampaignSupportTests()
     {
         added = added && leaderboard.add(std::string("Player") + static_cast<char>('A' + i), i * 100);
     }
-    const char* leaderboardPath = "DS-Project/tests/.phase78-leaderboard-test.json";
+    const char* leaderboardPath = "tests/.phase78-leaderboard-test.json";
     Leaderboard loadedLeaderboard;
     const bool leaderboardRoundTrip = added && leaderboard.size() == Leaderboard::Capacity &&
                                       leaderboard.save(leaderboardPath, &error) &&

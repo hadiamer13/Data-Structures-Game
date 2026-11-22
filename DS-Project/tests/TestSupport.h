@@ -3,10 +3,15 @@
 
 #include "../third_party/doctest/doctest.h"
 
-inline void testCheck(bool condition, const char* message)
-{
-    CHECK_MESSAGE(condition, message);
-}
+// Evaluate the condition into a plain bool first. doctest then receives a single
+// bool, so it never sees the && or || operators it forbids.
+// Macro, not a function, so the failure line points at the test that failed.
+#define testCheck(condition, message)                              \
+    do                                                             \
+    {                                                              \
+        const bool testCheckValue = static_cast<bool>(condition);  \
+        CHECK_MESSAGE(testCheckValue, message);                    \
+    } while (false)
 
 inline bool sameInts(const int* left, const int* right, int count)
 {

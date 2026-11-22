@@ -257,11 +257,7 @@ void BST::rangeRec(BSTNode* node, int low, int high, IntArray& out, EventLog* lo
     visit.alarmCost = 1;
     emit(log, visit);
 
-    if (node->key >= low && node->key <= high)
-    {
-        out.push(node->key);
-    }
-
+    // Left subtree first, so keys come out in ascending order.
     if (node->key > low)
     {
         rangeRec(static_cast<BSTNode*>(node->left), low, high, out, log);
@@ -271,6 +267,12 @@ void BST::rangeRec(BSTNode* node, int low, int high, IntArray& out, EventLog* lo
         emitSkipped(static_cast<BSTNode*>(node->left), log);
     }
 
+    if (node->key >= low && node->key <= high)
+    {
+        out.push(node->key);
+    }
+
+    // Right subtree last.
     if (node->key < high)
     {
         rangeRec(static_cast<BSTNode*>(node->right), low, high, out, log);

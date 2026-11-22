@@ -26,7 +26,7 @@ namespace
     {
         LevelDefArray defs;
         std::string error;
-        const std::string path = std::string("DS-Project/levels/act") + static_cast<char>('0' + act) + ".json";
+        const std::string path = std::string("levels/act") + static_cast<char>('0' + act) + ".json";
         if (!LevelLoader::loadFile(path, defs, &error) || defs.size() != 5)
         {
             return false;
